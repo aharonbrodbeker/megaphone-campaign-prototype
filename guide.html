@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Megaphone · Simple mode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #f7f6f3; --card: #fff; --ink: #1c1c1a; --muted: #6b6a66; --line: #e7e5df;
+    --accent: #1f7a5a; --accent-soft: #e8f3ee; --warn: #b4540a; --warn-soft: #fdf1e6;
+    --bad: #b42323; --bad-soft: #fbeaea; --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { font-family: Inter, system-ui, sans-serif; background: var(--bg); color: var(--ink); font-size: 16px; line-height: 1.5; }
+  button, input, textarea, select { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  a { color: var(--accent); }
+
+  .top { position: sticky; top: 0; z-index: 10; background: rgba(247,246,243,.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  .top-in { max-width: 760px; margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; gap: 12px; }
+  .brand { font-weight: 700; font-size: 17px; text-decoration: none; color: var(--ink); display: flex; align-items: center; gap: 8px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); }
+  .dot.off { background: var(--bad); }
+  .top .grow { flex: 1; }
+  .status { font-size: 14px; color: var(--muted); }
+
+  main { max-width: 760px; margin: 0 auto; padding: 24px 20px 80px; }
+
+  .btn { border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 10px 16px; font-weight: 500; }
+  .btn:hover { border-color: #cfccc4; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { background: #196549; }
+  .btn.danger { color: var(--bad); }
+  .btn.solid-danger { background: var(--bad); border-color: var(--bad); color: #fff; }
+  .btn.small { padding: 6px 12px; font-size: 14px; }
+  .btn.big { padding: 14px 22px; font-size: 17px; }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .link { background: none; border: 0; padding: 0; color: var(--accent); font-weight: 500; }
+
+  h1 { font-size: 30px; line-height: 1.2; margin: 0 0 8px; letter-spacing: -.01em; }
+  h2 { font-size: 20px; margin: 0 0 4px; }
+  h3 { font-size: 16px; margin: 0 0 8px; }
+  .lead { color: var(--muted); font-size: 17px; margin: 0 0 24px; }
+  .muted { color: var(--muted); }
+  .small { font-size: 14px; }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+  .stack > * + * { margin-top: 12px; }
+  .row { display: flex; align-items: center; gap: 12px; }
+  .row.wrap { flex-wrap: wrap; }
+  .spread { justify-content: space-between; }
+
+  /* Home tiles */
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 620px) { .tiles { grid-template-columns: 1fr; } h1 { font-size: 26px; } }
+  .tile { text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 18px 16px; display: flex; flex-direction: column; gap: 4px; min-height: 112px; }
+  .tile:hover { border-color: var(--accent); box-shadow: 0 2px 10px rgba(31,122,90,.08); }
+  .tile .num { font-size: 13px; color: var(--muted); font-weight: 600; }
+  .tile .t { font-size: 18px; font-weight: 600; }
+  .tile .d { color: var(--muted); font-size: 14px; }
+  .tile.hot { border-color: var(--warn); background: var(--warn-soft); }
+  .badge { display: inline-block; font-size: 13px; font-weight: 600; padding: 2px 9px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+  .badge.warn { background: var(--warn-soft); color: var(--warn); }
+  .badge.bad { background: var(--bad-soft); color: var(--bad); }
+  .badge.grey { background: #efeee9; color: var(--muted); }
+
+  /* Screen header */
+  .back { margin-bottom: 16px; display: inline-block; }
+  .hint { background: var(--accent-soft); color: #164f3b; border-radius: 10px; padding: 10px 14px; font-size: 15px; margin: -8px 0 20px; }
+  .hint b { font-weight: 600; }
+
+  /* Tour bar */
+  .tour { background: var(--ink); color: #fff; }
+  .tour-in { max-width: 760px; margin: 0 auto; padding: 10px 20px; display: flex; align-items: center; gap: 12px; font-size: 15px; }
+  .tour .grow { flex: 1; }
+  .tour .btn { background: transparent; color: #fff; border-color: #4a4a46; }
+  .tour .btn.primary { background: #fff; color: var(--ink); border-color: #fff; }
+  .steps { display: flex; gap: 4px; }
+  .steps i { width: 18px; height: 4px; border-radius: 2px; background: #4a4a46; }
+  .steps i.on { background: #fff; }
+
+  .paused-banner { background: var(--bad-soft); color: var(--bad); border-bottom: 1px solid #f1cfcf; }
+  .paused-banner .tour-in { color: var(--bad); }
+
+  /* Approvals */
+  .counter { font-size: 14px; color: var(--muted); font-weight: 500; }
+  .preview { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; background: #fcfcfb; white-space: pre-wrap; font-size: 15px; }
+  .preview .subj { font-weight: 600; margin-bottom: 8px; white-space: normal; }
+  .kv { display: grid; grid-template-columns: 130px 1fr; gap: 6px 12px; font-size: 15px; }
+  .kv dt { color: var(--muted); }
+  .kv dd { margin: 0; }
+  .actions-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+  textarea, input[type=text] { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: #fff; }
+  textarea:focus, input[type=text]:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 110px; }
+  .mono { font-family: ui-monospace, Consolas, monospace; font-size: 13.5px; }
+
+  /* Lists */
+  .list { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .item { border-top: 1px solid var(--line); }
+  .item:first-child { border-top: 0; }
+  .item-head { width: 100%; text-align: left; background: none; border: 0; padding: 14px 16px; display: flex; gap: 12px; align-items: center; }
+  .item-head:hover { background: #fbfaf8; }
+  .item-head .time { color: var(--muted); font-size: 14px; width: 48px; flex: none; }
+  .item-head .ttl { flex: 1; }
+  .item-body { padding: 0 16px 16px 76px; font-size: 15px; }
+  @media (max-width: 620px) { .item-body { padding-left: 16px; } }
+  .item.new { animation: flash 2.5s ease-out; }
+  @keyframes flash { from { background: var(--accent-soft); } to { background: transparent; } }
+
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .chip { border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 6px 14px; font-size: 14px; }
+  .chip.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  /* Permissions */
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .seg button { border: 0; background: #fff; padding: 8px 12px; font-size: 14px; border-left: 1px solid var(--line); }
+  .seg button:first-child { border-left: 0; }
+  .seg button.on { background: var(--accent); color: #fff; }
+  .seg button.on.off { background: var(--muted); }
+  .stepper { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+  .stepper button { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--line); background: #fff; }
+
+  .bar { height: 10px; background: #efeee9; border-radius: 999px; overflow: hidden; }
+  .bar > i { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+  .big-num { font-size: 32px; font-weight: 700; letter-spacing: -.01em; }
+
+  .toggle { position: relative; width: 44px; height: 26px; border-radius: 999px; background: #d9d7d0; border: 0; flex: none; transition: background .15s; }
+  .toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: left .15s; }
+  .toggle.on { background: var(--accent); }
+  .toggle.on::after { left: 21px; }
+
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+
+  /* Calls */
+  .chat { display: flex; flex-direction: column; gap: 8px; }
+  .msg { max-width: 85%; padding: 9px 13px; border-radius: 14px; font-size: 15px; }
+  .msg.bot { background: var(--accent-soft); align-self: flex-start; border-bottom-left-radius: 4px; }
+  .msg.human { background: #efeee9; align-self: flex-end; border-bottom-right-radius: 4px; }
+  .msg small { display: block; font-size: 12px; color: var(--muted); margin-bottom: 2px; }
+
+  /* Public preview */
+  .frame { border: 1px dashed #cfccc4; border-radius: var(--radius); padding: 24px; background: #fff; }
+  .stats3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 18px 0; }
+  .stats3 div { background: var(--bg); border-radius: 10px; padding: 12px; }
+  .stats3 b { display: block; font-size: 22px; }
+  .post { border-top: 1px solid var(--line); padding: 14px 0; white-space: pre-wrap; font-size: 15px; }
+  .src { display: inline-block; font-size: 12px; background: var(--accent-soft); color: var(--accent); padding: 0 7px; border-radius: 6px; font-weight: 500; }
+  .answer { background: var(--accent-soft); border-radius: 12px; padding: 14px 16px; margin-top: 12px; }
+
+  /* Modal + toast */
+  .modal-bg { position: fixed; inset: 0; background: rgba(28,28,26,.35); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 50; }
+  .modal { background: #fff; border-radius: var(--radius); padding: 24px; max-width: 440px; width: 100%; }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 10px; font-size: 15px; z-index: 60; opacity: 0; transition: opacity .2s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+
+  .foot { text-align: center; margin-top: 40px; font-size: 14px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div id="tourbar"></div>
+<div id="pausebar"></div>
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="#home"><span class="dot" id="dot"></span>Megaphone</a>
+    <span class="status" id="statusText"></span>
+    <span class="grow"></span>
+    <button class="btn small" id="pauseBtn"></button>
+  </div>
+</header>
+<main id="main"></main>
+<div class="toast" id="toast"></div>
+<div id="modal"></div>
+
+<script src="data.js"></script>
+<script>
+(function () {
+  const D = window.DATA;
+  const clone = (o) => JSON.parse(JSON.stringify(o));
+
+  const S = {
+    paused: false,
+    tour: null,
+    approvals: clone(D.approvals),
+    decisions: [],
+    actions: clone(D.actions),
+    tools: clone(D.tools),
+    store: clone(D.store),
+    brain: clone(D.brain),
+    budget: clone(D.budget),
+    cardFrozen: false,
+    filter: 'all',
+    open: null,
+    callOpen: null,
+    apMode: null,
+    draft: null,
+    liveIdx: 0,
+    answer: null,
+  };
+
+  const SCREENS = [
+    { id: 'approve', title: 'Approve what the agent wants to do', desc: 'Sensitive actions wait here until a person says yes.', hint: 'Approve the newsletter, then reject the ₪350 boost and give a reason.' },
+    { id: 'activity', title: 'See everything it did today', desc: 'Every action, why it did it, and what happened.', hint: 'Tap the red “Stopped by a rule” item to see why the agent was stopped.' },
+    { id: 'instructions', title: 'Tell it how to behave', desc: 'Its instructions, key messages and the things it must never do.', hint: 'Add a new “never do” rule and press Save.' },
+    { id: 'permissions', title: 'Choose what it is allowed to do', desc: 'For each tool: do it alone, ask first, or off.', hint: 'Switch Email from “Ask me first” to “Do it alone”.' },
+    { id: 'money', title: 'Money', desc: 'Budget, the agent\u2019s virtual card and spending rules.', hint: 'Drag the auto-pay limit and see how the rules change.' },
+    { id: 'calls', title: 'Phone calls', desc: 'Who it called, what was said, how it ended.', hint: 'Open Dana\u2019s call and read how the agent introduces itself.' },
+    { id: 'public', title: 'What the public sees', desc: 'The public page, and people can ask the agent questions.', hint: 'Ask the agent: “what did you do today?”' },
+  ];
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const ils = (n) => '₪' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 });
+  const withSrc = (s) => esc(s).replace(/\[\[src:(.+?)\]\]/g, '<span class="src">$1</span>');
+  const nowTime = () => new Date().toTimeString().slice(0, 5);
+  const toolName = (id) => (S.tools.find((t) => t.id === id) || {}).name || id;
+
+  const STATUS = {
+    executed: ['Done', 'grey'],
+    pending: ['Waiting for you', 'warn'],
+    blocked: ['Stopped by a rule', 'bad'],
+    rejected: ['Rejected by team', 'grey'],
+    failed: ['Failed', 'bad'],
+  };
+  const MODE = { auto: 'Do it alone', approval: 'Ask me first', off: 'Off' };
+
+  let toastTimer;
+  function toast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  function route() { return (location.hash.slice(1) || 'home').split('/')[0]; }
+  function go(r) { location.hash = r; }
+
+  function pendingCount() { return S.approvals.length; }
+
+  // ---------- chrome ----------
+  function renderChrome() {
+    $('dot').className = 'dot' + (S.paused ? ' off' : '');
+    $('statusText').textContent = S.paused ? 'Paused' : 'Working · day ' + D.campaign.day;
+    const pb = $('pauseBtn');
+    pb.textContent = S.paused ? 'Resume agent' : 'Pause agent';
+    pb.className = 'btn small' + (S.paused ? ' primary' : ' danger');
+
+    $('pausebar').innerHTML = S.paused
+      ? `<div class="paused-banner"><div class="tour-in"><b>The agent is paused.</b><span class="grow"></span>Nothing is posted, sent, called or paid.</div></div>`
+      : '';
+
+    if (S.tour === null) { $('tourbar').innerHTML = ''; return; }
+    const i = S.tour;
+    const sc = SCREENS[i];
+    $('tourbar').innerHTML = `
+      <div class="tour"><div class="tour-in">
+        <span>Tour · step ${i + 1} of ${SCREENS.length}</span>
+        <span class="steps">${SCREENS.map((_, k) => `<i class="${k <= i ? 'on' : ''}"></i>`).join('')}</span>
+        <span class="grow"></span>
+        <button class="btn small" data-tour="prev" ${i === 0 ? 'disabled' : ''}>Back</button>
+        <button class="btn small primary" data-tour="next">${i === SCREENS.length - 1 ? 'Finish' : 'Next'}</button>
+        <button class="btn small" data-tour="end">Exit</button>
+      </div></div>`;
+  }
+
+  function header(id) {
+    const sc = SCREENS.find((s) => s.id === id);
+    return `
+      ${S.tour === null ? '<button class="link back" data-go="home">← All sections</button>' : ''}
+      <h1>${esc(sc.title)}</h1>
+      <p class="lead">${esc(sc.desc)}</p>
+      <div class="hint"><b>Try this:</b> ${esc(sc.hint)}</div>`;
+  }
+
+  // ---------- home ----------
+  function home() {
+    const n = pendingCount();
+    const sub = {
+      approve: n ? `${n} waiting for you` : 'Nothing waiting',
+      activity: `${S.actions.length} actions today`,
+      instructions: `Version ${S.brain.version}`,
+      permissions: `${S.tools.length} tools connected`,
+      money: `${ils(S.budget.monthlySpent)} of ${ils(S.budget.monthlyCap)} this month`,
+      calls: `${D.stats.calls.toLocaleString()} calls so far`,
+      public: 'Preview the public page',
+    };
+    return `
+      <h1>What do you want to do?</h1>
+      <p class="lead">Megaphone is an AI agent running the “${esc(D.campaign.name)}” campaign. You decide what it can do.</p>
+      <div class="row wrap" style="margin-bottom:24px">
+        <button class="btn primary big" data-tour="start">Show me around (2 min)</button>
+        ${n ? `<button class="btn big" data-go="approve">${n} things need your OK</button>` : ''}
+      </div>
+      <div class="tiles">
+        ${SCREENS.map((s, i) => `
+          <button class="tile ${s.id === 'approve' && n ? 'hot' : ''}" data-go="${s.id}">
+            <span class="num">${i + 1}</span>
+            <span class="t">${esc(s.title)}</span>
+            <span class="d">${esc(sub[s.id])}</span>
+          </button>`).join('')}
+      </div>
+      <p class="foot">Prototype · nothing here is real or saved · <a href="index.html">Full version</a></p>`;
+  }
+
+  // ---------- approvals ----------
+  function previewHTML(p, editable) {
+    const pv = p.preview;
+    if (editable) {
+      return `<textarea id="draft" rows="8">${esc(S.draft)}</textarea>`;
+    }
+    if (pv.type === 'email') return `<div class="preview"><div class="subj">Subject: ${esc(pv.subject)}</div>${esc(pv.body)}</div>`;
+    if (pv.type === 'tweet') return `<div class="preview">${withSrc(pv.text)}</div>`;
+    if (pv.type === 'call') return `<div class="preview">${esc(pv.script)}</div>`;
+    if (pv.type === 'payment') return `<div class="preview"><div class="subj">Pay ${ils(pv.amount)} to ${esc(pv.vendor)}</div>For ${esc(pv.duration)} · ${esc(pv.target)}</div>`;
+    return '';
+  }
+  const draftKey = (pv) => (pv.type === 'email' ? 'body' : pv.type === 'tweet' ? 'text' : pv.type === 'call' ? 'script' : null);
+
+  function approve() {
+    let html = header('approve');
+    if (!S.approvals.length) {
+      html += `<div class="card"><h2>All clear</h2><p class="muted" style="margin:4px 0 0">Nothing is waiting for you. The agent keeps working on everything else.</p></div>`;
+    } else {
+      const p = S.approvals[0];
+      const risk = p.blocked ? ['Stopped by a rule', 'bad'] : p.risk === 'Medium' ? ['Medium risk', 'warn'] : p.risk === 'High' ? ['High risk', 'bad'] : ['Low risk', 'grey'];
+      const editing = S.apMode === 'edit';
+      const rejecting = S.apMode === 'reject';
+      html += `
+        <div class="row spread" style="margin-bottom:10px"><span class="counter">1 of ${S.approvals.length} waiting</span></div>
+        <div class="card stack">
+          <div class="row wrap"><span class="badge">${esc(toolName(p.tool))}</span><span class="badge ${risk[1]}">${risk[0]}</span></div>
+          <h2>${esc(p.title)}</h2>
+          <dl class="kv">
+            <dt>Why it's here</dt><dd>${esc(p.why)}</dd>
+            <dt>Agent's reason</dt><dd>${esc(p.reasoning)}</dd>
+            <dt>Goes to</dt><dd>${esc(p.audience)}</dd>
+            <dt>Cost</dt><dd>${ils(p.cost)}</dd>
+          </dl>
+          <h3 style="margin-top:16px">${editing ? 'Edit it' : 'What will go out'}</h3>
+          ${previewHTML(p, editing)}
+          ${rejecting ? `
+            <div class="stack" style="margin-top:14px">
+              <label class="small muted" for="reason">Why not? The agent learns from this.</label>
+              <input type="text" id="reason" placeholder="e.g. Too expensive right now" />
+              <label class="row small"><input type="checkbox" id="asRule" /> Make this a permanent rule</label>
+            </div>` : ''}
+          <div class="actions-bar">
+            ${p.blocked ? (rejecting ? `
+                <button class="btn solid-danger" data-ap="confirm-reject">Discard it</button>
+                <button class="btn" data-ap="cancel">Cancel</button>` : `
+                <button class="btn primary" data-ap="fix">Ask agent to fix it</button>
+                <button class="btn danger" data-ap="reject">Discard</button>`)
+              : editing ? `
+                <button class="btn primary" data-ap="save-approve">Save and approve</button>
+                <button class="btn" data-ap="cancel">Cancel</button>`
+              : rejecting ? `
+                <button class="btn solid-danger" data-ap="confirm-reject">Reject</button>
+                <button class="btn" data-ap="cancel">Cancel</button>` : `
+                <button class="btn primary" data-ap="approve">Approve</button>
+                ${draftKey(p.preview) ? '<button class="btn" data-ap="edit">Edit first</button>' : ''}
+                <button class="btn danger" data-ap="reject">Reject</button>`}
+          </div>
+        </div>`;
+    }
+    if (S.decisions.length) {
+      html += `<h3 style="margin-top:28px">You decided</h3><div class="list">${S.decisions.map((d) => `
+        <div class="item"><div class="item-head"><span class="ttl">${esc(d.title)}</span><span class="badge ${d.cls}">${esc(d.label)}</span></div></div>`).join('')}</div>`;
+    }
+    return html;
+  }
+
+  function decide(kind) {
+    const p = S.approvals[0];
+    if (!p) return;
+    const act = S.actions.find((a) => a.id === p.actionId);
+    if (kind === 'approve' || kind === 'save-approve') {
+      if (kind === 'save-approve') {
+        const k = draftKey(p.preview);
+        if (k) p.preview[k] = $('draft').value;
+      }
+      if (act) { act.status = 'executed'; act.approvedBy = 'You'; act.output = 'Approved by you. Done.'; }
+      else S.actions.unshift({ id: p.actionId, time: nowTime(), tool: p.tool, title: p.title, status: 'executed', policy: 'approval', approvedBy: 'You', cost: p.cost, reasoning: p.reasoning, output: 'Approved by you. Done.' });
+      if (p.tool === 'ads' || p.tool === 'payments') {
+        S.budget.monthlySpent += p.cost; S.budget.dailySpent += p.cost;
+        const e = S.budget.expenses.find((x) => x.status === 'pending' && x.amount === p.cost);
+        if (e) e.status = 'approved';
+      }
+      S.decisions.unshift({ title: p.title, label: kind === 'save-approve' ? 'Edited + approved' : 'Approved', cls: '' });
+      toast('Approved. The agent will do it now.');
+    } else if (kind === 'fix') {
+      if (act) { act.output = 'Sent back: find a primary source or rephrase as a question.'; }
+      S.decisions.unshift({ title: p.title, label: 'Sent back to fix', cls: 'warn' });
+      toast('Sent back. The agent will rewrite it with a source.');
+    } else if (kind === 'confirm-reject') {
+      const reason = ($('reason') && $('reason').value.trim()) || 'No reason given';
+      if ($('asRule') && $('asRule').checked) { S.brain.redLines.push(reason); toast('Rejected, and added as a permanent rule.'); }
+      else toast('Rejected. The agent won\u2019t do it.');
+      if (act) { act.status = 'rejected'; act.rejectedBy = 'You'; act.output = 'Rejected by you: “' + reason + '”'; }
+      const e = S.budget.expenses.find((x) => x.status === 'pending' && x.amount === p.cost);
+      if (e) e.status = 'rejected';
+      S.decisions.unshift({ title: p.title, label: 'Rejected', cls: 'bad' });
+    }
+    S.approvals.shift();
+    S.apMode = null; S.draft = null;
+    render();
+  }
+
+  // ---------- activity ----------
+  function activity() {
+    const F = [['all', 'Everything'], ['pending', 'Waiting for you'], ['blocked', 'Stopped'], ['executed', 'Done']];
+    const list = S.actions.filter((a) => S.filter === 'all' || a.status === S.filter || (S.filter === 'blocked' && a.status === 'failed'));
+    return header('activity') + `
+      <div class="filters">${F.map(([k, l]) => `<button class="chip ${S.filter === k ? 'on' : ''}" data-filter="${k}">${l}</button>`).join('')}</div>
+      <div class="list">${list.length ? list.map((a) => {
+        const st = STATUS[a.status] || ['', 'grey'];
+        const open = S.open === a.id;
+        return `<div class="item ${a._new ? 'new' : ''}">
+          <button class="item-head" data-open="${a.id}">
+            <span class="time">${esc(a.time)}</span>
+            <span class="ttl">${esc(a.title)}<br><span class="small muted">${esc(toolName(a.tool))}</span></span>
+            <span class="badge ${st[1]}">${st[0]}</span>
+          </button>
+          ${open ? `<div class="item-body stack">
+            <dl class="kv">
+              <dt>Why</dt><dd>${esc(a.reasoning)}</dd>
+              <dt>Result</dt><dd>${esc(a.output)}</dd>
+              <dt>Cost</dt><dd>${ils(a.cost)}</dd>
+              ${a.approvedBy ? `<dt>Approved by</dt><dd>${esc(a.approvedBy)}</dd>` : ''}
+              ${a.rejectedBy ? `<dt>Rejected by</dt><dd>${esc(a.rejectedBy)}</dd>` : ''}
+            </dl>
+            ${a.status === 'pending' ? '<button class="btn small primary" data-go="approve">Go approve it</button>' : ''}
+          </div>` : ''}
+        </div>`;
+      }).join('') : '<div class="item"><div class="item-head muted">Nothing here.</div></div>'}</div>`;
+  }
+
+  // ---------- instructions ----------
+  function instructions() {
+    const b = S.brain;
+    const listBlock = (key, title, sub, ph) => `
+      <div class="card stack">
+        <div><h2>${title}</h2><p class="muted small" style="margin:0">${sub}</p></div>
+        <div class="list">${b[key].map((m, i) => `
+          <div class="item"><div class="item-head"><span class="ttl">${esc(m)}</span><button class="link small" data-del="${key}:${i}">Remove</button></div></div>`).join('')}</div>
+        <div class="row"><input type="text" id="add-${key}" placeholder="${ph}" /><button class="btn" data-add="${key}">Add</button></div>
+      </div>`;
+    return header('instructions') + `
+      <div class="stack">
+        ${listBlock('redLines', 'Never do', 'Hard rules. If the agent tries, it gets stopped.', 'e.g. Never mention family members')}
+        ${listBlock('messages', 'Key messages', 'What the agent keeps coming back to.', 'e.g. Transparency protects workers')}
+        <div class="card stack">
+          <div class="row spread"><h2>Full instructions</h2><span class="badge grey">Version ${b.version}</span></div>
+          <p class="muted small" style="margin:0">The text the agent reads before every task.</p>
+          <textarea id="prompt" class="mono" rows="12">${esc(b.systemPrompt)}</textarea>
+        </div>
+        <div class="row"><button class="btn primary big" data-save-brain>Save as version ${b.version + 1}</button></div>
+        <div class="card stack">
+          <h2>History</h2>
+          ${b.versions.map((v) => `<div class="row small"><span class="badge grey">v${v.v}</span><span class="muted">${esc(v.when)} · ${esc(v.by)}</span><span>${esc(v.note)}</span></div>`).join('')}
+        </div>
+      </div>`;
+  }
+
+  // ---------- permissions ----------
+  function permissions() {
+    return header('permissions') + `
+      <div class="list">${S.tools.map((t) => `
+        <div class="item"><div class="item-head" style="flex-wrap:wrap;cursor:default">
+          <span class="ttl"><b>${esc(t.name)}</b><br><span class="small muted">${esc(t.desc)}</span></span>
+          <span class="stack" style="text-align:right">
+            <span class="seg">${['auto', 'approval', 'off'].map((m) => `<button class="${t.mode === m ? 'on' + (m === 'off' ? ' off' : '') : ''}" data-mode="${t.id}:${m}">${MODE[m]}</button>`).join('')}</span>
+            <span class="stepper" style="display:flex;justify-content:flex-end">Limit
+              <button data-quota="${t.id}:-">−</button><b>${t.quota}</b><button data-quota="${t.id}:+">+</button>
+              <span class="muted">${esc(t.unit)}</span></span>
+          </span>
+        </div></div>`).join('')}</div>
+      <h3 style="margin-top:28px">Add a tool</h3>
+      <div class="list">${S.store.map((t) => `
+        <div class="item"><div class="item-head" style="cursor:default">
+          <span class="ttl"><b>${esc(t.name)}</b><br><span class="small muted">${esc(t.desc)}</span></span>
+          <button class="btn small" data-connect="${t.id}">Connect</button>
+        </div></div>`).join('')}</div>`;
+  }
+
+  // ---------- money ----------
+  function money() {
+    const B = S.budget;
+    const pct = (a, b) => Math.min(100, Math.round((a / b) * 100));
+    const ST = { auto: ['Paid automatically', 'grey'], approved: ['Approved', ''], pending: ['Waiting for you', 'warn'], rejected: ['Rejected', 'bad'] };
+    return header('money') + `
+      <div class="stack">
+        <div class="card stack">
+          <div class="row spread"><span class="muted">Spent this month</span><span class="muted small">of ${ils(B.monthlyCap)}</span></div>
+          <div class="big-num">${ils(B.monthlySpent)}</div>
+          <div class="bar"><i style="width:${pct(B.monthlySpent, B.monthlyCap)}%"></i></div>
+          <div class="row spread small"><span class="muted">Today: ${ils(B.dailySpent)} of ${ils(B.dailyCap)}</span><span class="muted">${ils(B.monthlyCap - B.monthlySpent)} left</span></div>
+        </div>
+        <div class="card stack">
+          <div class="row spread">
+            <div><h2>The agent's card</h2><p class="muted small" style="margin:0">VISA •••• ${B.card.last4} · the agent never sees the number</p></div>
+            <button class="btn ${S.cardFrozen ? 'primary' : 'danger'}" data-freeze>${S.cardFrozen ? 'Unfreeze card' : 'Freeze card'}</button>
+          </div>
+          ${S.cardFrozen ? '<p class="badge bad" style="margin:0">Frozen. No payments can go through.</p>' : ''}
+        </div>
+        <div class="card stack">
+          <h2 id="limitTitle">Pays alone up to ${ils(B.autoLimit)}</h2>
+          <p class="muted small" style="margin:0">Above this, it has to ask you.</p>
+          <input type="range" min="0" max="500" step="10" value="${B.autoLimit}" data-limit />
+          <div class="list">${B.rules.map((r) => `
+            <div class="item"><div class="item-head" style="cursor:default">
+              <span class="ttl" data-ruletext="${r.id}">${esc(r.text.replace(/\{auto\}/g, B.autoLimit))}</span>
+              <button class="toggle ${r.on ? 'on' : ''}" data-rule="${r.id}" aria-label="toggle"></button>
+            </div></div>`).join('')}</div>
+        </div>
+        <h3 style="margin-top:12px">Recent payments</h3>
+        <div class="list">${B.expenses.map((e) => {
+          const s = ST[e.status];
+          return `<div class="item"><div class="item-head" style="cursor:default">
+            <span class="ttl">${esc(e.vendor)} · ${ils(e.amount)}<br><span class="small muted">${esc(e.desc)} · ${esc(e.time)}</span></span>
+            ${e.status === 'pending' ? '<button class="btn small primary" data-go="approve">Review</button>' : `<span class="badge ${s[1]}">${s[0]}</span>`}
+          </div></div>`;
+        }).join('')}</div>
+      </div>`;
+  }
+
+  // ---------- calls ----------
+  function calls() {
+    const OUT = { supporter: ['Supporter', ''], opposed: ['Not interested', 'bad'], neutral: ['Undecided', 'warn'], 'no-answer': ['No answer', 'grey'] };
+    const fmtDur = (s) => (s ? Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0') : '—');
+    return header('calls') + `
+      <div class="card row spread" style="margin-bottom:14px">
+        <span>The agent only calls people who asked, and always says it's an AI.</span>
+        <button class="btn primary small" data-newcalls>Plan a call round</button>
+      </div>
+      <div class="list">${D.calls.map((c) => {
+        const o = OUT[c.outcome];
+        const open = S.callOpen === c.id;
+        return `<div class="item">
+          <button class="item-head" data-call="${c.id}">
+            <span class="time">${esc(c.time)}</span>
+            <span class="ttl"><b>${esc(c.name)}</b> <span class="muted small">· ${fmtDur(c.duration)}</span><br><span class="small muted">${esc(c.summary)}</span></span>
+            <span class="badge ${o[1]}">${o[0]}</span>
+          </button>
+          ${open ? `<div class="item-body">
+            ${c.transcript.length ? `<div class="chat">${c.transcript.map((m) => `<div class="msg ${m.who}"><small>${m.who === 'bot' ? 'Agent' : esc(c.name)}</small>${esc(m.text)}</div>`).join('')}</div>` : '<p class="muted">No conversation. Nobody answered.</p>'}
+          </div>` : ''}
+        </div>`;
+      }).join('')}</div>`;
+  }
+
+  // ---------- public ----------
+  function publicView() {
+    const st = D.stats;
+    return header('public') + `
+      <div class="frame">
+        <p class="small muted" style="margin:0 0 6px">${esc(D.campaign.name)}</p>
+        <h1 style="font-size:26px">${esc(D.campaign.slogan)}</h1>
+        <p class="muted" style="margin:0">Run by an AI agent, supervised by people. Every action is public.</p>
+        <div class="stats3">
+          <div><b>${st.supporters.toLocaleString()}</b><span class="small muted">supporters</span></div>
+          <div><b>${(st.reach / 1e6).toFixed(1)}M</b><span class="small muted">people reached</span></div>
+          <div><b>${st.actionsToday}</b><span class="small muted">actions today</span></div>
+        </div>
+        <h3>Ask the agent</h3>
+        <div class="row"><input type="text" id="ask" placeholder="e.g. What did you do today?" /><button class="btn primary" data-ask>Ask</button></div>
+        ${S.answer ? `<div class="answer">${esc(S.answer)}</div>` : ''}
+        <h3 style="margin-top:24px">Latest posts</h3>
+        ${D.feed.filter((f) => f.type === 'tweet').map((f) => `<div class="post">${withSrc(f.text)}<div class="small muted" style="margin-top:6px">${esc(f.time)} · ${f.likes.toLocaleString()} likes · ${esc(f.views)} views</div></div>`).join('')}
+      </div>`;
+  }
+
+  function askAgent(q) {
+    const s = q.toLowerCase();
+    let best = null, score = 0;
+    D.qa.forEach((e) => {
+      const n = e.keys.filter((k) => s.includes(k)).length;
+      if (n > score) { score = n; best = e; }
+    });
+    S.answer = best ? best.answer : 'Good question. I don\u2019t have a short answer for that yet, so I\u2019ve passed it to the human team. You can see everything I did today in the activity list.';
+    render();
+  }
+
+  // ---------- live simulation ----------
+  setInterval(() => {
+    if (S.paused || S.tour !== null) return;
+    const ev = D.liveEvents[S.liveIdx++ % D.liveEvents.length];
+    const id = 'A-' + (1100 + S.liveIdx);
+    S.actions.forEach((a) => (a._new = false));
+    S.actions.unshift({ ...clone(ev), id, time: nowTime(), _new: true });
+    if (ev.status === 'pending') {
+      S.approvals.push({ id: 'P-' + id, actionId: id, tool: ev.tool, title: ev.title, why: 'Email always requires approval', risk: 'Low', cost: ev.cost, audience: '3 journalists from the press list', reasoning: ev.reasoning,
+        preview: { type: 'email', subject: 'Research summary: union financial transparency', body: 'Hi,\n\nAs requested, attached is our 6-page summary. Every claim links to a public source.\n\n— Transparent Histadrut (sent by Megaphone, our AI agent)' } });
+    }
+    const r = route();
+    if (r === 'activity' || r === 'home') {
+      const typing = document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName);
+      if (!typing) render();
+    }
+  }, 30000);
+
+  // ---------- render + events ----------
+  const VIEWS = { home, approve, activity, instructions, permissions, money, calls, public: publicView };
+
+  function render() {
+    const r = route();
+    const view = VIEWS[r] || home;
+    $('main').innerHTML = view();
+    renderChrome();
+  }
+
+  function modal(html) { $('modal').innerHTML = html ? `<div class="modal-bg" data-close><div class="modal">${html}</div></div>` : ''; }
+
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('button, [data-close]');
+    if (!t) return;
+    const d = t.dataset;
+
+    if ('close' in d) { if (t.tagName === 'BUTTON' || e.target === t) modal(''); return; }
+    if (d.go) { if (S.tour !== null && d.go === 'home') S.tour = null; return go(d.go); }
+
+    if (d.tour === 'start') { S.tour = 0; return go(SCREENS[0].id); }
+    if (d.tour === 'next') {
+      if (S.tour >= SCREENS.length - 1) { S.tour = null; toast('That\u2019s everything. Pick any section to try it again.'); return go('home'); }
+      S.tour++; return go(SCREENS[S.tour].id);
+    }
+    if (d.tour === 'prev') { S.tour = Math.max(0, S.tour - 1); return go(SCREENS[S.tour].id); }
+    if (d.tour === 'end') { S.tour = null; return go('home'); }
+
+    if (t.id === 'pauseBtn') {
+      if (S.paused) { S.paused = false; toast('Agent resumed.'); return render(); }
+      return modal(`<h2>Pause the agent?</h2><p class="muted">It stops posting, emailing, calling and paying right away, until you resume.</p>
+        <div class="actions-bar"><button class="btn solid-danger" data-confirm-pause>Pause everything</button><button class="btn" data-close>Cancel</button></div>`);
+    }
+    if ('confirmPause' in d) { S.paused = true; modal(''); toast('Agent paused.'); return render(); }
+
+    if (d.ap) {
+      if (d.ap === 'edit') { const p = S.approvals[0]; S.apMode = 'edit'; S.draft = p.preview[draftKey(p.preview)]; return render(); }
+      if (d.ap === 'reject') { S.apMode = 'reject'; render(); const r = $('reason'); if (r) r.focus(); return; }
+      if (d.ap === 'cancel') { S.apMode = null; S.draft = null; return render(); }
+      return decide(d.ap);
+    }
+
+    if (d.filter) { S.filter = d.filter; S.open = null; return render(); }
+    if (d.open) { S.open = S.open === d.open ? null : d.open; return render(); }
+
+    if (d.add) {
+      const inp = $('add-' + d.add);
+      const v = inp.value.trim();
+      if (!v) return inp.focus();
+      S.brain[d.add].push(v); S.brainDirty = true; render();
+      return toast('Added. Press Save to make it live.');
+    }
+    if (d.del) { const [k, i] = d.del.split(':'); S.brain[k].splice(+i, 1); return render(); }
+    if ('saveBrain' in d) {
+      S.brain.systemPrompt = $('prompt').value;
+      S.brain.version++;
+      S.brain.versions.unshift({ v: S.brain.version, by: 'You', when: 'Just now', note: 'Updated from Simple mode' });
+      toast('Saved. The agent uses version ' + S.brain.version + ' from now on.');
+      return render();
+    }
+
+    if (d.mode) {
+      const [id, m] = d.mode.split(':');
+      const tool = S.tools.find((x) => x.id === id);
+      tool.mode = m;
+      toast(`${tool.name}: ${MODE[m]}`);
+      return render();
+    }
+    if (d.quota) {
+      const [id, dir] = d.quota.split(':');
+      const tool = S.tools.find((x) => x.id === id);
+      const step = tool.quota >= 100 ? 10 : 1;
+      tool.quota = Math.max(0, tool.quota + (dir === '+' ? step : -step));
+      return render();
+    }
+    if (d.connect) {
+      const i = S.store.findIndex((x) => x.id === d.connect);
+      const s = S.store.splice(i, 1)[0];
+      S.tools.push({ id: s.id, name: s.name, mode: 'approval', quota: 10, used: 0, unit: 'actions / day', desc: s.desc });
+      toast(s.name + ' connected. It will ask you first.');
+      return render();
+    }
+
+    if ('freeze' in d) { S.cardFrozen = !S.cardFrozen; toast(S.cardFrozen ? 'Card frozen.' : 'Card active again.'); return render(); }
+    if (d.rule) { const r = S.budget.rules.find((x) => x.id === d.rule); r.on = !r.on; return render(); }
+
+    if (d.call) { S.callOpen = S.callOpen === d.call ? null : d.call; return render(); }
+    if ('newcalls' in d) {
+      S.approvals.push({ id: 'P-new' + Date.now(), actionId: 'A-call-' + Date.now(), tool: 'calls', title: 'Call round · 40 new sign-ups', why: 'Calls require approval', risk: 'Low', cost: 48, audience: '40 people who asked to be called',
+        reasoning: 'Welcome new sign-ups and invite them to Thursday\u2019s Zoom. Calling window 18:00-20:30 only.',
+        preview: { type: 'call', script: 'Hi {name}, this is Megaphone, an AI assistant calling for the Transparent Histadrut campaign. You signed up and asked for a call. Is now a good time?' } });
+      toast('Planned. It\u2019s waiting for your approval.');
+      return render();
+    }
+
+    if ('ask' in d) { const v = $('ask').value.trim(); if (v) askAgent(v); }
+  });
+
+  document.addEventListener('input', (e) => {
+    if (e.target.matches('[data-limit]')) {
+      S.budget.autoLimit = +e.target.value;
+      $('limitTitle').textContent = 'Pays alone up to ' + ils(S.budget.autoLimit);
+      document.querySelectorAll('[data-ruletext]').forEach((el) => {
+        const r = S.budget.rules.find((x) => x.id === el.dataset.ruletext);
+        el.textContent = r.text.replace(/\{auto\}/g, S.budget.autoLimit);
+      });
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return;
+    if (e.target.id === 'ask') { const v = e.target.value.trim(); if (v) askAgent(v); }
+    if (e.target.id && e.target.id.startsWith('add-')) document.querySelector(`[data-add="${e.target.id.slice(4)}"]`).click();
+    if (e.target.id === 'reason') document.querySelector('[data-ap="confirm-reject"]').click();
+  });
+
+  window.addEventListener('hashchange', () => {
+    const r = route();
+    const i = SCREENS.findIndex((s) => s.id === r);
+    if (S.tour !== null && i >= 0) S.tour = i;
+    S.apMode = null;
+    render();
+    window.scrollTo(0, 0);
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

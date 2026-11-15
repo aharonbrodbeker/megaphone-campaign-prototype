@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Megaphone · Campaign Agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Instrument Sans', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            white: '#221c18',
+            slate: { 100: '#2a231f', 200: '#2f2824', 300: '#4a413b', 400: '#6b625b', 500: '#8a7f77', 600: '#a39890', 700: '#d9cfc7', 800: '#ece4dd', 900: '#f6f0eb' },
+            ink: { 950: '#fdf7f4', 900: '#fbf3ef', 850: '#ffffff', 800: '#ffffff', 700: '#f5ece6', 600: '#ebe0d9' },
+            neon: { green: '#2f7d57', amber: '#b26a12', red: '#c8323f', cyan: '#b4432f', violet: '#6d5bb5' },
+          },
+        },
+      },
+    };
+  </script>
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="clean.css" />
+</head>
+<body class="bg-ink-950 text-slate-200 font-sans antialiased">
+  <div id="admin-shell" class="relative flex min-h-screen">
+    <aside id="sidebar" class="sidebar w-64 shrink-0 flex-col border-e border-white/5 bg-ink-900 h-screen">
+      <div class="p-5 flex items-center gap-3 border-b border-white/5">
+        <div class="logo-mark"><i data-lucide="megaphone" class="w-5 h-5"></i></div>
+        <div>
+          <div class="font-bold text-white leading-tight tracking-tight">Megaphone</div>
+          <div class="text-[11px] text-slate-500">Transparent Histadrut</div>
+        </div>
+      </div>
+      <nav id="nav" class="flex-1 p-3 space-y-1 overflow-y-auto"></nav>
+      <div class="p-4 border-t border-white/5">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full grid place-items-center font-semibold text-sm avatar">YC</div>
+          <div class="text-sm">
+            <div class="text-white font-medium">Yoav Cohen</div>
+            <div class="text-[11px] text-slate-500">Campaign manager · full access</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="flex-1 min-w-0 flex flex-col">
+      <div class="concept-bar">Interactive prototype · simulated activity and numbers · nothing is sent, called or paid · <a href="index.html">dark version</a></div>
+      <header id="topbar" class="sticky top-0 z-30 border-b border-white/5">
+        <div class="flex items-center gap-4 px-6 h-16">
+          <button id="mobile-nav-btn" class="lg:hidden btn-ghost"><i data-lucide="menu" class="w-5 h-5"></i></button>
+          <div id="agent-pill"></div>
+          <div class="hidden md:flex items-center gap-2 text-xs text-slate-500 font-mono" id="clock"></div>
+          <div class="flex-1"></div>
+          <a href="#/public" class="btn-ghost text-sm"><i data-lucide="globe" class="w-4 h-4"></i><span class="hidden sm:inline">Public page</span></a>
+          <button id="kill-btn" class="kill-btn" data-act="kill"><i data-lucide="octagon-x" class="w-4 h-4"></i><span>Stop everything</span></button>
+        </div>
+      </header>
+      <main id="view" class="flex-1 relative"></main>
+    </div>
+  </div>
+
+  <div id="drawer-root"></div>
+  <div id="modal-root"></div>
+  <div id="toasts" class="fixed bottom-5 right-5 z-[70] flex flex-col gap-2 w-80"></div>
+
+  <script src="data.js"></script>
+  <script>
+    (function () {
+      var c = { 'Paid promotion': '#b4432f', 'Voice calls': '#2f7d57', 'Software': '#b26a12', 'Model usage (Claude)': '#6d5bb5' };
+      DATA.budget.byCategory.forEach(function (x) { if (c[x.label]) x.color = c[x.label]; });
+    })();
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>
