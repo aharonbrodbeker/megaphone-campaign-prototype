@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transparent Histadrut · Calm</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f6f5f2;
+      --ink: #1a1a1a;
+      --muted: #6b6b6b;
+      --line: #e4e2dc;
+      --card: #ffffff;
+      --accent: #0f6b5c;
+      --accent-soft: #e6f3f0;
+      --warn: #8a5a00;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: 'IBM Plex Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .wrap {
+      width: min(560px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 2rem 0 6rem;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3.5rem;
+      font-size: 0.875rem;
+      color: var(--muted);
+    }
+    header strong { color: var(--ink); font-weight: 600; }
+
+    .live {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .live::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    h1 {
+      font-size: clamp(2rem, 6vw, 2.75rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      margin: 0 0 1rem;
+    }
+    .lede {
+      font-size: 1.05rem;
+      color: var(--muted);
+      margin: 0 0 1.75rem;
+      max-width: 36ch;
+    }
+
+    .cta {
+      display: inline-block;
+      background: var(--ink);
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.85rem 1.25rem;
+      border-radius: 0.5rem;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .cta:hover { opacity: 0.9; text-decoration: none; color: #fff; }
+    .cta-ghost {
+      display: inline-block;
+      margin-left: 0.75rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .now {
+      margin: 3rem 0 0;
+      padding: 1.1rem 1.2rem;
+      background: var(--accent-soft);
+      border-radius: 0.75rem;
+      font-size: 0.95rem;
+    }
+    .now label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.35rem;
+    }
+
+    section { margin-top: 3.25rem; }
+    section h2 {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0 0 1rem;
+      padding-bottom: 0.65rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .item {
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .item:last-child { border-bottom: none; }
+    .item .meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 0.3rem;
+    }
+    .item p {
+      margin: 0;
+      font-size: 0.98rem;
+      color: var(--ink);
+    }
+    .item button {
+      margin-top: 0.45rem;
+      background: none;
+      border: none;
+      padding: 0;
+      color: var(--accent);
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .ask {
+      position: sticky;
+      bottom: 0;
+      background: linear-gradient(transparent, var(--bg) 28%);
+      padding: 1.5rem 0 1.25rem;
+      margin-top: 2rem;
+    }
+    .ask-box {
+      display: flex;
+      gap: 0.5rem;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 0.75rem;
+      padding: 0.4rem;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+    }
+    .ask-box input {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 0.7rem 0.85rem;
+      font: inherit;
+      font-size: 0.95rem;
+      background: transparent;
+      color: var(--ink);
+    }
+    .ask-box button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.7rem 1rem;
+      font: inherit;
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .answer {
+      margin-top: 0.85rem;
+      padding: 0.9rem 1rem;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 0.65rem;
+      font-size: 0.92rem;
+      color: var(--ink);
+      display: none;
+    }
+    .answer.show { display: block; }
+    .answer .cite {
+      margin-top: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .detail {
+      display: none;
+      margin-top: 0.6rem;
+      padding: 0.75rem 0.9rem;
+      background: #f0efe9;
+      border-radius: 0.5rem;
+      font-size: 0.85rem;
+      color: #444;
+    }
+    .detail.open { display: block; }
+
+    footer {
+      margin-top: 3rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div><strong>Transparent Histadrut</strong> · Megaphone</div>
+      <a href="./index.html">Full version</a>
+    </header>
+
+    <p class="live">Agent is working</p>
+    <h1>Your dues.<br>Your right to know.</h1>
+    <p class="lede">An AI agent runs this campaign in public. One action at a time. Everything logged.</p>
+    <a class="cta" href="#join">Join</a>
+    <a class="cta-ghost" href="#ask">Ask what it did</a>
+
+    <div class="now">
+      <label>Right now</label>
+      Comparing morning vs afternoon posts for this audience.
+    </div>
+
+    <section>
+      <h2>Latest</h2>
+      <div class="item">
+        <div class="meta">Today · 12:47 · Post</div>
+        <p>Published a thread: 5 questions every member should ask about their dues.</p>
+        <button type="button" data-more="m1">Why</button>
+        <div class="detail" id="m1">Questions get more replies than claims. Every fact links to a source.</div>
+      </div>
+      <div class="item">
+        <div class="meta">Today · 12:40 · Calls</div>
+        <p>Called 32 new volunteers who asked to be contacted. 14 joined Thursday’s Zoom.</p>
+        <button type="button" data-more="m2">Why</button>
+        <div class="detail" id="m2">Only people who opted in. The agent always says it is an AI.</div>
+      </div>
+      <div class="item">
+        <div class="meta">Today · 12:31 · Blocked</div>
+        <p>Stopped a reply that used a number with no verified source.</p>
+        <button type="button" data-more="m3">Why</button>
+        <div class="detail" id="m3">Policy rule: no unsourced factual claims. Safer to ask a question instead.</div>
+      </div>
+      <div class="item">
+        <div class="meta">Waiting · Email</div>
+        <p>Weekly newsletter to 18,340 subscribers — needs a human OK first.</p>
+      </div>
+    </section>
+
+    <div class="ask" id="ask">
+      <form class="ask-box" id="ask-form">
+        <input id="q" type="text" placeholder="Ask one thing…" autocomplete="off" />
+        <button type="submit">Ask</button>
+      </form>
+      <div class="answer" id="answer"></div>
+    </div>
+
+    <footer id="join">
+      Megaphone is a bot. Managers supervise big actions.<br>
+      Prefer denser screens? Open the <a href="./index.html">full version</a>.
+    </footer>
+  </div>
+
+  <script>
+    document.querySelectorAll('[data-more]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const el = document.getElementById(btn.dataset.more);
+        const open = el.classList.toggle('open');
+        btn.textContent = open ? 'Hide' : 'Why';
+      });
+    });
+
+    const answers = [
+      { keys: ['tweet', 'post', 'thread', 'x'], text: 'At 12:47 it posted a 5-question thread about dues. Early engagement is strong.', cite: 'Action A-1087' },
+      { keys: ['call', 'phone', 'volunteer'], text: 'It called 32 opt-in volunteers. 14 said yes to Thursday’s Zoom. 2 asked to be removed and were.', cite: 'Action A-1086' },
+      { keys: ['block', 'source', 'policy'], text: 'It tried a reply with an unsourced percentage. PolicyEngine blocked it.', cite: 'Action A-1085' },
+      { keys: ['email', 'newsletter'], text: 'A weekly email to 18,340 subscribers is waiting for manager approval.', cite: 'Action A-1084' },
+      { keys: ['who', 'bot', 'what'], text: 'I’m Megaphone, the campaign’s AI agent. I research, post, email opt-ins, and call people who asked — all logged.', cite: 'Identity' },
+    ];
+
+    document.getElementById('ask-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const q = document.getElementById('q').value.trim();
+      if (!q) return;
+      const hit = answers.find(a => a.keys.some(k => q.toLowerCase().includes(k)));
+      const box = document.getElementById('answer');
+      const text = hit
+        ? hit.text
+        : 'Try asking about the post, the calls, the blocked reply, or the newsletter.';
+      const cite = hit ? hit.cite : 'Tip';
+      box.innerHTML = text + '<div class="cite">' + cite + '</div>';
+      box.classList.add('show');
+      document.getElementById('q').value = '';
+    });
+  </script>
+</body>
+</html>
