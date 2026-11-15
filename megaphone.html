@@ -662,13 +662,70 @@ body { min-height: 100vh; }
   .hide-mobile { display: none !important; }
 }
 
-  </style>
+.login-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(ellipse 50% 40% at 20% 20%, rgba(155,123,255,0.18), transparent 55%),
+    radial-gradient(ellipse 45% 35% at 80% 70%, rgba(46,230,255,0.12), transparent 50%),
+    #05070a;
+}
+.login-gate.hidden { display: none; }
+.login-card {
+  width: min(380px, 100%);
+  padding: 1.75rem;
+  border-radius: 1.25rem;
+  background: rgba(15,20,28,0.92);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.55);
+  backdrop-filter: blur(16px);
+}
+.login-input {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border-radius: 0.65rem;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 0.9rem;
+  outline: none;
+}
+.login-input:focus { border-color: rgba(46,230,255,0.45); box-shadow: 0 0 0 3px rgba(46,230,255,0.12); }
+.login-error {
+  margin-top: 0.85rem;
+  font-size: 0.8rem;
+  color: var(--neon-red);
+}
+
+</style>
 </head>
 <body class="bg-ink-950 text-slate-200 font-sans antialiased">
   <div class="bg-grid fixed inset-0 pointer-events-none"></div>
   <div class="bg-glow fixed inset-0 pointer-events-none"></div>
 
-  <div id="admin-shell" class="relative flex min-h-screen">
+  <div id="login-gate" class="login-gate">
+    <form id="login-form" class="login-card" autocomplete="on">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="logo-mark"><i data-lucide="megaphone" class="w-5 h-5"></i></div>
+        <div>
+          <div class="font-bold text-white text-lg">Megaphone</div>
+          <div class="text-[11px] text-slate-500">Private demo · enter credentials</div>
+        </div>
+      </div>
+      <label class="block text-xs text-slate-500 mb-1.5 font-semibold uppercase tracking-wider">Username</label>
+      <input id="login-user" name="username" type="text" class="login-input" placeholder="username" autocomplete="username" required />
+      <label class="block text-xs text-slate-500 mb-1.5 mt-4 font-semibold uppercase tracking-wider">Password</label>
+      <input id="login-pass" name="password" type="password" class="login-input" placeholder="password" autocomplete="current-password" required />
+      <p id="login-error" class="login-error hidden">Wrong username or password</p>
+      <button type="submit" class="btn-primary w-full mt-5">Enter demo</button>
+    </form>
+  </div>
+
+  <div id="admin-shell" class="relative flex min-h-screen hidden">
     <aside id="sidebar" class="hidden lg:flex w-64 shrink-0 flex-col border-r border-white/5 bg-ink-900/80 backdrop-blur-xl sticky top-0 h-screen">
       <div class="p-5 flex items-center gap-3 border-b border-white/5">
         <div class="logo-mark"><i data-lucide="megaphone" class="w-5 h-5"></i></div>
@@ -1094,8 +1151,8 @@ Rules:
   activitySeries: [4, 7, 5, 9, 12, 8, 14, 11, 16, 10, 13, 18, 15, 9, 12, 17, 14, 19, 11, 8, 12, 16, 14, 7],
 };
 
-  </script>
-  <script>
+</script>
+<script>
 /* Megaphone campaign-agent HTML prototype — all client-side mock */
 
 const state = {
@@ -1151,7 +1208,7 @@ const TOOL_ICON = {
 
 /* ---------- utils ---------- */
 const $ = (sel, el = document) => el.querySelector(sel);
-const $$ = (sel, el = document) => [...el.querySelectorAll(sel)];
+const $ = (sel, el = document) => [...el.querySelectorAll(sel)];
 const fmtTime = (iso) => {
   const d = new Date(iso);
   return d.toLocaleString('en-GB', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -1454,7 +1511,7 @@ function renderOps(view) {
 
   const resume = $('#resume-btn');
   if (resume) resume.onclick = resumeAgent;
-  $$('#ops-feed .feed-item').forEach(el => {
+  $('#ops-feed .feed-item').forEach(el => {
     el.onclick = () => openActionDrawer(el.dataset.id);
   });
 }
@@ -1507,13 +1564,13 @@ function renderApprovals(view) {
       </div>
     </div>`;
 
-  $$('[data-approve]').forEach(btn => {
+  $('[data-approve]').forEach(btn => {
     btn.onclick = () => decideApproval(btn.dataset.approve, 'approved');
   });
-  $$('[data-reject]').forEach(btn => {
+  $('[data-reject]').forEach(btn => {
     btn.onclick = () => decideApproval(btn.dataset.reject, 'rejected');
   });
-  $$('[data-edit]').forEach(btn => {
+  $('[data-edit]').forEach(btn => {
     btn.onclick = () => toast('Edit preview — wire to form in production', 'warn');
   });
 }
@@ -1642,9 +1699,9 @@ function renderLog(view) {
       </div>
     </div>`;
 
-  $$('[data-ft]').forEach(b => b.onclick = () => { state.logFilter.tool = b.dataset.ft; render(); });
-  $$('[data-fs]').forEach(b => b.onclick = () => { state.logFilter.status = b.dataset.fs; render(); });
-  $$('[data-log]').forEach(r => r.onclick = () => openActionDrawer(r.dataset.log));
+  $('[data-ft]').forEach(b => b.onclick = () => { state.logFilter.tool = b.dataset.ft; render(); });
+  $('[data-fs]').forEach(b => b.onclick = () => { state.logFilter.status = b.dataset.fs; render(); });
+  $('[data-log]').forEach(r => r.onclick = () => openActionDrawer(r.dataset.log));
 }
 
 /* ===== BRAIN ===== */
@@ -1706,7 +1763,7 @@ function renderBrain(view) {
       </div>
     </div>`;
 
-  $$('.style-range').forEach(input => {
+  $('.style-range').forEach(input => {
     input.oninput = () => {
       state.brain.style[input.dataset.key] = Number(input.value);
       $(`#val-${input.dataset.key}`).textContent = input.value;
@@ -1755,7 +1812,7 @@ function renderTools(view) {
       </div>
     </div>`;
 
-  $$('.mode-btn').forEach(btn => {
+  $('.mode-btn').forEach(btn => {
     btn.onclick = () => {
       const tool = state.tools.find(t => t.id === btn.dataset.tool);
       if (!tool) return;
@@ -1764,7 +1821,7 @@ function renderTools(view) {
       render();
     };
   });
-  $$('[data-connect]').forEach(btn => {
+  $('[data-connect]').forEach(btn => {
     btn.onclick = () => toast(`Connect ${btn.dataset.connect} — OAuth stub in prototype`, 'warn');
   });
 }
@@ -1888,7 +1945,7 @@ function renderCalls(view) {
       </div>
     </div>`;
 
-  $$('[data-call]').forEach(btn => {
+  $('[data-call]').forEach(btn => {
     btn.onclick = () => {
       state.selectedCall = btn.dataset.call;
       state.callPlaying = false;
@@ -2041,7 +2098,7 @@ function renderPublic(view) {
     input.value = '';
     askBot(q);
   };
-  $$('.suggest-q').forEach(b => b.onclick = () => askBot(b.textContent));
+  $('.suggest-q').forEach(b => b.onclick = () => askBot(b.textContent));
 }
 
 function artifactCard(a) {
@@ -2209,11 +2266,54 @@ function openMobileNav() {
   document.body.appendChild(el);
   lucide.createIcons({ nodes: [el] });
   $('#mob-bg').onclick = () => el.remove();
-  $$('[data-mob]').forEach(a => a.onclick = () => el.remove());
+  $('[data-mob]').forEach(a => a.onclick = () => el.remove());
+}
+
+/* ---------- auth gate ---------- */
+const AUTH = { user: 'joker', pass: 'Aa123456', key: 'megaphone_auth_v1' };
+
+function isAuthed() {
+  return sessionStorage.getItem(AUTH.key) === '1';
+}
+
+function unlockApp() {
+  const gate = $('#login-gate');
+  const shell = $('#admin-shell');
+  if (gate) gate.classList.add('hidden');
+  if (shell) shell.classList.remove('hidden');
+  startApp();
+}
+
+function showLogin() {
+  const gate = $('#login-gate');
+  const shell = $('#admin-shell');
+  if (gate) gate.classList.remove('hidden');
+  if (shell) shell.classList.add('hidden');
+  lucide.createIcons();
+  const form = $('#login-form');
+  if (!form) return;
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    const u = ($('#login-user')?.value || '').trim();
+    const p = $('#login-pass')?.value || '';
+    const err = $('#login-error');
+    if (u === AUTH.user && p === AUTH.pass) {
+      sessionStorage.setItem(AUTH.key, '1');
+      if (err) err.classList.add('hidden');
+      unlockApp();
+    } else {
+      if (err) err.classList.remove('hidden');
+      $('#login-pass').value = '';
+      $('#login-pass')?.focus();
+    }
+  };
 }
 
 /* ---------- boot ---------- */
-function boot() {
+let appStarted = false;
+function startApp() {
+  if (appStarted) return;
+  appStarted = true;
   window.addEventListener('hashchange', render);
   $('#kill-btn').onclick = showKillModal;
   $('#mobile-nav-btn').onclick = openMobileNav;
@@ -2221,7 +2321,6 @@ function boot() {
   setInterval(tickClock, 1000);
   render();
   setInterval(liveTick, 9000);
-  // gentle status flicker when idle on ops
   setInterval(() => {
     if (state.stopped || state.route !== 'ops') return;
     if (state.agentStatus === 'thinking') {
@@ -2238,8 +2337,13 @@ function boot() {
   }, 14000);
 }
 
+function boot() {
+  if (isAuthed()) unlockApp();
+  else showLogin();
+}
+
 document.addEventListener('DOMContentLoaded', boot);
 
-  </script>
+</script>
 </body>
 </html>

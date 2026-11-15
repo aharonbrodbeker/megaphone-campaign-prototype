@@ -1114,8 +1114,51 @@ function openMobileNav() {
   $$('[data-mob]').forEach(a => a.onclick = () => el.remove());
 }
 
+/* ---------- auth gate ---------- */
+const AUTH = { user: 'joker', pass: 'Aa123456', key: 'megaphone_auth_v1' };
+
+function isAuthed() {
+  return sessionStorage.getItem(AUTH.key) === '1';
+}
+
+function unlockApp() {
+  const gate = $('#login-gate');
+  const shell = $('#admin-shell');
+  if (gate) gate.classList.add('hidden');
+  if (shell) shell.classList.remove('hidden');
+  startApp();
+}
+
+function showLogin() {
+  const gate = $('#login-gate');
+  const shell = $('#admin-shell');
+  if (gate) gate.classList.remove('hidden');
+  if (shell) shell.classList.add('hidden');
+  lucide.createIcons();
+  const form = $('#login-form');
+  if (!form) return;
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    const u = ($('#login-user')?.value || '').trim();
+    const p = $('#login-pass')?.value || '';
+    const err = $('#login-error');
+    if (u === AUTH.user && p === AUTH.pass) {
+      sessionStorage.setItem(AUTH.key, '1');
+      if (err) err.classList.add('hidden');
+      unlockApp();
+    } else {
+      if (err) err.classList.remove('hidden');
+      $('#login-pass').value = '';
+      $('#login-pass')?.focus();
+    }
+  };
+}
+
 /* ---------- boot ---------- */
-function boot() {
+let appStarted = false;
+function startApp() {
+  if (appStarted) return;
+  appStarted = true;
   window.addEventListener('hashchange', render);
   $('#kill-btn').onclick = showKillModal;
   $('#mobile-nav-btn').onclick = openMobileNav;
@@ -1123,7 +1166,6 @@ function boot() {
   setInterval(tickClock, 1000);
   render();
   setInterval(liveTick, 9000);
-  // gentle status flicker when idle on ops
   setInterval(() => {
     if (state.stopped || state.route !== 'ops') return;
     if (state.agentStatus === 'thinking') {
@@ -1138,6 +1180,11 @@ function boot() {
       }
     }
   }, 14000);
+}
+
+function boot() {
+  if (isAuthed()) unlockApp();
+  else showLogin();
 }
 
 document.addEventListener('DOMContentLoaded', boot);
