@@ -1,320 +1,664 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Transparent Histadrut · Calm</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg: #f6f5f2;
-      --ink: #1a1a1a;
-      --muted: #6b6b6b;
-      --line: #e4e2dc;
-      --card: #ffffff;
-      --accent: #0f6b5c;
-      --accent-soft: #e6f3f0;
-      --warn: #8a5a00;
-    }
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      font-family: 'IBM Plex Sans', system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--ink);
-      line-height: 1.5;
-      min-height: 100vh;
-    }
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Transparent Histadrut</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #fbfaf8;
+    --surface: #ffffff;
+    --ink: #121212;
+    --ink-2: #3d3d3d;
+    --muted: #8a8a85;
+    --line: rgba(18, 18, 18, 0.07);
+    --line-strong: rgba(18, 18, 18, 0.12);
+    --accent: #1f7a5a;
+    --accent-soft: rgba(31, 122, 90, 0.08);
+    --warn: #b4690e;
+    --warn-soft: rgba(180, 105, 14, 0.08);
+    --stop: #b42318;
+    --radius: 16px;
+    --shadow: 0 1px 2px rgba(18,18,18,0.04), 0 8px 24px -12px rgba(18,18,18,0.08);
+    --ease: cubic-bezier(.2,.7,.2,1);
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.55 'Inter', system-ui, sans-serif;
+    font-feature-settings: 'cv11', 'ss01';
+    letter-spacing: -0.006em;
+  }
+  button, input { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  a { color: inherit; }
 
-    .wrap {
-      width: min(560px, calc(100% - 2rem));
-      margin: 0 auto;
-      padding: 2rem 0 6rem;
-    }
+  .container { width: min(680px, calc(100% - 40px)); margin: 0 auto; }
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 3.5rem;
-      font-size: 0.875rem;
-      color: var(--muted);
-    }
-    header strong { color: var(--ink); font-weight: 600; }
+  /* ---------- top bar ---------- */
+  .top {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(251, 250, 248, 0.82);
+    backdrop-filter: saturate(1.4) blur(14px);
+    border-bottom: 1px solid transparent;
+    transition: border-color .3s;
+  }
+  .top.scrolled { border-bottom-color: var(--line); }
+  .top .container { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; }
+  .brand-mark {
+    width: 22px; height: 22px; border-radius: 7px; background: var(--ink);
+    display: grid; place-items: center;
+  }
+  .brand-mark::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #fff; }
 
-    .live {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.75rem;
-      color: var(--accent);
-      font-weight: 500;
-    }
-    .live::before {
-      content: '';
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--accent);
-    }
+  .seg {
+    display: inline-flex; padding: 3px; gap: 2px;
+    background: rgba(18,18,18,0.045); border-radius: 10px;
+  }
+  .seg button {
+    border: 0; background: transparent; padding: 6px 14px; border-radius: 8px;
+    font-size: 13px; font-weight: 500; color: var(--muted);
+    transition: all .2s var(--ease);
+  }
+  .seg button.on { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 0 0 1px var(--line); }
 
-    h1 {
-      font-size: clamp(2rem, 6vw, 2.75rem);
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      line-height: 1.12;
-      margin: 0 0 1rem;
-    }
-    .lede {
-      font-size: 1.05rem;
-      color: var(--muted);
-      margin: 0 0 1.75rem;
-      max-width: 36ch;
-    }
+  .quiet-link { font-size: 13px; color: var(--muted); text-decoration: none; }
+  .quiet-link:hover { color: var(--ink); }
 
-    .cta {
-      display: inline-block;
-      background: var(--ink);
-      color: #fff;
-      font-weight: 600;
-      font-size: 0.95rem;
-      padding: 0.85rem 1.25rem;
-      border-radius: 0.5rem;
-      border: none;
-      cursor: pointer;
-      text-decoration: none;
-    }
-    .cta:hover { opacity: 0.9; text-decoration: none; color: #fff; }
-    .cta-ghost {
-      display: inline-block;
-      margin-left: 0.75rem;
-      color: var(--muted);
-      font-size: 0.9rem;
-      font-weight: 500;
-    }
+  /* ---------- views ---------- */
+  .view { display: none; animation: rise .5s var(--ease); }
+  .view.on { display: block; }
+  @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-    .now {
-      margin: 3rem 0 0;
-      padding: 1.1rem 1.2rem;
-      background: var(--accent-soft);
-      border-radius: 0.75rem;
-      font-size: 0.95rem;
-    }
-    .now label {
-      display: block;
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 0.35rem;
-    }
+  /* ---------- hero ---------- */
+  .hero { padding: 88px 0 56px; }
+  .status {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--ink-2);
+    padding: 6px 12px 6px 10px; border-radius: 999px;
+    background: var(--surface); box-shadow: 0 0 0 1px var(--line);
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); position: relative; }
+  .dot::after {
+    content: ''; position: absolute; inset: -4px; border-radius: 50%;
+    background: var(--accent); opacity: .18; animation: breathe 3.2s ease-in-out infinite;
+  }
+  .dot.paused { background: var(--muted); }
+  .dot.paused::after { display: none; }
+  @keyframes breathe { 0%,100% { transform: scale(.6); opacity: .25; } 50% { transform: scale(1.15); opacity: 0; } }
 
-    section { margin-top: 3.25rem; }
-    section h2 {
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin: 0 0 1rem;
-      padding-bottom: 0.65rem;
-      border-bottom: 1px solid var(--line);
-    }
+  h1 {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(48px, 9vw, 76px);
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+    margin: 28px 0 22px;
+  }
+  h1 em { font-style: italic; color: var(--accent); }
+  .lede { font-size: 17px; color: var(--ink-2); max-width: 46ch; margin: 0 0 32px; }
 
-    .item {
-      padding: 1rem 0;
-      border-bottom: 1px solid var(--line);
-    }
-    .item:last-child { border-bottom: none; }
-    .item .meta {
-      font-size: 0.75rem;
-      color: var(--muted);
-      margin-bottom: 0.3rem;
-    }
-    .item p {
-      margin: 0;
-      font-size: 0.98rem;
-      color: var(--ink);
-    }
-    .item button {
-      margin-top: 0.45rem;
-      background: none;
-      border: none;
-      padding: 0;
-      color: var(--accent);
-      font: inherit;
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-    }
+  .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .btn {
+    border: 0; border-radius: 11px; padding: 12px 20px; font-size: 14px; font-weight: 500;
+    transition: transform .15s var(--ease), background .2s, box-shadow .2s;
+    display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+  }
+  .btn:active { transform: scale(.98); }
+  .btn-dark { background: var(--ink); color: #fff; }
+  .btn-dark:hover { background: #2a2a2a; }
+  .btn-light { background: var(--surface); color: var(--ink); box-shadow: 0 0 0 1px var(--line-strong); }
+  .btn-light:hover { box-shadow: 0 0 0 1px rgba(18,18,18,.22); }
+  .btn-green { background: var(--accent); color: #fff; }
+  .btn-green:hover { background: #18684c; }
+  .btn-text { background: none; color: var(--muted); padding: 12px 10px; }
+  .btn-text:hover { color: var(--ink); }
 
-    .ask {
-      position: sticky;
-      bottom: 0;
-      background: linear-gradient(transparent, var(--bg) 28%);
-      padding: 1.5rem 0 1.25rem;
-      margin-top: 2rem;
-    }
-    .ask-box {
-      display: flex;
-      gap: 0.5rem;
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 0.75rem;
-      padding: 0.4rem;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.04);
-    }
-    .ask-box input {
-      flex: 1;
-      border: none;
-      outline: none;
-      padding: 0.7rem 0.85rem;
-      font: inherit;
-      font-size: 0.95rem;
-      background: transparent;
-      color: var(--ink);
-    }
-    .ask-box button {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 0.5rem;
-      padding: 0.7rem 1rem;
-      font: inherit;
-      font-weight: 600;
-      font-size: 0.875rem;
-      cursor: pointer;
-    }
-    .answer {
-      margin-top: 0.85rem;
-      padding: 0.9rem 1rem;
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 0.65rem;
-      font-size: 0.92rem;
-      color: var(--ink);
-      display: none;
-    }
-    .answer.show { display: block; }
-    .answer .cite {
-      margin-top: 0.5rem;
-      font-size: 0.75rem;
-      color: var(--muted);
-    }
+  /* ---------- now card ---------- */
+  .now {
+    margin-top: 56px; background: var(--surface); border-radius: var(--radius);
+    box-shadow: var(--shadow), 0 0 0 1px var(--line); padding: 22px 24px;
+    display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start;
+  }
+  .orb {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: radial-gradient(circle at 32% 30%, #6fd3ad, var(--accent) 60%, #0f4a35);
+    box-shadow: 0 6px 16px -6px rgba(31,122,90,.6);
+  }
+  .now-label { font-size: 12px; color: var(--muted); margin-bottom: 3px; }
+  .now-text { font-size: 15.5px; color: var(--ink); transition: opacity .45s var(--ease); min-height: 24px; }
+  .now-text.fade { opacity: 0; }
 
-    .detail {
-      display: none;
-      margin-top: 0.6rem;
-      padding: 0.75rem 0.9rem;
-      background: #f0efe9;
-      border-radius: 0.5rem;
-      font-size: 0.85rem;
-      color: #444;
-    }
-    .detail.open { display: block; }
+  .numbers { display: flex; margin-top: 28px; border-top: 1px solid var(--line); }
+  .num { flex: 1; padding: 20px 0 0; }
+  .num + .num { padding-left: 24px; border-left: 1px solid var(--line); margin-left: 24px; }
+  .num b { display: block; font-size: 26px; font-weight: 500; letter-spacing: -0.03em; }
+  .num span { font-size: 13px; color: var(--muted); }
 
-    footer {
-      margin-top: 3rem;
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-  </style>
+  /* ---------- sections ---------- */
+  .section { padding: 64px 0 0; }
+  .section-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 18px; }
+  .section-head h2 { font-size: 20px; font-weight: 600; letter-spacing: -0.02em; margin: 0; }
+  .tabs { display: flex; gap: 18px; }
+  .tabs button {
+    border: 0; background: none; padding: 4px 0; font-size: 13px; color: var(--muted);
+    border-bottom: 1.5px solid transparent; transition: all .2s;
+  }
+  .tabs button.on { color: var(--ink); border-bottom-color: var(--ink); }
+
+  .list { background: var(--surface); border-radius: var(--radius); box-shadow: 0 0 0 1px var(--line); overflow: hidden; }
+  .row {
+    display: grid; grid-template-columns: 52px 1fr auto; gap: 14px; align-items: start;
+    padding: 18px 20px; border-top: 1px solid var(--line); cursor: pointer;
+    transition: background .2s;
+  }
+  .row:first-child { border-top: 0; }
+  .row:hover { background: rgba(18,18,18,0.015); }
+  .row-time { font-size: 13px; color: var(--muted); padding-top: 1px; font-variant-numeric: tabular-nums; }
+  .row-kind { font-size: 12px; color: var(--muted); margin-bottom: 2px; }
+  .row-title { font-size: 15px; color: var(--ink); }
+  .row-chev { color: var(--muted); transition: transform .3s var(--ease); padding-top: 2px; }
+  .row.open .row-chev { transform: rotate(180deg); }
+  .row-more {
+    grid-column: 2 / 4; max-height: 0; overflow: hidden; opacity: 0;
+    transition: max-height .4s var(--ease), opacity .3s, margin .3s;
+    font-size: 14px; color: var(--ink-2);
+  }
+  .row.open .row-more { max-height: 200px; opacity: 1; margin-top: 6px; }
+  .src { display: inline-block; margin-top: 10px; font-size: 12px; color: var(--muted); }
+  .tag {
+    display: inline-block; font-size: 11.5px; font-weight: 500; padding: 2px 8px; border-radius: 6px; margin-left: 6px;
+    vertical-align: 1px;
+  }
+  .tag.wait { color: var(--warn); background: var(--warn-soft); }
+  .tag.block { color: var(--stop); background: rgba(180,35,24,.07); }
+
+  /* ---------- ask ---------- */
+  .ask {
+    background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow), 0 0 0 1px var(--line);
+    padding: 8px;
+  }
+  .ask form { display: flex; gap: 8px; }
+  .ask input {
+    flex: 1; border: 0; outline: 0; background: transparent; padding: 12px 14px; font-size: 15px;
+  }
+  .ask input::placeholder { color: #b0afaa; }
+  .hints { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+  .hints button {
+    border: 0; background: none; font-size: 13px; color: var(--muted); padding: 4px 8px; border-radius: 8px;
+  }
+  .hints button:hover { color: var(--ink); background: rgba(18,18,18,0.04); }
+  .answer {
+    margin-top: 14px; padding: 18px 20px; background: var(--surface); border-radius: var(--radius);
+    box-shadow: 0 0 0 1px var(--line); display: none; animation: rise .4s var(--ease);
+  }
+  .answer.on { display: block; }
+  .answer-q { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+  .answer-a { font-size: 15px; }
+  .answer-ref { margin-top: 12px; font-size: 12px; color: var(--muted); }
+
+  footer { padding: 88px 0 56px; font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+
+  /* ---------- team ---------- */
+  .greet { padding: 72px 0 36px; }
+  .greet h1 { font-size: clamp(40px, 7vw, 56px); margin: 0 0 10px; }
+  .greet p { margin: 0; color: var(--ink-2); font-size: 16px; }
+
+  .focus {
+    background: var(--surface); border-radius: 20px; box-shadow: var(--shadow), 0 0 0 1px var(--line);
+    padding: 28px; transition: opacity .3s var(--ease), transform .3s var(--ease);
+  }
+  .focus.leave { opacity: 0; transform: translateX(24px); }
+  .focus-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  .pill { font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 999px; background: rgba(18,18,18,0.05); color: var(--ink-2); }
+  .pill.warn { color: var(--warn); background: var(--warn-soft); }
+  .pill.stop { color: var(--stop); background: rgba(180,35,24,.07); }
+  .progress { display: flex; gap: 5px; }
+  .progress i { width: 18px; height: 3px; border-radius: 3px; background: rgba(18,18,18,0.1); transition: background .3s; }
+  .progress i.done { background: var(--ink); }
+  .progress i.cur { background: var(--accent); }
+  .focus h3 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 6px; }
+  .focus .why { color: var(--ink-2); margin: 0 0 20px; }
+  .preview {
+    background: var(--bg); border-radius: 12px; padding: 18px 20px; font-size: 14.5px; color: var(--ink-2);
+    white-space: pre-wrap; margin-bottom: 22px; box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .preview .big { font-size: 34px; font-weight: 500; letter-spacing: -0.03em; color: var(--ink); white-space: normal; }
+  .preview .sub { font-size: 13px; color: var(--muted); white-space: normal; margin-top: 2px; }
+  .preview .subject { font-weight: 600; color: var(--ink); margin-bottom: 8px; white-space: normal; }
+  .focus-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .focus-actions .spacer { flex: 1; }
+  .meta-line { margin-top: 18px; font-size: 12.5px; color: var(--muted); }
+
+  .clear { text-align: center; padding: 56px 24px; }
+  .check {
+    width: 48px; height: 48px; border-radius: 50%; margin: 0 auto 16px; background: var(--accent-soft);
+    display: grid; place-items: center; color: var(--accent);
+  }
+  .clear h3 { font-size: 20px; margin: 0 0 4px; }
+  .clear p { color: var(--muted); margin: 0; }
+
+  .card { background: var(--surface); border-radius: var(--radius); box-shadow: 0 0 0 1px var(--line); }
+  .setting { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 20px; border-top: 1px solid var(--line); }
+  .setting:first-child { border-top: 0; }
+  .setting-name { font-size: 15px; }
+  .setting-desc { font-size: 13px; color: var(--muted); }
+
+  .mini-seg { display: inline-flex; padding: 2px; background: rgba(18,18,18,0.045); border-radius: 8px; }
+  .mini-seg button { border: 0; background: none; padding: 5px 11px; font-size: 12.5px; border-radius: 6px; color: var(--muted); transition: all .2s; }
+  .mini-seg button.on { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 0 0 1px var(--line); }
+
+  .switch { width: 42px; height: 24px; border-radius: 999px; background: var(--accent); border: 0; position: relative; transition: background .25s; flex-shrink: 0; }
+  .switch::after { content: ''; position: absolute; top: 3px; left: 21px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: left .25s var(--ease); box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+  .switch.off { background: rgba(18,18,18,0.18); }
+  .switch.off::after { left: 3px; }
+
+  .bar { height: 6px; border-radius: 6px; background: rgba(18,18,18,0.06); overflow: hidden; margin-top: 12px; }
+  .bar i { display: block; height: 100%; background: var(--ink); border-radius: 6px; transition: width .6s var(--ease); }
+  .budget { padding: 22px 20px; }
+  .budget-top { display: flex; justify-content: space-between; align-items: baseline; }
+  .budget-top b { font-size: 26px; font-weight: 500; letter-spacing: -0.03em; }
+  .budget-top span { font-size: 13px; color: var(--muted); }
+
+  .voice { padding: 22px 20px; }
+  .range-labels { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--muted); margin-top: 8px; }
+  input[type=range] { width: 100%; -webkit-appearance: none; appearance: none; height: 4px; border-radius: 4px; background: rgba(18,18,18,0.1); outline: none; margin-top: 16px; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 1px var(--line-strong), 0 2px 6px rgba(0,0,0,.12); cursor: pointer; }
+  input[type=range]::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #fff; border: 1px solid var(--line-strong); }
+  .voice-sample { margin-top: 18px; padding: 16px 18px; background: var(--bg); border-radius: 12px; font-size: 14.5px; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--line); transition: opacity .25s; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px); opacity: 0;
+    background: var(--ink); color: #fff; padding: 11px 18px; border-radius: 12px; font-size: 14px;
+    transition: all .35s var(--ease); pointer-events: none; z-index: 50;
+  }
+  .toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 560px) {
+    .hero { padding-top: 56px; }
+    .numbers { flex-direction: column; }
+    .num + .num { border-left: 0; margin-left: 0; padding-left: 0; border-top: 1px solid var(--line); margin-top: 18px; }
+    .row { grid-template-columns: 44px 1fr auto; padding: 16px; }
+    .section-head { flex-direction: column; gap: 10px; }
+    .quiet-link { display: none; }
+    .focus { padding: 22px; }
+    .setting { flex-direction: column; align-items: flex-start; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div><strong>Transparent Histadrut</strong> · Megaphone</div>
-      <a href="./index.html">Full version</a>
-    </header>
 
-    <p class="live">Agent is working</p>
-    <h1>Your dues.<br>Your right to know.</h1>
-    <p class="lede">An AI agent runs this campaign in public. One action at a time. Everything logged.</p>
-    <a class="cta" href="#join">Join</a>
-    <a class="cta-ghost" href="#ask">Ask what it did</a>
-
-    <div class="now">
-      <label>Right now</label>
-      Comparing morning vs afternoon posts for this audience.
+<div class="top" id="top">
+  <div class="container">
+    <div class="brand"><span class="brand-mark"></span>Transparent Histadrut</div>
+    <div class="seg" role="tablist">
+      <button class="on" data-view="public">Public</button>
+      <button data-view="team">Team</button>
     </div>
+    <a class="quiet-link" href="./index.html">Full version ↗</a>
+  </div>
+</div>
 
-    <section>
-      <h2>Latest</h2>
-      <div class="item">
-        <div class="meta">Today · 12:47 · Post</div>
-        <p>Published a thread: 5 questions every member should ask about their dues.</p>
-        <button type="button" data-more="m1">Why</button>
-        <div class="detail" id="m1">Questions get more replies than claims. Every fact links to a source.</div>
+<!-- ================= PUBLIC ================= -->
+<main class="view on" id="view-public">
+  <div class="container">
+    <section class="hero">
+      <span class="status"><span class="dot" id="pub-dot"></span><span id="pub-status">Megaphone is working · Day 23</span></span>
+      <h1>Your dues.<br>Your <em>right to know.</em></h1>
+      <p class="lede">A campaign for open union finances, run in public by an AI agent and supervised by people. Every action it takes is written down here.</p>
+      <div class="actions">
+        <button class="btn btn-dark" id="join-btn">Join the campaign</button>
+        <button class="btn btn-text" id="ask-jump">Ask what it did →</button>
       </div>
-      <div class="item">
-        <div class="meta">Today · 12:40 · Calls</div>
-        <p>Called 32 new volunteers who asked to be contacted. 14 joined Thursday’s Zoom.</p>
-        <button type="button" data-more="m2">Why</button>
-        <div class="detail" id="m2">Only people who opted in. The agent always says it is an AI.</div>
+
+      <div class="now">
+        <div class="orb"></div>
+        <div>
+          <div class="now-label">Right now</div>
+          <div class="now-text" id="now-text">Reading this morning’s coverage of the wage talks.</div>
+        </div>
       </div>
-      <div class="item">
-        <div class="meta">Today · 12:31 · Blocked</div>
-        <p>Stopped a reply that used a number with no verified source.</p>
-        <button type="button" data-more="m3">Why</button>
-        <div class="detail" id="m3">Policy rule: no unsourced factual claims. Safer to ask a question instead.</div>
-      </div>
-      <div class="item">
-        <div class="meta">Waiting · Email</div>
-        <p>Weekly newsletter to 18,340 subscribers — needs a human OK first.</p>
+
+      <div class="numbers">
+        <div class="num"><b>430</b><span>posts on X</span></div>
+        <div class="num"><b>18,340</b><span>emails, opt‑in only</span></div>
+        <div class="num"><b>1,296</b><span>calls, all disclose AI</span></div>
       </div>
     </section>
 
-    <div class="ask" id="ask">
-      <form class="ask-box" id="ask-form">
-        <input id="q" type="text" placeholder="Ask one thing…" autocomplete="off" />
-        <button type="submit">Ask</button>
-      </form>
-      <div class="answer" id="answer"></div>
-    </div>
+    <section class="section">
+      <div class="section-head">
+        <h2>Today</h2>
+        <div class="tabs" id="tabs">
+          <button class="on" data-f="all">All</button>
+          <button data-f="post">Posts</button>
+          <button data-f="email">Email</button>
+          <button data-f="call">Calls</button>
+        </div>
+      </div>
+      <div class="list" id="feed"></div>
+    </section>
 
-    <footer id="join">
-      Megaphone is a bot. Managers supervise big actions.<br>
-      Prefer denser screens? Open the <a href="./index.html">full version</a>.
+    <section class="section" id="ask-section">
+      <div class="section-head"><h2>Ask Megaphone</h2></div>
+      <div class="ask">
+        <form id="ask-form">
+          <input id="ask-input" placeholder="What did you post today?" autocomplete="off" />
+          <button class="btn btn-dark" type="submit">Ask</button>
+        </form>
+      </div>
+      <div class="hints">
+        <button data-q="What did you post today?">What did you post?</button>
+        <button data-q="Did you spend money?">Did you spend money?</button>
+        <button data-q="What got blocked?">What got blocked?</button>
+      </div>
+      <div class="answer" id="answer">
+        <div class="answer-q" id="answer-q"></div>
+        <div class="answer-a" id="answer-a"></div>
+        <div class="answer-ref" id="answer-ref"></div>
+      </div>
+    </section>
+
+    <footer>
+      <span>Megaphone is an AI agent. Humans approve anything big.</span>
+      <a class="quiet-link" style="display:inline" href="./index.html">See the full ops room ↗</a>
     </footer>
   </div>
+</main>
 
-  <script>
-    document.querySelectorAll('[data-more]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const el = document.getElementById(btn.dataset.more);
-        const open = el.classList.toggle('open');
-        btn.textContent = open ? 'Hide' : 'Why';
-      });
-    });
+<!-- ================= TEAM ================= -->
+<main class="view" id="view-team">
+  <div class="container">
+    <section class="greet">
+      <h1>Good afternoon, Yoav.</h1>
+      <p id="greet-sub">4 things need you. One at a time.</p>
+    </section>
 
-    const answers = [
-      { keys: ['tweet', 'post', 'thread', 'x'], text: 'At 12:47 it posted a 5-question thread about dues. Early engagement is strong.', cite: 'Action A-1087' },
-      { keys: ['call', 'phone', 'volunteer'], text: 'It called 32 opt-in volunteers. 14 said yes to Thursday’s Zoom. 2 asked to be removed and were.', cite: 'Action A-1086' },
-      { keys: ['block', 'source', 'policy'], text: 'It tried a reply with an unsourced percentage. PolicyEngine blocked it.', cite: 'Action A-1085' },
-      { keys: ['email', 'newsletter'], text: 'A weekly email to 18,340 subscribers is waiting for manager approval.', cite: 'Action A-1084' },
-      { keys: ['who', 'bot', 'what'], text: 'I’m Megaphone, the campaign’s AI agent. I research, post, email opt-ins, and call people who asked — all logged.', cite: 'Identity' },
-    ];
+    <div id="focus-wrap"></div>
 
-    document.getElementById('ask-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const q = document.getElementById('q').value.trim();
-      if (!q) return;
-      const hit = answers.find(a => a.keys.some(k => q.toLowerCase().includes(k)));
-      const box = document.getElementById('answer');
-      const text = hit
-        ? hit.text
-        : 'Try asking about the post, the calls, the blocked reply, or the newsletter.';
-      const cite = hit ? hit.cite : 'Tip';
-      box.innerHTML = text + '<div class="cite">' + cite + '</div>';
-      box.classList.add('show');
-      document.getElementById('q').value = '';
-    });
-  </script>
+    <section class="section">
+      <div class="section-head"><h2>Agent</h2></div>
+      <div class="card">
+        <div class="setting">
+          <div>
+            <div class="setting-name" id="run-name">Running</div>
+            <div class="setting-desc">Pause stops every post, email, call and payment.</div>
+          </div>
+          <button class="switch" id="run-switch" aria-label="Pause agent"></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>What it may do alone</h2></div>
+      <div class="card" id="perms"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Budget</h2></div>
+      <div class="card budget">
+        <div class="budget-top"><b id="spent">₪6,681</b><span>of ₪15,000 this month</span></div>
+        <div class="bar"><i id="spent-bar" style="width:44.5%"></i></div>
+        <div class="meta-line">Up to ₪100 it pays alone. Above that, it asks you.</div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Voice</h2></div>
+      <div class="card voice">
+        <div class="setting-name">How it sounds</div>
+        <input type="range" min="0" max="100" value="45" id="voice" />
+        <div class="range-labels"><span>Calm</span><span>Bold</span></div>
+        <div class="voice-sample" id="voice-sample"></div>
+      </div>
+    </section>
+
+    <footer>
+      <span>Everything here is a mock. Nothing is sent.</span>
+      <a class="quiet-link" style="display:inline" href="./index.html">Full version ↗</a>
+    </footer>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => [...document.querySelectorAll(s)];
+  const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+
+  /* ---------- data ---------- */
+  const feed = [
+    { time: '12:47', kind: 'post', label: 'Post on X', title: 'Thread: 5 questions every member should ask about their dues.', why: 'Questions invite replies; claims invite fights. Each point links to a public source.', src: 'Annual report 2025, §4' },
+    { time: '12:40', kind: 'call', label: 'Calls', title: 'Called 32 volunteers who asked to hear from us. 14 will join Thursday’s Zoom.', why: 'Opt-in list only. Every call opens with “I’m an AI.” Two people asked to be removed and were.', src: 'Call log · 32 calls' },
+    { time: '12:31', kind: 'post', label: 'Post on X', title: 'A reply with an unsourced number was stopped.', tag: ['block', 'Blocked'], why: 'Rule: no factual claim without a verified source. The agent rewrote it as a question instead.', src: 'Policy · sources required' },
+    { time: '12:22', kind: 'email', label: 'Email', title: 'Weekly newsletter to 18,340 subscribers.', tag: ['wait', 'Waiting for a human'], why: 'Emails always need a person to approve them first.', src: 'Approval queue' },
+    { time: '11:12', kind: 'email', label: 'Email', title: 'Welcome note to 412 new volunteers. 61% opened it.', why: 'A quick hello right after sign-up keeps people around.', src: 'Delivered 409 / 412' },
+    { time: '09:58', kind: 'post', label: 'Post on X', title: '“What do you actually get for your dues?” — 88K views.', why: 'Morning is when this audience reads. Boosted with ₪150 after a strong start, approved by Yoav.', src: 'X analytics' },
+  ];
+
+  const thoughts = [
+    'Reading this morning’s coverage of the wage talks.',
+    'Checking a claim against the annual report before using it.',
+    'Comparing morning and afternoon posts for this audience.',
+    'Drafting a reply as a question, not an accusation.',
+    'Waiting for Yoav on the newsletter.',
+  ];
+
+  const qa = [
+    { k: ['post', 'tweet', 'thread', 'x'], a: 'At 12:47 I posted a thread with five questions about where dues go. Every point links to a public source. It’s at 842 likes so far.', r: 'Action A‑1087 · Post on X' },
+    { k: ['spend', 'money', 'pay', 'budget', 'cost'], a: 'This month I’ve spent ₪6,681 of ₪15,000. Today: a ₪49 design tool (under my ₪100 limit) and a ₪150 boost Yoav approved. A ₪350 boost is waiting.', r: 'Budget · Ledger' },
+    { k: ['block', 'stop', 'source', 'wrong'], a: 'At 12:31 I drafted a reply with a percentage I couldn’t source. The policy blocked it. I rewrote it as a question.', r: 'Action A‑1085 · Blocked' },
+    { k: ['call', 'phone'], a: 'I called 32 volunteers who asked to be contacted. 21 picked up, 14 are joining Thursday’s Zoom, 2 asked to be removed.', r: 'Action A‑1086 · Calls' },
+    { k: ['email', 'newsletter'], a: 'The weekly newsletter is drafted and waiting for a human to approve it. I can’t send email on my own.', r: 'Action A‑1084 · Waiting' },
+    { k: ['who', 'you', 'bot', 'human'], a: 'I’m Megaphone, the campaign’s AI agent. I research, post, email and call — but only within rules people set, and everything I do is listed here.', r: 'About Megaphone' },
+  ];
+
+  const queue = [
+    { kind: 'Email', pill: 'warn', pillText: 'Needs approval', title: 'Weekly newsletter', why: 'Highlights, Thursday’s Zoom, and one ask: share the dues thread.',
+      preview: `<div class="subject">Week 4: one big question</div>Hi {first_name},\n\nThis week thousands of you asked the same thing: where do our dues actually go?\n\nJoin us Thursday at 20:00 to plan what’s next.\n\n— Written by Megaphone (AI), approved by our team`,
+      meta: '18,340 opt‑in subscribers · unsubscribe link included' },
+    { kind: 'Payment', pill: 'warn', pillText: 'Above ₪100', title: 'Boost the dues thread', why: 'It’s doing 3× our usual engagement. A 48‑hour boost could double reach.',
+      preview: `<div class="big">₪350</div><div class="sub">X Ads · 48 hours · Israel, ages 25–60</div>`,
+      meta: 'Leaves ₪30 in today’s budget' },
+    { kind: 'Post', pill: '', pillText: 'Over daily limit', title: 'One more post today', why: 'A Knesset committee just scheduled a hearing on union transparency. Timely.',
+      preview: `The Knesset Labor Committee will discuss union financial transparency next Tuesday.\n\nWe’ll be there. What would you ask them?`,
+      meta: 'Post 13 of a 12‑post day' },
+    { kind: 'Calls', pill: '', pillText: 'Needs approval', title: 'Evening calls to 80 supporters', why: 'Invite them to Thursday’s Zoom and the petition. 18:00–20:30 only.',
+      preview: `“Hi {name}, this is Megaphone, an AI assistant for Transparent Histadrut. You asked to hear from us — do you have a minute?”`,
+      meta: 'Opt‑in list · est. ₪96' },
+  ];
+  let qIndex = 0;
+
+  const perms = [
+    { name: 'Research', desc: 'Search and read sources', mode: 'auto' },
+    { name: 'Posts on X', desc: 'Up to 12 a day', mode: 'auto' },
+    { name: 'Email', desc: 'Opt‑in subscribers only', mode: 'ask' },
+    { name: 'Calls', desc: 'People who asked to be called', mode: 'ask' },
+    { name: 'Payments', desc: 'Up to ₪100 alone', mode: 'ask' },
+  ];
+
+  const voices = [
+    'We support strong unions. We also think members should be able to see where their dues go.',
+    'Members pay dues every month. They deserve a clear, public answer on where that money goes.',
+    'Dues without disclosure is a blank check. Open the books.',
+  ];
+
+  /* ---------- helpers ---------- */
+  let toastT;
+  function toast(msg) {
+    const t = $('#toast');
+    t.textContent = msg;
+    t.classList.add('on');
+    clearTimeout(toastT);
+    toastT = setTimeout(() => t.classList.remove('on'), 2200);
+  }
+
+  /* ---------- view switch ---------- */
+  function show(view) {
+    $$('.seg button').forEach(b => b.classList.toggle('on', b.dataset.view === view));
+    $$('.view').forEach(v => v.classList.toggle('on', v.id === 'view-' + view));
+    history.replaceState(null, '', '#' + view);
+    window.scrollTo({ top: 0 });
+  }
+  $$('.seg button').forEach(b => b.addEventListener('click', () => show(b.dataset.view)));
+  if (location.hash === '#team') show('team');
+
+  window.addEventListener('scroll', () => $('#top').classList.toggle('scrolled', scrollY > 8), { passive: true });
+
+  /* ---------- public: feed ---------- */
+  const chev = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+  function renderFeed(filter = 'all') {
+    const items = feed.filter(f => filter === 'all' || f.kind === filter);
+    $('#feed').innerHTML = items.map(f => `
+      <div class="row">
+        <div class="row-time">${f.time}</div>
+        <div>
+          <div class="row-kind">${f.label}${f.tag ? `<span class="tag ${f.tag[0]}">${f.tag[1]}</span>` : ''}</div>
+          <div class="row-title">${esc(f.title)}</div>
+        </div>
+        <div class="row-chev">${chev}</div>
+        <div class="row-more">${esc(f.why)}<br><span class="src">Source · ${esc(f.src)}</span></div>
+      </div>`).join('');
+    $$('#feed .row').forEach(r => r.addEventListener('click', () => r.classList.toggle('open')));
+  }
+  renderFeed();
+  $$('#tabs button').forEach(b => b.addEventListener('click', () => {
+    $$('#tabs button').forEach(x => x.classList.toggle('on', x === b));
+    renderFeed(b.dataset.f);
+  }));
+
+  /* ---------- public: now ---------- */
+  let ti = 0, paused = false;
+  setInterval(() => {
+    if (paused) return;
+    const el = $('#now-text');
+    el.classList.add('fade');
+    setTimeout(() => {
+      ti = (ti + 1) % thoughts.length;
+      el.textContent = thoughts[ti];
+      el.classList.remove('fade');
+    }, 450);
+  }, 6000);
+
+  /* ---------- public: ask ---------- */
+  function ask(q) {
+    const hit = qa.find(x => x.k.some(k => q.toLowerCase().includes(k)));
+    $('#answer-q').textContent = q;
+    $('#answer-a').textContent = hit ? hit.a : 'I don’t have that in my log. Try asking about posts, calls, money, or what got blocked.';
+    $('#answer-ref').textContent = hit ? '↳ ' + hit.r : '';
+    const box = $('#answer');
+    box.classList.remove('on'); void box.offsetWidth; box.classList.add('on');
+  }
+  $('#ask-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const v = $('#ask-input').value.trim();
+    if (!v) return;
+    ask(v);
+    $('#ask-input').value = '';
+  });
+  $$('.hints button').forEach(b => b.addEventListener('click', () => ask(b.dataset.q)));
+  $('#ask-jump').addEventListener('click', () => {
+    $('#ask-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => $('#ask-input').focus(), 500);
+  });
+  $('#join-btn').addEventListener('click', () => toast('Thanks — you’d be signed up here.'));
+
+  /* ---------- team: focus queue ---------- */
+  function renderFocus() {
+    const wrap = $('#focus-wrap');
+    const left = queue.length - qIndex;
+    $('#greet-sub').textContent = left
+      ? `${left} thing${left > 1 ? 's' : ''} need${left > 1 ? '' : 's'} you. One at a time.`
+      : 'Nothing needs you right now.';
+    if (!left) {
+      wrap.innerHTML = `
+        <div class="focus clear">
+          <div class="check"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+          <h3>All clear</h3>
+          <p>Megaphone will keep going with what it’s allowed to do alone.</p>
+        </div>`;
+      return;
+    }
+    const it = queue[qIndex];
+    wrap.innerHTML = `
+      <div class="focus" id="focus">
+        <div class="focus-top">
+          <span class="pill ${it.pill}">${it.kind} · ${it.pillText}</span>
+          <div class="progress">${queue.map((_, i) => `<i class="${i < qIndex ? 'done' : i === qIndex ? 'cur' : ''}"></i>`).join('')}</div>
+        </div>
+        <h3>${esc(it.title)}</h3>
+        <p class="why">${esc(it.why)}</p>
+        <div class="preview">${it.preview}</div>
+        <div class="focus-actions">
+          <button class="btn btn-green" data-d="approve">Approve</button>
+          <button class="btn btn-light" data-d="decline">Decline</button>
+          <span class="spacer"></span>
+          <button class="btn btn-text" data-d="later">Later</button>
+        </div>
+        <div class="meta-line">${esc(it.meta)}</div>
+      </div>`;
+    $$('#focus [data-d]').forEach(b => b.addEventListener('click', () => decide(b.dataset.d)));
+  }
+  function decide(d) {
+    const card = $('#focus');
+    card.classList.add('leave');
+    const msg = { approve: 'Approved. Megaphone is on it.', decline: 'Declined. It won’t do this.', later: 'Moved to the end.' }[d];
+    setTimeout(() => {
+      if (d === 'later') queue.push(queue.splice(qIndex, 1)[0]);
+      else qIndex++;
+      renderFocus();
+      toast(msg);
+    }, 260);
+  }
+  renderFocus();
+
+  /* ---------- team: pause ---------- */
+  $('#run-switch').addEventListener('click', e => {
+    paused = !paused;
+    e.currentTarget.classList.toggle('off', paused);
+    $('#run-name').textContent = paused ? 'Paused' : 'Running';
+    $('#pub-dot').classList.toggle('paused', paused);
+    $('#pub-status').textContent = paused ? 'Megaphone is paused' : 'Megaphone is working · Day 23';
+    $('#now-text').textContent = paused ? 'Paused by the team. Nothing will be sent.' : thoughts[ti];
+    toast(paused ? 'Agent paused. Nothing will go out.' : 'Agent running again.');
+  });
+
+  /* ---------- team: permissions ---------- */
+  function renderPerms() {
+    $('#perms').innerHTML = perms.map((p, i) => `
+      <div class="setting">
+        <div><div class="setting-name">${p.name}</div><div class="setting-desc">${p.desc}</div></div>
+        <div class="mini-seg">
+          ${['off', 'ask', 'auto'].map(m => `<button class="${p.mode === m ? 'on' : ''}" data-i="${i}" data-m="${m}">${{ off: 'Off', ask: 'Ask me', auto: 'Alone' }[m]}</button>`).join('')}
+        </div>
+      </div>`).join('');
+    $$('#perms button').forEach(b => b.addEventListener('click', () => {
+      perms[b.dataset.i].mode = b.dataset.m;
+      renderPerms();
+    }));
+  }
+  renderPerms();
+
+  /* ---------- team: voice ---------- */
+  function renderVoice() {
+    const v = +$('#voice').value;
+    $('#voice-sample').textContent = voices[v < 34 ? 0 : v < 67 ? 1 : 2];
+  }
+  $('#voice').addEventListener('input', renderVoice);
+  renderVoice();
+})();
+</script>
 </body>
 </html>
