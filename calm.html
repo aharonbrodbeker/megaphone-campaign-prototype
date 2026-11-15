@@ -24,8 +24,10 @@
     --radius: 16px;
     --shadow: 0 1px 2px rgba(18,18,18,0.04), 0 8px 24px -12px rgba(18,18,18,0.08);
     --ease: cubic-bezier(.2,.7,.2,1);
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   html { -webkit-font-smoothing: antialiased; }
   body {
     margin: 0;
@@ -35,9 +37,11 @@
     font-feature-settings: 'cv11', 'ss01';
     letter-spacing: -0.006em;
   }
-  button, input { font: inherit; color: inherit; }
+  button, input, textarea, select { font: inherit; color: inherit; }
   button { cursor: pointer; }
+  button:disabled { cursor: default; }
   a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   .container { width: min(680px, calc(100% - 40px)); margin: 0 auto; }
 
@@ -85,7 +89,7 @@
     padding: 6px 12px 6px 10px; border-radius: 999px;
     background: var(--surface); box-shadow: 0 0 0 1px var(--line);
   }
-  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); position: relative; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); position: relative; flex-shrink: 0; }
   .dot::after {
     content: ''; position: absolute; inset: -4px; border-radius: 50%;
     background: var(--accent); opacity: .18; animation: breathe 3.2s ease-in-out infinite;
@@ -108,10 +112,12 @@
   .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
   .btn {
     border: 0; border-radius: 11px; padding: 12px 20px; font-size: 14px; font-weight: 500;
-    transition: transform .15s var(--ease), background .2s, box-shadow .2s;
+    transition: transform .15s var(--ease), background .2s, box-shadow .2s, opacity .2s;
     display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
   }
   .btn:active { transform: scale(.98); }
+  .btn:disabled { opacity: .6; transform: none; }
+  .btn.sm { padding: 8px 14px; font-size: 13px; border-radius: 9px; }
   .btn-dark { background: var(--ink); color: #fff; }
   .btn-dark:hover { background: #2a2a2a; }
   .btn-light { background: var(--surface); color: var(--ink); box-shadow: 0 0 0 1px var(--line-strong); }
@@ -120,6 +126,12 @@
   .btn-green:hover { background: #18684c; }
   .btn-text { background: none; color: var(--muted); padding: 12px 10px; }
   .btn-text:hover { color: var(--ink); }
+  .link-btn {
+    border: 0; background: none; padding: 2px 0; font-size: 13px; color: var(--muted);
+    text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line-strong);
+    transition: color .2s;
+  }
+  .link-btn:hover { color: var(--ink); }
 
   /* ---------- now card ---------- */
   .now {
@@ -151,6 +163,7 @@
     border: 0; background: none; padding: 4px 0; font-size: 13px; color: var(--muted);
     border-bottom: 1.5px solid transparent; transition: all .2s;
   }
+  .tabs button:hover { color: var(--ink-2); }
   .tabs button.on { color: var(--ink); border-bottom-color: var(--ink); }
 
   .list { background: var(--surface); border-radius: var(--radius); box-shadow: 0 0 0 1px var(--line); overflow: hidden; }
@@ -206,9 +219,57 @@
 
   footer { padding: 88px 0 56px; font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
 
-  /* ---------- team ---------- */
-  .greet { padding: 72px 0 36px; }
+  /* ---------- team: bar + nav ---------- */
+  .team-bar {
+    position: sticky; top: 64px; z-index: 9;
+    background: rgba(251, 250, 248, 0.88);
+    backdrop-filter: saturate(1.4) blur(14px);
+    border-bottom: 1px solid var(--line);
+  }
+  .team-bar .container { display: flex; align-items: center; justify-content: space-between; gap: 10px 24px; flex-wrap: wrap; padding: 12px 0; }
+  .team-status { display: flex; align-items: center; gap: 9px; font-size: 13px; color: var(--ink-2); }
+  .team-status.is-paused #team-state { color: var(--warn); }
+  .pause-btn {
+    border: 0; background: var(--surface); box-shadow: 0 0 0 1px var(--line-strong); border-radius: 999px;
+    padding: 3px 11px; font-size: 12.5px; color: var(--ink-2); transition: box-shadow .2s, color .2s;
+  }
+  .pause-btn:hover { color: var(--ink); box-shadow: 0 0 0 1px rgba(18,18,18,.22); }
+  .team-nav { gap: 16px; overflow-x: auto; scrollbar-width: none; }
+  .team-nav::-webkit-scrollbar { display: none; }
+  .team-nav button { white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
+  .count {
+    font-size: 10.5px; font-weight: 600; min-width: 17px; height: 17px; padding: 0 5px; border-radius: 999px;
+    background: var(--accent); color: #fff; display: inline-grid; place-items: center; line-height: 1;
+  }
+
+  .pane { display: none; }
+  .pane.on { display: block; animation: rise .45s var(--ease); }
+  .pane-head { padding: 56px 0 28px; }
+  .pane-head h1 { font-size: clamp(36px, 6vw, 48px); margin: 0 0 8px; }
+  .pane-head p { margin: 0; color: var(--ink-2); }
+  .sub-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 44px 0 12px; }
+  .pane-head + .sub-head { margin-top: 0; }
+  .sub-head h2 { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; margin: 0; }
+  .sub-head span { font-size: 13px; color: var(--muted); }
+  .card-pad { padding: 20px; }
+  .line-top { border-top: 1px solid var(--line); }
+  .hint { font-size: 13.5px; color: var(--muted); margin: 0; }
+  .mono { font-family: var(--mono); font-size: 12px; }
+  .empty { padding: 36px 20px; text-align: center; color: var(--muted); font-size: 14px; }
+  .row-actions { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+  .row-actions .spacer { flex: 1; }
+
+  .field {
+    width: 100%; border: 0; background: var(--bg); border-radius: 12px; padding: 14px 16px;
+    font-size: 14.5px; line-height: 1.55; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-strong);
+    outline: none; resize: vertical; transition: box-shadow .2s;
+  }
+  .field:focus { box-shadow: inset 0 0 0 1.5px var(--accent); }
+
+  /* ---------- team: inbox ---------- */
+  .greet { padding: 56px 0 28px; }
   .greet h1 { font-size: clamp(40px, 7vw, 56px); margin: 0 0 10px; }
+  .greet-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
   .greet p { margin: 0; color: var(--ink-2); font-size: 16px; }
 
   .focus {
@@ -216,10 +277,12 @@
     padding: 28px; transition: opacity .3s var(--ease), transform .3s var(--ease);
   }
   .focus.leave { opacity: 0; transform: translateX(24px); }
-  .focus-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-  .pill { font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 999px; background: rgba(18,18,18,0.05); color: var(--ink-2); }
+  .focus-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 18px; }
+  .pill { font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 999px; background: rgba(18,18,18,0.05); color: var(--ink-2); white-space: nowrap; }
+  .pill.sm { font-size: 11.5px; padding: 2px 8px; }
   .pill.warn { color: var(--warn); background: var(--warn-soft); }
   .pill.stop { color: var(--stop); background: rgba(180,35,24,.07); }
+  .pill.ok { color: var(--accent); background: var(--accent-soft); }
   .progress { display: flex; gap: 5px; }
   .progress i { width: 18px; height: 3px; border-radius: 3px; background: rgba(18,18,18,0.1); transition: background .3s; }
   .progress i.done { background: var(--ink); }
@@ -233,9 +296,36 @@
   .preview .big { font-size: 34px; font-weight: 500; letter-spacing: -0.03em; color: var(--ink); white-space: normal; }
   .preview .sub { font-size: 13px; color: var(--muted); white-space: normal; margin-top: 2px; }
   .preview .subject { font-weight: 600; color: var(--ink); margin-bottom: 8px; white-space: normal; }
+  .preview mark { background: rgba(180,35,24,.1); color: var(--stop); border-radius: 4px; padding: 0 3px; }
+  .policy-note {
+    display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--stop);
+    background: rgba(180,35,24,.05); border-radius: 10px; padding: 10px 12px; margin: -10px 0 22px;
+  }
+  .policy-note svg { flex-shrink: 0; margin-top: 1px; }
+  .edit-area { display: grid; gap: 10px; margin-bottom: 22px; }
+  .search-lines {
+    font: 12.5px/1.75 var(--mono); color: var(--ink-2); background: var(--bg); border-radius: 12px;
+    padding: 14px 16px; box-shadow: inset 0 0 0 1px var(--line); min-height: 96px;
+  }
+  .search-lines div { animation: rise .35s var(--ease); }
+  .search-lines .muted { color: var(--muted); font-family: 'Inter', system-ui, sans-serif; font-size: 13px; }
+  .spin {
+    width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid currentColor; border-right-color: transparent;
+    display: inline-block; animation: spin .8s linear infinite; vertical-align: -1px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
   .focus-actions { display: flex; gap: 8px; flex-wrap: wrap; }
   .focus-actions .spacer { flex: 1; }
   .meta-line { margin-top: 18px; font-size: 12.5px; color: var(--muted); }
+
+  .q-row {
+    width: 100%; display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; text-align: left;
+    border: 0; border-top: 1px solid var(--line); background: none; padding: 14px 18px; transition: background .2s;
+  }
+  .q-row:first-child { border-top: 0; }
+  .q-row:hover { background: rgba(18,18,18,.015); }
+  .q-title { font-size: 14.5px; }
+  .q-meta { font-size: 12.5px; color: var(--muted); }
 
   .clear { text-align: center; padding: 56px 24px; }
   .check {
@@ -243,15 +333,16 @@
     display: grid; place-items: center; color: var(--accent);
   }
   .clear h3 { font-size: 20px; margin: 0 0 4px; }
-  .clear p { color: var(--muted); margin: 0; }
+  .clear p { color: var(--muted); margin: 0 0 14px; }
 
+  /* ---------- team: generic cards ---------- */
   .card { background: var(--surface); border-radius: var(--radius); box-shadow: 0 0 0 1px var(--line); }
   .setting { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 20px; border-top: 1px solid var(--line); }
   .setting:first-child { border-top: 0; }
   .setting-name { font-size: 15px; }
   .setting-desc { font-size: 13px; color: var(--muted); }
 
-  .mini-seg { display: inline-flex; padding: 2px; background: rgba(18,18,18,0.045); border-radius: 8px; }
+  .mini-seg { display: inline-flex; padding: 2px; background: rgba(18,18,18,0.045); border-radius: 8px; flex-shrink: 0; }
   .mini-seg button { border: 0; background: none; padding: 5px 11px; font-size: 12.5px; border-radius: 6px; color: var(--muted); transition: all .2s; }
   .mini-seg button.on { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 0 0 1px var(--line); }
 
@@ -259,25 +350,171 @@
   .switch::after { content: ''; position: absolute; top: 3px; left: 21px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: left .25s var(--ease); box-shadow: 0 1px 2px rgba(0,0,0,.2); }
   .switch.off { background: rgba(18,18,18,0.18); }
   .switch.off::after { left: 3px; }
+  .switch.sm { width: 34px; height: 20px; }
+  .switch.sm::after { width: 14px; height: 14px; left: 17px; }
+  .switch.sm.off::after { left: 3px; }
 
   .bar { height: 6px; border-radius: 6px; background: rgba(18,18,18,0.06); overflow: hidden; margin-top: 12px; }
   .bar i { display: block; height: 100%; background: var(--ink); border-radius: 6px; transition: width .6s var(--ease); }
+  .bar i.over { background: var(--warn); }
   .budget { padding: 22px 20px; }
-  .budget-top { display: flex; justify-content: space-between; align-items: baseline; }
+  .budget-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
   .budget-top b { font-size: 26px; font-weight: 500; letter-spacing: -0.03em; }
   .budget-top span { font-size: 13px; color: var(--muted); }
 
+  .stepper { display: inline-flex; align-items: center; border-radius: 9px; box-shadow: 0 0 0 1px var(--line-strong); background: var(--surface); flex-shrink: 0; }
+  .stepper button { border: 0; background: none; width: 30px; height: 30px; font-size: 16px; line-height: 1; color: var(--ink-2); border-radius: 8px; }
+  .stepper button:hover:not(:disabled) { background: rgba(18,18,18,.04); }
+  .stepper button:disabled { opacity: .3; }
+  .stepper output { min-width: 56px; text-align: center; font-size: 13px; font-variant-numeric: tabular-nums; }
+  .stepper.big button { width: 38px; height: 38px; }
+  .stepper.big output { min-width: 72px; font-size: 16px; font-weight: 500; }
+
+  /* ---------- team: log ---------- */
+  .filters { display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chips button {
+    border: 0; background: none; font-size: 12.5px; color: var(--muted); padding: 4px 11px; border-radius: 999px;
+    box-shadow: 0 0 0 1px var(--line); transition: all .2s;
+  }
+  .chips button:hover { color: var(--ink-2); }
+  .chips button.on { color: var(--ink); background: var(--surface); box-shadow: 0 0 0 1px var(--line-strong); }
+  .log-item { border-top: 1px solid var(--line); }
+  .log-item:first-child { border-top: 0; }
+  .log-row {
+    width: 100%; display: grid; grid-template-columns: 44px 72px 1fr auto; gap: 12px; align-items: baseline; text-align: left;
+    border: 0; background: none; padding: 14px 18px; transition: background .2s;
+  }
+  .log-row:hover, .log-item.open .log-row { background: rgba(18,18,18,.015); }
+  .log-tool { font-size: 13px; color: var(--muted); }
+  .log-tool-m { display: none; color: var(--muted); }
+  .log-title { font-size: 14.5px; min-width: 0; }
+  .log-more { padding: 6px 18px 20px 74px; animation: rise .3s var(--ease); background: rgba(18,18,18,.015); }
+  .kv { display: grid; grid-template-columns: 64px 1fr; gap: 10px 14px; margin: 0; font-size: 14px; }
+  .kv dt { color: var(--muted); font-size: 13px; padding-top: 1px; }
+  .kv dd { margin: 0; color: var(--ink-2); min-width: 0; }
+  .code {
+    margin: 0; font: 12.5px/1.6 var(--mono); background: var(--surface); border-radius: 10px; padding: 12px 14px;
+    box-shadow: inset 0 0 0 1px var(--line); overflow-x: auto; white-space: pre; color: var(--ink-2);
+  }
+  .log-more .link-btn { margin-top: 14px; }
+  .log-foot { margin-top: 12px; font-size: 12.5px; color: var(--muted); }
+
+  /* ---------- team: brain ---------- */
+  .prompt { font: 13px/1.65 var(--mono); min-height: 300px; }
+  .dirty { font-size: 12.5px; color: var(--warn); }
+  .ver { display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center; padding: 14px 20px; border-top: 1px solid var(--line); }
+  .ver:first-child { border-top: 0; }
+  .ver b { font-weight: 600; font-size: 14px; font-variant-numeric: tabular-nums; }
+  .ver-note { font-size: 14px; }
+  .ver-meta { font-size: 12.5px; color: var(--muted); }
+  .edit-list { list-style: none; margin: 0; padding: 0; }
+  .edit-list li { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; padding: 13px 20px; border-top: 1px solid var(--line); font-size: 14.5px; }
+  .edit-list li:first-child { border-top: 0; }
+  .edit-list li.muted-li { color: var(--muted); }
+  .x-btn {
+    border: 0; background: none; color: var(--muted); width: 28px; height: 28px; border-radius: 8px;
+    display: grid; place-items: center; flex-shrink: 0; margin: -3px -6px 0 0; transition: all .2s;
+  }
+  .x-btn:hover { color: var(--stop); background: rgba(180,35,24,.06); }
+  .add-row { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--line); }
+  .add-row .field { padding: 9px 14px; }
   .voice { padding: 22px 20px; }
+  .slider-row + .slider-row { margin-top: 20px; }
+  .slider-row label { font-size: 14.5px; }
   .range-labels { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--muted); margin-top: 8px; }
-  input[type=range] { width: 100%; -webkit-appearance: none; appearance: none; height: 4px; border-radius: 4px; background: rgba(18,18,18,0.1); outline: none; margin-top: 16px; }
+  input[type=range] { width: 100%; -webkit-appearance: none; appearance: none; height: 4px; border-radius: 4px; background: rgba(18,18,18,0.1); outline: none; margin-top: 14px; display: block; }
+  input[type=range]:focus-visible { outline: 2px solid var(--accent); outline-offset: 6px; }
   input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 1px var(--line-strong), 0 2px 6px rgba(0,0,0,.12); cursor: pointer; }
   input[type=range]::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #fff; border: 1px solid var(--line-strong); }
-  .voice-sample { margin-top: 18px; padding: 16px 18px; background: var(--bg); border-radius: 12px; font-size: 14.5px; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--line); transition: opacity .25s; }
+  .sample-q { font-size: 13px; color: var(--muted); margin-top: 26px; }
+  .voice-sample { margin-top: 8px; padding: 16px 18px; background: var(--bg); border-radius: 12px; font-size: 14.5px; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--line); }
+  .src-chip { display: inline-block; font-size: 11.5px; color: var(--accent); background: var(--accent-soft); padding: 1px 7px; border-radius: 6px; vertical-align: 1px; }
+
+  /* ---------- team: tools ---------- */
+  .tool { padding: 18px 20px; border-top: 1px solid var(--line); }
+  .tool:first-child { border-top: 0; }
+  .tool-top { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+  .tool-use { display: flex; align-items: center; gap: 14px; margin-top: 14px; transition: opacity .2s; }
+  .tool.is-off .tool-use { opacity: .4; }
+  .tool-use .bar { flex: 1; margin-top: 0; }
+  .use-label { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .mode-key { font-size: 12.5px; color: var(--muted); margin-top: 12px; }
+  .store-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 20px; border-top: 1px solid var(--line); }
+  .store-row:first-child { border-top: 0; }
+  .store-info { display: flex; gap: 12px; align-items: center; min-width: 0; }
+  .logo {
+    width: 34px; height: 34px; border-radius: 10px; background: var(--bg); box-shadow: inset 0 0 0 1px var(--line);
+    display: grid; place-items: center; font-size: 12px; font-weight: 600; color: var(--ink-2); flex-shrink: 0;
+  }
+  .connected { font-size: 13px; color: var(--accent); display: inline-flex; align-items: center; gap: 6px; padding: 8px 4px; white-space: nowrap; }
+
+  /* ---------- team: budget ---------- */
+  .callout {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 16px;
+    padding: 14px 18px; border-radius: 14px; background: var(--warn-soft); color: var(--ink-2); font-size: 14px;
+  }
+  .card-split { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; padding: 20px; align-items: center; }
+  .vcard {
+    aspect-ratio: 1.586; border-radius: 14px; padding: 18px; color: #fff;
+    background:
+      radial-gradient(120% 140% at 100% 0%, rgba(111,211,173,.28), transparent 52%),
+      linear-gradient(160deg, #1f1f1f, #0d0d0d);
+    display: flex; flex-direction: column; justify-content: space-between;
+    box-shadow: 0 14px 30px -18px rgba(0,0,0,.55); font-size: 11px; letter-spacing: .03em;
+  }
+  .vcard-top, .vcard-bot { display: flex; justify-content: space-between; gap: 8px; }
+  .vcard-top span:first-child, .vcard-bot { opacity: .7; }
+  .vcard-net { font-weight: 600; font-style: italic; font-size: 13px; letter-spacing: .04em; }
+  .vcard-num { font-size: 18px; letter-spacing: .14em; font-variant-numeric: tabular-nums; }
+  .auto-box .stepper { margin-top: 14px; }
+  .ledger-row { display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; padding: 14px 20px; border-top: 1px solid var(--line); align-items: start; }
+  .ledger-row:first-child { border-top: 0; }
+  .ledger-vendor { font-size: 14.5px; }
+  .ledger-desc { font-size: 13px; color: var(--muted); }
+  .ledger-row .link-btn { margin-top: 4px; color: var(--warn); }
+  .ledger-side { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .ledger-amt { font-size: 14.5px; font-variant-numeric: tabular-nums; }
+  .ledger-amt.struck { text-decoration: line-through; color: var(--muted); }
+  .rule { display: flex; justify-content: space-between; gap: 16px; align-items: center; padding: 14px 20px; border-top: 1px solid var(--line); font-size: 14.5px; }
+  .rule:first-child { border-top: 0; }
+
+  /* ---------- team: calls ---------- */
+  .call-row {
+    width: 100%; display: grid; grid-template-columns: 1fr auto auto; gap: 14px; align-items: center; text-align: left;
+    border: 0; border-top: 1px solid var(--line); background: none; padding: 14px 20px; transition: background .2s;
+  }
+  .call-row:first-child { border-top: 0; }
+  .call-row:hover { background: rgba(18,18,18,.015); }
+  .call-row.on { background: var(--accent-soft); }
+  .call-name { font-size: 14.5px; }
+  .call-meta { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .call-detail { margin-top: 16px; padding: 22px; scroll-margin-top: 140px; animation: rise .35s var(--ease); }
+  .call-detail.is-empty { background: none; box-shadow: none; padding: 8px 4px; }
+  .cd-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .cd-head h3 { margin: 0 0 2px; font-size: 20px; font-weight: 600; letter-spacing: -.02em; }
+  .cd-summary { margin: 14px 0 0; color: var(--ink-2); }
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+  .tag-row span { font-size: 12px; color: var(--ink-2); background: rgba(18,18,18,.045); padding: 3px 9px; border-radius: 999px; }
+  .player { display: flex; align-items: center; gap: 12px; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
+  .player .bar { flex: 1; margin-top: 0; }
+  .player .bar i { transition: width .1s linear; }
+  .play-btn { width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--ink); color: #fff; display: grid; place-items: center; flex-shrink: 0; transition: background .2s; }
+  .play-btn:hover { background: #2a2a2a; }
+  .play-time { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .player-empty { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
+  .transcript { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+  .line { max-width: 85%; animation: rise .35s var(--ease); }
+  .line .who { display: block; font-size: 11.5px; color: var(--muted); margin-bottom: 3px; }
+  .line p { margin: 0; padding: 10px 14px; border-radius: 14px; font-size: 14px; }
+  .line.bot p { background: var(--bg); box-shadow: inset 0 0 0 1px var(--line); border-top-left-radius: 4px; }
+  .line.human { align-self: flex-end; text-align: right; }
+  .line.human p { background: var(--accent-soft); color: var(--ink); border-top-right-radius: 4px; text-align: left; }
 
   .toast {
     position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px); opacity: 0;
     background: var(--ink); color: #fff; padding: 11px 18px; border-radius: 12px; font-size: 14px;
-    transition: all .35s var(--ease); pointer-events: none; z-index: 50;
+    transition: all .35s var(--ease); pointer-events: none; z-index: 50; max-width: calc(100% - 32px); text-align: center;
   }
   .toast.on { opacity: 1; transform: translate(-50%, 0); }
 
@@ -290,6 +527,31 @@
     .quiet-link { display: none; }
     .focus { padding: 22px; }
     .setting { flex-direction: column; align-items: flex-start; }
+
+    .team-bar { position: static; }
+    .team-bar .container { flex-direction: column; align-items: stretch; gap: 8px; padding: 10px 0 0; }
+    .team-nav { margin: 0 -20px; padding: 0 20px 8px; }
+    .greet, .pane-head { padding: 40px 0 24px; }
+    .greet-row { flex-direction: column; gap: 6px; }
+    .log-row { grid-template-columns: 40px 1fr auto; padding: 14px 16px; gap: 10px; }
+    .log-tool { display: none; }
+    .log-tool-m { display: inline; }
+    .log-more { padding: 6px 16px 18px; }
+    .kv { grid-template-columns: 1fr; gap: 2px; }
+    .kv dd { margin-bottom: 10px; }
+    .tool-top { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .tool-use { flex-wrap: wrap; }
+    .tool-use .bar { flex-basis: 100%; }
+    .use-label { flex: 1; }
+    .store-row { padding: 14px 16px; }
+    .card-split { grid-template-columns: 1fr; }
+    .vcard { max-width: 340px; }
+    .call-row { grid-template-columns: 1fr auto; padding: 14px 16px; }
+    .call-dur { display: none; }
+    .line { max-width: 92%; }
+    .ver { grid-template-columns: 36px 1fr; }
+    .ver > :last-child { grid-column: 2; justify-self: start; }
+    .callout { flex-direction: column; align-items: flex-start; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -301,9 +563,9 @@
 <div class="top" id="top">
   <div class="container">
     <div class="brand"><span class="brand-mark"></span>Transparent Histadrut</div>
-    <div class="seg" role="tablist">
-      <button class="on" data-view="public">Public</button>
-      <button data-view="team">Team</button>
+    <div class="seg" role="tablist" aria-label="View">
+      <button class="on" role="tab" aria-selected="true" data-view="public">Public</button>
+      <button role="tab" aria-selected="false" data-view="team">Team</button>
     </div>
     <a class="quiet-link" href="./index.html">Full version ↗</a>
   </div>
@@ -353,7 +615,7 @@
       <div class="section-head"><h2>Ask Megaphone</h2></div>
       <div class="ask">
         <form id="ask-form">
-          <input id="ask-input" placeholder="What did you post today?" autocomplete="off" />
+          <input id="ask-input" placeholder="What did you post today?" autocomplete="off" aria-label="Ask Megaphone" />
           <button class="btn btn-dark" type="submit">Ask</button>
         </form>
       </div>
@@ -378,49 +640,180 @@
 
 <!-- ================= TEAM ================= -->
 <main class="view" id="view-team">
+  <div class="team-bar">
+    <div class="container">
+      <div class="team-status" id="team-status">
+        <span class="dot" id="team-dot"></span>
+        <span id="team-state">Running · Day 23</span>
+        <button class="pause-btn" id="pause-btn">Pause</button>
+      </div>
+      <nav class="tabs team-nav" id="team-nav" aria-label="Team sections">
+        <button class="on" data-tab="inbox" aria-current="page">Inbox <span class="count" id="inbox-count">5</span></button>
+        <button data-tab="log">Log</button>
+        <button data-tab="brain">Brain</button>
+        <button data-tab="tools">Tools</button>
+        <button data-tab="budget">Budget</button>
+        <button data-tab="calls">Calls</button>
+      </nav>
+    </div>
+  </div>
+
   <div class="container">
-    <section class="greet">
-      <h1>Good afternoon, Yoav.</h1>
-      <p id="greet-sub">4 things need you. One at a time.</p>
+
+    <!-- ---------- Inbox ---------- -->
+    <section class="pane on" id="pane-inbox" aria-label="Inbox">
+      <div class="greet">
+        <h1 id="greet-h">Good afternoon, Yoav.</h1>
+        <div class="greet-row">
+          <p id="greet-sub">5 things need you. One at a time.</p>
+          <button class="link-btn" id="see-all" aria-pressed="false">See all 5</button>
+        </div>
+      </div>
+      <div id="focus-wrap"></div>
     </section>
 
-    <div id="focus-wrap"></div>
+    <!-- ---------- Log ---------- -->
+    <section class="pane" id="pane-log" aria-label="Log">
+      <div class="pane-head">
+        <h1>Log</h1>
+        <p>Everything Megaphone did today, newest first. Open a row to see why.</p>
+      </div>
+      <div class="filters">
+        <div class="tabs" id="log-status" role="group" aria-label="Filter by status"></div>
+        <div class="chips" id="log-tools" role="group" aria-label="Filter by tool"></div>
+      </div>
+      <div class="list" id="log-list"></div>
+      <div class="log-foot" id="log-count"></div>
+    </section>
 
-    <section class="section">
-      <div class="section-head"><h2>Agent</h2></div>
+    <!-- ---------- Brain ---------- -->
+    <section class="pane" id="pane-brain" aria-label="Brain">
+      <div class="pane-head">
+        <h1>Brain</h1>
+        <p>What Megaphone believes, says, and never does.</p>
+      </div>
+
+      <div class="sub-head"><h2>System prompt</h2><span id="prompt-ver">v12</span></div>
+      <div class="card card-pad">
+        <textarea class="field prompt" id="prompt" rows="16" spellcheck="false" aria-label="System prompt"></textarea>
+        <div class="row-actions">
+          <span class="dirty" id="prompt-dirty" hidden>Unsaved changes</span>
+          <span class="spacer"></span>
+          <button class="btn btn-dark sm" id="prompt-save">Save</button>
+        </div>
+      </div>
+
+      <div class="sub-head"><h2>Versions</h2><span>Restore loads it into the editor</span></div>
+      <div class="card" id="versions"></div>
+
+      <div class="sub-head"><h2>Core messages</h2><span>What it keeps coming back to</span></div>
       <div class="card">
-        <div class="setting">
-          <div>
-            <div class="setting-name" id="run-name">Running</div>
-            <div class="setting-desc">Pause stops every post, email, call and payment.</div>
-          </div>
-          <button class="switch" id="run-switch" aria-label="Pause agent"></button>
+        <ul class="edit-list" id="list-messages"></ul>
+        <form class="add-row" id="add-messages">
+          <input class="field" placeholder="Add a message" aria-label="New core message" autocomplete="off" />
+          <button class="btn btn-light sm" type="submit">Add</button>
+        </form>
+      </div>
+
+      <div class="sub-head"><h2>Red lines</h2><span>Never crossed, even if asked</span></div>
+      <div class="card">
+        <ul class="edit-list" id="list-redLines"></ul>
+        <form class="add-row" id="add-redLines">
+          <input class="field" placeholder="Add a red line" aria-label="New red line" autocomplete="off" />
+          <button class="btn btn-light sm" type="submit">Add</button>
+        </form>
+      </div>
+
+      <div class="sub-head"><h2>Voice</h2><span>How it sounds</span></div>
+      <div class="card voice">
+        <div class="slider-row">
+          <label for="s-tone">Tone</label>
+          <input type="range" min="0" max="100" value="45" id="s-tone" data-k="tone" />
+          <div class="range-labels"><span>Calm</span><span>Bold</span></div>
+        </div>
+        <div class="slider-row">
+          <label for="s-sharpness">Sharpness</label>
+          <input type="range" min="0" max="100" value="50" id="s-sharpness" data-k="sharpness" />
+          <div class="range-labels"><span>Gentle</span><span>Pointed</span></div>
+        </div>
+        <div class="slider-row">
+          <label for="s-humor">Humor</label>
+          <input type="range" min="0" max="100" value="30" id="s-humor" data-k="humor" />
+          <div class="range-labels"><span>Serious</span><span>Playful</span></div>
+        </div>
+        <div class="sample-q">Sample reply to @dan_k: “The Histadrut negotiates our salaries. What more do you want?”</div>
+        <div class="voice-sample" id="voice-sample" aria-live="polite"></div>
+        <div class="row-actions">
+          <span class="spacer"></span>
+          <button class="btn btn-light sm" id="style-save">Save voice</button>
         </div>
       </div>
     </section>
 
-    <section class="section">
-      <div class="section-head"><h2>What it may do alone</h2></div>
-      <div class="card" id="perms"></div>
+    <!-- ---------- Tools ---------- -->
+    <section class="pane" id="pane-tools" aria-label="Tools">
+      <div class="pane-head">
+        <h1>Tools</h1>
+        <p>What it may do, and how much of it per day.</p>
+      </div>
+      <div class="card" id="tools-list"></div>
+      <div class="mode-key">Off: never. Ask me: it drafts, you approve. Alone: it acts within the daily limit.</div>
+
+      <div class="sub-head"><h2>Add a tool</h2><span>New tools start on “Ask me”</span></div>
+      <div class="card" id="store"></div>
     </section>
 
-    <section class="section">
-      <div class="section-head"><h2>Budget</h2></div>
-      <div class="card budget">
-        <div class="budget-top"><b id="spent">₪6,681</b><span>of ₪15,000 this month</span></div>
-        <div class="bar"><i id="spent-bar" style="width:44.5%"></i></div>
-        <div class="meta-line">Up to ₪100 it pays alone. Above that, it asks you.</div>
+    <!-- ---------- Budget ---------- -->
+    <section class="pane" id="pane-budget" aria-label="Budget">
+      <div class="pane-head">
+        <h1>Budget</h1>
+        <p>What it spent, what it may spend, and who said yes.</p>
       </div>
+      <div class="card">
+        <div class="budget">
+          <div class="budget-top"><b id="b-month">₪6,681</b><span id="b-month-cap">of ₪15,000 this month</span></div>
+          <div class="bar"><i id="b-month-bar"></i></div>
+        </div>
+        <div class="budget line-top">
+          <div class="budget-top"><b id="b-day">₪120</b><span id="b-day-cap">of ₪500 today</span></div>
+          <div class="bar"><i id="b-day-bar"></i></div>
+        </div>
+      </div>
+      <div class="callout" id="b-pending" hidden></div>
+
+      <div class="sub-head"><h2>Card &amp; auto‑pay</h2></div>
+      <div class="card card-split">
+        <div class="vcard" aria-label="Virtual card ending in 4821">
+          <div class="vcard-top"><span>MEGAPHONE · CAMPAIGN AGENT</span><span class="vcard-net">VISA</span></div>
+          <div class="vcard-num">•••• 4821</div>
+          <div class="vcard-bot"><span>Virtual · Stripe Issuing</span><span>11/27</span></div>
+        </div>
+        <div class="auto-box">
+          <div class="setting-name">Auto‑pay limit</div>
+          <div class="setting-desc">It pays up to this alone, only to approved vendors. Above that, it asks you. It never sees the card number.</div>
+          <div class="stepper big" role="group" aria-label="Auto-pay limit">
+            <button id="b-auto-dec" aria-label="Lower auto-pay limit by ₪25">−</button>
+            <output id="b-auto" aria-live="polite">₪100</output>
+            <button id="b-auto-inc" aria-label="Raise auto-pay limit by ₪25">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="sub-head"><h2>Spending</h2><span>Most recent first</span></div>
+      <div class="card" id="ledger"></div>
+
+      <div class="sub-head"><h2>Rules</h2></div>
+      <div class="card" id="rules"></div>
     </section>
 
-    <section class="section">
-      <div class="section-head"><h2>Voice</h2></div>
-      <div class="card voice">
-        <div class="setting-name">How it sounds</div>
-        <input type="range" min="0" max="100" value="45" id="voice" />
-        <div class="range-labels"><span>Calm</span><span>Bold</span></div>
-        <div class="voice-sample" id="voice-sample"></div>
+    <!-- ---------- Calls ---------- -->
+    <section class="pane" id="pane-calls" aria-label="Calls">
+      <div class="pane-head">
+        <h1>Calls</h1>
+        <p>32 calls today · 21 answered · 14 joining Thursday’s Zoom. Every call opens with “I’m an AI.”</p>
       </div>
+      <div class="list" id="call-list"></div>
+      <div class="card call-detail is-empty" id="call-detail"></div>
     </section>
 
     <footer>
@@ -430,20 +823,37 @@
   </div>
 </main>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 (() => {
-  const $ = (s) => document.querySelector(s);
-  const $$ = (s) => [...document.querySelectorAll(s)];
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+  const pad = (n) => String(n).padStart(2, '0');
+  const nowHM = () => { const d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+  const ils = (n) => '₪' + Math.round(n).toLocaleString('en-US');
+  const money = (n) => (n === 0 ? '₪0' : n < 10 ? '₪' + n.toFixed(2) : ils(n));
+  const mmss = (s) => Math.floor(s / 60) + ':' + pad(Math.floor(s % 60));
+  const clip = (s, n) => { const t = String(s).replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n - 1).trimEnd() + '…' : t; };
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ME = 'Yoav C.';
 
-  /* ---------- data ---------- */
+  const ic = (d, s = 16) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  const svg = {
+    check: ic('<path d="M20 6 9 17l-5-5"/>', 14),
+    x: ic('<path d="M18 6 6 18M6 6l12 12"/>', 14),
+    shield: ic('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9.5 9.5 5 5m0-5-5 5"/>', 15),
+    play: '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>',
+    pause: '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>',
+  };
+
+  /* ================= public data ================= */
   const feed = [
     { time: '12:47', kind: 'post', label: 'Post on X', title: 'Thread: 5 questions every member should ask about their dues.', why: 'Questions invite replies; claims invite fights. Each point links to a public source.', src: 'Annual report 2025, §4' },
     { time: '12:40', kind: 'call', label: 'Calls', title: 'Called 32 volunteers who asked to hear from us. 14 will join Thursday’s Zoom.', why: 'Opt-in list only. Every call opens with “I’m an AI.” Two people asked to be removed and were.', src: 'Call log · 32 calls' },
     { time: '12:31', kind: 'post', label: 'Post on X', title: 'A reply with an unsourced number was stopped.', tag: ['block', 'Blocked'], why: 'Rule: no factual claim without a verified source. The agent rewrote it as a question instead.', src: 'Policy · sources required' },
-    { time: '12:22', kind: 'email', label: 'Email', title: 'Weekly newsletter to 18,340 subscribers.', tag: ['wait', 'Waiting for a human'], why: 'Emails always need a person to approve them first.', src: 'Approval queue' },
+    { ref: 'A-1084', time: '12:22', kind: 'email', label: 'Email', title: 'Weekly newsletter to 18,340 subscribers.', tag: ['wait', 'Waiting for a human'], why: 'Emails always need a person to approve them first.', src: 'Approval queue' },
     { time: '11:12', kind: 'email', label: 'Email', title: 'Welcome note to 412 new volunteers. 61% opened it.', why: 'A quick hello right after sign-up keeps people around.', src: 'Delivered 409 / 412' },
     { time: '09:58', kind: 'post', label: 'Post on X', title: '“What do you actually get for your dues?” — 88K views.', why: 'Morning is when this audience reads. Boosted with ₪150 after a strong start, approved by Yoav.', src: 'X analytics' },
   ];
@@ -465,60 +875,328 @@
     { k: ['who', 'you', 'bot', 'human'], a: 'I’m Megaphone, the campaign’s AI agent. I research, post, email and call — but only within rules people set, and everything I do is listed here.', r: 'About Megaphone' },
   ];
 
+  /* ================= team data ================= */
   const queue = [
-    { kind: 'Email', pill: 'warn', pillText: 'Needs approval', title: 'Weekly newsletter', why: 'Highlights, Thursday’s Zoom, and one ask: share the dues thread.',
-      preview: `<div class="subject">Week 4: one big question</div>Hi {first_name},\n\nThis week thousands of you asked the same thing: where do our dues actually go?\n\nJoin us Thursday at 20:00 to plan what’s next.\n\n— Written by Megaphone (AI), approved by our team`,
-      meta: '18,340 opt‑in subscribers · unsubscribe link included' },
-    { kind: 'Payment', pill: 'warn', pillText: 'Above ₪100', title: 'Boost the dues thread', why: 'It’s doing 3× our usual engagement. A 48‑hour boost could double reach.',
-      preview: `<div class="big">₪350</div><div class="sub">X Ads · 48 hours · Israel, ages 25–60</div>`,
-      meta: 'Leaves ₪30 in today’s budget' },
-    { kind: 'Post', pill: '', pillText: 'Over daily limit', title: 'One more post today', why: 'A Knesset committee just scheduled a hearing on union transparency. Timely.',
-      preview: `The Knesset Labor Committee will discuss union financial transparency next Tuesday.\n\nWe’ll be there. What would you ask them?`,
-      meta: 'Post 13 of a 12‑post day' },
-    { kind: 'Calls', pill: '', pillText: 'Needs approval', title: 'Evening calls to 80 supporters', why: 'Invite them to Thursday’s Zoom and the petition. 18:00–20:30 only.',
-      preview: `“Hi {name}, this is Megaphone, an AI assistant for Transparent Histadrut. You asked to hear from us — do you have a minute?”`,
-      meta: 'Opt‑in list · est. ₪96' },
+    { id: 'P-1', actionId: 'A-1084', tool: 'email', kind: 'Email', pill: 'warn', pillText: 'Needs approval', type: 'email',
+      title: 'Weekly newsletter', why: 'Highlights, Thursday’s Zoom, and one ask: share the dues thread.',
+      subject: 'Week 4: one big question',
+      body: 'Hi {first_name},\n\nThis week thousands of you asked the same thing: where do our dues actually go?\n\nJoin us Thursday at 20:00 to plan what’s next.\n\n— Written by Megaphone (AI), approved by our team',
+      meta: '18,340 opt‑in subscribers · unsubscribe link included',
+      done: 'Sent to 18,340 opt-in subscribers. Unsubscribe link included.', uses: 1,
+      pub: { kind: 'email', label: 'Email', title: 'Weekly newsletter sent to 18,340 subscribers.', why: 'A person read it and approved it first. Emails always need that.', src: 'Approved by Yoav' } },
+    { id: 'P-2', actionId: 'A-1083', tool: 'ads', kind: 'Payment', pill: 'warn', pillText: 'Above auto‑pay limit', type: 'payment',
+      title: 'Boost the dues thread', why: 'It’s doing 3× our usual engagement. A 48‑hour boost could double reach.',
+      amount: 350, sub: 'X Ads · 48 hours · Israel, ages 25–60',
+      meta: 'Leaves ₪30 in today’s budget',
+      done: 'Campaign live for 48 hours. Charged card •••• 4821.',
+      pub: { kind: 'pay', label: 'Payment', title: '₪350 to boost the dues thread for 48 hours.', why: 'Above the auto-pay limit, so a person approved it.', src: 'Budget · Ledger' } },
+    { id: 'P-3', actionId: 'A-1089', tool: 'x', kind: 'Post', pill: '', pillText: 'Over daily limit', type: 'post',
+      title: 'One more post today', why: 'A Knesset committee just scheduled a hearing on union transparency. Timely.',
+      text: 'The Knesset Labor Committee will discuss union financial transparency next Tuesday.\n\nWe’ll be there. What would you ask them?',
+      meta: 'Post 13 of a 12‑post day',
+      done: 'Posted from @TransparentHist.', uses: 1,
+      pub: { kind: 'post', label: 'Post on X', why: 'Over the daily limit, so a person approved it. Timely: the hearing was just announced.', src: 'Knesset agenda' } },
+    { id: 'P-4', actionId: 'A-1090', tool: 'calls', kind: 'Calls', pill: '', pillText: 'Needs approval', type: 'call',
+      title: 'Evening calls to 80 supporters', why: 'Invite them to Thursday’s Zoom and the petition. 18:00–20:30 only.',
+      text: '“Hi {name}, this is Megaphone, an AI assistant for Transparent Histadrut. You asked to hear from us — do you have a minute?”',
+      meta: 'Opt‑in list · est. ₪96',
+      done: 'Scheduled for 18:00–20:30. 80 people on the opt-in list.',
+      pub: { kind: 'call', label: 'Calls', title: 'Evening calls to 80 supporters who asked to hear from us.', why: 'Opt-in list only, 18:00–20:30. Every call opens with “I’m an AI.”', src: 'Approved by Yoav' } },
+    { id: 'P-5', actionId: 'A-1085', tool: 'x', kind: 'Reply', pill: 'stop', pillText: 'Blocked', type: 'post', blocked: true,
+      title: 'Reply with an unsourced number', why: 'Someone asked how much of their dues goes to politics. It answered with an estimate.',
+      text: 'Roughly 40% of dues go to political activity. That’s outrageous.', flag: '40%',
+      rule: '“40%” is a factual claim with no verified source. Also flagged: charged language (“outrageous”).',
+      meta: 'Reply to @user_8812',
+      done: 'Reply posted to @user_8812.', uses: 1,
+      pub: { kind: 'post', label: 'Reply on X', why: 'First draft was blocked for an unsourced number. Rewritten as a sourced question, then approved.', src: 'Annual report 2025, §4' } },
   ];
-  let qIndex = 0;
 
-  const perms = [
-    { name: 'Research', desc: 'Search and read sources', mode: 'auto' },
-    { name: 'Posts on X', desc: 'Up to 12 a day', mode: 'auto' },
-    { name: 'Email', desc: 'Opt‑in subscribers only', mode: 'ask' },
-    { name: 'Calls', desc: 'People who asked to be called', mode: 'ask' },
-    { name: 'Payments', desc: 'Up to ₪100 alone', mode: 'ask' },
+  const log = [
+    { id: 'A-1090', time: '12:58', tool: 'calls', title: 'Evening call round: 80 supporters who opted in', status: 'pending', policy: 'approval', cost: 0, tokens: 3100,
+      why: 'Invite supporters to Thursday’s Zoom and ask about the petition. Calling window 18:00–20:30 only.',
+      input: { list: 'supporters_optin_calls', count: 80, script: 'zoom_invite_v2', window: '18:00-20:30', disclose_ai: true },
+      output: 'Waiting for approval. Calls always need a person.' },
+    { id: 'A-1089', time: '12:55', tool: 'x', title: 'Post #13: Knesset committee hearing on union transparency', status: 'pending', policy: 'approval', cost: 0, tokens: 2200,
+      why: 'Breaking: a Knesset committee scheduled a hearing on union transparency. Worth going one over today’s limit.',
+      input: { type: 'tweet', quota_today: 12, would_be: 13, source: 'Knesset agenda' },
+      output: 'Waiting for approval (over the daily limit of 12).' },
+    { id: 'A-1088', time: '12:52', tool: 'research', title: 'Morning news scan: 14 articles on public-sector wage talks', status: 'executed', policy: 'auto', cost: 0.42, tokens: 18400,
+      why: 'Wage negotiations are trending. Looking for factual openings to raise the transparency question without attacking individuals.',
+      input: { query: 'public sector wage negotiations Histadrut', sources: 'news, gov.il, Knesset', limit: 20 },
+      output: 'Found 3 response opportunities. Flagged 1 article with a claim that needs verification before we reference it.' },
+    { id: 'A-1087', time: '12:47', tool: 'x', title: 'Thread: 5 questions every member should ask about their dues', status: 'executed', policy: 'auto', cost: 0.18, tokens: 6200,
+      why: 'Questions perform better than claims and invite engagement. Every factual point has a source attached.',
+      input: { type: 'thread', posts: 5, schedule: 'now' },
+      output: 'Posted. 5/5 tweets live. Thread URL: x.com/TransparentHist/status/1859…' },
+    { id: 'A-1086', time: '12:40', tool: 'calls', title: 'Call round: 32 new volunteers who requested a call', status: 'executed', policy: 'approval', approvedBy: 'Yoav C.', cost: 38.6, tokens: 41000,
+      why: 'New sign-ups from yesterday asked to be called. Goal: confirm interest and invite to Thursday’s Zoom.',
+      input: { list: 'volunteers_new_2026_11_14', count: 32, script: 'welcome_v3', disclose_ai: true },
+      output: '21 answered, 14 agreed to join the Zoom, 2 asked to be removed (removed), 11 no answer.' },
+    { id: 'A-1085', time: '12:31', tool: 'x', title: 'Reply with a numeric claim that has no verified source', status: 'blocked', policy: 'blocked', cost: 0.05, tokens: 1900,
+      why: 'A user asked how much is spent on political activity. I drafted a reply with an estimate.',
+      input: { type: 'reply', to: '@user_8812', text: 'Roughly 40% of dues go to political activity…' },
+      output: 'Blocked by PolicyEngine. Rule: factual claim without a verified source. Agent asked to find a primary source or rephrase as a question.' },
+    { id: 'A-1084', time: '12:22', tool: 'email', title: 'Weekly newsletter to 18,340 subscribers', status: 'pending', policy: 'approval', cost: 0, tokens: 9800,
+      why: 'Weekly digest: highlights, Thursday Zoom invite, and a call to share the dues thread.',
+      input: { list: 'subscribers_optin', count: 18340, template: 'weekly_v2' },
+      output: 'Waiting for manager approval.' },
+    { id: 'A-1083', time: '12:10', tool: 'ads', title: 'Boost the dues thread: ₪350 for 48 hours', status: 'pending', policy: 'approval', cost: 350, tokens: 2100,
+      why: 'Organic engagement is 3.1x our average in the first 20 minutes. A small boost could double reach at a low cost per engagement.',
+      input: { platform: 'X Ads', budget_ils: 350, duration_h: 48, audience: 'IL, 25-60, interests: labor, economy' },
+      output: 'Waiting for manager approval (above ₪100 auto-limit).' },
+    { id: 'A-1082', time: '11:58', tool: 'research', title: 'Parsed public annual financial report (PDF, 212 pages)', status: 'executed', policy: 'auto', cost: 1.12, tokens: 96000,
+      why: 'Primary sources beat secondary coverage. Need exact wording for budget line items before citing them.',
+      input: { file: 'annual_report_2025.pdf', task: 'extract spending categories' },
+      output: 'Extracted 6 relevant sections. 2 marked for legal review before public use.' },
+    { id: 'A-1081', time: '11:45', tool: 'x', title: 'Reply to a user asking how to cancel membership', status: 'executed', policy: 'auto', cost: 0.06, tokens: 1400,
+      why: 'Helpful, factual answer builds trust. Linked to the official procedure rather than paraphrasing it.',
+      input: { type: 'reply', to: '@noa_works' },
+      output: 'Posted. 34 likes, 6 replies.' },
+    { id: 'A-1080', time: '11:30', tool: 'payments', title: 'Paid ₪49: Canva Pro monthly subscription', status: 'executed', policy: 'auto', cost: 49, tokens: 600,
+      why: 'Recurring design tool used for campaign graphics. Under ₪100 auto-limit, vendor on allow-list.',
+      input: { vendor: 'Canva', amount_ils: 49, category: 'software' },
+      output: 'Charged card •••• 4821. Receipt saved.' },
+    { id: 'A-1079', time: '11:12', tool: 'email', title: 'Thank-you email to 412 new volunteers', status: 'executed', policy: 'approval', approvedBy: 'Maya L.', cost: 0.9, tokens: 3300,
+      why: 'Fast follow-up after sign-up improves retention.',
+      input: { list: 'volunteers_new', count: 412, template: 'thanks_v1' },
+      output: 'Delivered 409/412. Open rate after 1h: 61%.' },
+    { id: 'A-1078', time: '10:55', tool: 'calls', title: 'Callback failed: invalid number', status: 'failed', policy: 'auto', cost: 0.2, tokens: 300,
+      why: 'Scheduled callback from yesterday.',
+      input: { contact: 'vol_2231', attempt: 2 },
+      output: 'Twilio error 21211: invalid phone number. Contact flagged for manual review.' },
+    { id: 'A-1077', time: '10:40', tool: 'x', title: 'Satirical tweet about the union chairman', status: 'rejected', policy: 'approval', rejectedBy: 'Yoav C.', cost: 0.08, tokens: 1700,
+      why: 'Humor drives reach. Drafted a satirical take.',
+      input: { type: 'tweet' },
+      output: 'Rejected by manager: “We go after policies, not people.” Rule added to red lines.' },
+    { id: 'A-1076', time: '10:20', tool: 'research', title: 'Mapped 40 journalists who covered labor relations last quarter', status: 'executed', policy: 'auto', cost: 0.74, tokens: 52000,
+      why: 'Building a press list for next week’s report launch.',
+      input: { task: 'journalist mapping', period: 'Q3 2026' },
+      output: '40 journalists, 12 with a history of covering union finances. Saved to CRM.' },
+    { id: 'A-1075', time: '09:58', tool: 'x', title: 'Morning tweet: what do you get for your dues?', status: 'executed', policy: 'auto', cost: 0.11, tokens: 2600,
+      why: 'Morning slot performs best for our audience (8-10am).',
+      input: { type: 'tweet', schedule: '09:58' },
+      output: 'Posted. 1.2K likes, 310 reposts, 88K views.' },
+    { id: 'A-1074', time: '09:30', tool: 'ads', title: 'Boosted morning tweet: ₪150', status: 'executed', policy: 'approval', approvedBy: 'Yoav C.', cost: 150, tokens: 900,
+      why: 'Strong early signal on the morning post.',
+      input: { platform: 'X Ads', budget_ils: 150, duration_h: 24 },
+      output: 'Campaign live. Est. reach +40K.' },
+    { id: 'A-1073', time: '09:05', tool: 'research', title: 'Daily plan: 6 tasks, 2 need approval', status: 'executed', policy: 'auto', cost: 0.31, tokens: 12000,
+      why: 'Start-of-day planning based on yesterday’s results and today’s news cycle.',
+      input: { task: 'daily_plan' },
+      output: '1) News scan 2) Dues thread 3) Volunteer calls 4) Newsletter 5) Boost if thread performs 6) Journalist list' },
   ];
 
-  const voices = [
-    'We support strong unions. We also think members should be able to see where their dues go.',
-    'Members pay dues every month. They deserve a clear, public answer on where that money goes.',
-    'Dues without disclosure is a blank check. Open the books.',
+  const TOOL_NAMES = { research: 'Research', x: 'X', email: 'Email', calls: 'Calls', payments: 'Payments', ads: 'Ads' };
+  const toolName = (id) => TOOL_NAMES[id] || id;
+
+  const PROMPT_V12 = `You are Megaphone, the autonomous campaign agent for "Transparent Histadrut".
+
+MISSION
+Build public support for three asks: (1) published, independently audited
+accounts, (2) opt-in consent for political spending from dues, (3) freedom
+to choose your union.
+
+HOW YOU WORK
+- Plan your day each morning; report to the human team each evening.
+- Use tools to research, post, email and call within your permissions.
+- Prefer questions to accusations. Prefer primary sources to coverage.
+
+ALWAYS
+- Disclose that you are an AI in every call and in your public bio.
+- Attach a verified source to every factual claim.
+- Respect opt-outs immediately.
+
+NEVER
+- Attack individuals, their families or their character.
+- Invent numbers, quotes or sources.
+- Impersonate people or create additional accounts.`;
+  const PROMPT_V11 = PROMPT_V12.replace('- Prefer questions to accusations. Prefer primary sources to coverage.', '- Prefer primary sources to coverage.');
+  const PROMPT_V10 = PROMPT_V11.replace('- Plan your day each morning; report to the human team each evening.', '- Plan your day each morning.');
+
+  const brain = {
+    version: 12, prompt: PROMPT_V12, saved: PROMPT_V12, restoredFrom: null,
+    tone: 45, sharpness: 50, humor: 30,
+    messages: [
+      'We support unions. We also support members’ right to know.',
+      'Your dues, your voice: political spending should be opt-in.',
+      'Published, audited accounts should be one click away.',
+      'Choice makes representation stronger, not weaker.',
+    ],
+    redLines: [
+      'No personal attacks: go after policies, not people',
+      'No unsourced numbers or statistics',
+      'No contact with anyone who has not opted in',
+      'No content about strikes in essential services during an active strike',
+    ],
+    versions: [
+      { v: 12, by: 'Yoav C.', when: 'Today 10:42', note: 'Added “policies, not people” red line', prompt: PROMPT_V12 },
+      { v: 11, by: 'Maya L.', when: 'Yesterday', note: 'Softer tone for phone calls', prompt: PROMPT_V11 },
+      { v: 10, by: 'Yoav C.', when: 'Nov 12', note: 'Added opt-in political spending ask', prompt: PROMPT_V10 },
+    ],
+  };
+
+  const budget = {
+    monthlyCap: 15000, monthlySpent: 6681,
+    dailyCap: 500, dailySpent: 120,
+    autoLimit: 100,
+    rules: [
+      { text: 'Payments up to ₪{auto} to allow-listed vendors run automatically', on: true },
+      { text: 'Anything above ₪{auto} or to a new vendor needs a manager', on: true },
+      { text: 'Hard stop when the daily cap is reached', on: true },
+      { text: 'Two managers must approve payments over ₪1,000', on: true },
+      { text: 'Block all payments outside 07:00–23:00', on: false },
+    ],
+    ledger: [
+      { time: 'Today 12:10', vendor: 'X Ads', desc: 'Boost dues thread (48h)', amount: 350, status: 'pending', item: 'P-2' },
+      { time: 'Today 11:30', vendor: 'Canva', desc: 'Pro subscription (monthly)', amount: 49, status: 'auto' },
+      { time: 'Today 09:30', vendor: 'X Ads', desc: 'Boost morning tweet', amount: 150, status: 'approved' },
+      { time: 'Yesterday', vendor: 'Twilio', desc: 'Voice minutes top-up', amount: 400, status: 'approved' },
+      { time: 'Yesterday', vendor: 'Meta Ads', desc: 'Volunteer recruitment ad', amount: 600, status: 'approved' },
+      { time: 'Nov 13', vendor: 'Unsplash+', desc: 'Image license', amount: 29, status: 'auto' },
+      { time: 'Nov 13', vendor: 'PrintHub', desc: 'Flyers, 2,000 units', amount: 1150, status: 'rejected' },
+    ],
+  };
+
+  const tools = [
+    { id: 'research', name: 'Web research', desc: 'Search, read and fact-check before publishing', mode: 'auto', quota: 200, used: 87, unit: 'searches', step: 10 },
+    { id: 'x', name: 'Posts on X', desc: 'Tweets, threads and replies from the campaign account', mode: 'auto', quota: 12, used: 7, unit: 'posts', step: 1 },
+    { id: 'email', name: 'Email', desc: 'Opt‑in subscribers only, always with an unsubscribe link', mode: 'ask', quota: 3, used: 1, unit: 'sends', step: 1 },
+    { id: 'calls', name: 'Calls', desc: 'Only people who asked. Always says it’s an AI.', mode: 'ask', quota: 150, used: 64, unit: 'calls', step: 10 },
+    { id: 'payments', name: 'Payments', desc: 'Virtual card with hard limits', mode: 'ask', unit: '₪', step: 50, money: true },
+    { id: 'ads', name: 'Paid promotion', desc: 'Boost posts on X and Meta within budget', mode: 'ask', quota: 300, used: 150, unit: '₪', step: 50, money: true },
+  ];
+  const quotaOf = (t) => (t.id === 'payments' ? budget.dailyCap : t.quota);
+  const usedOf = (t) => (t.id === 'payments' ? budget.dailySpent : t.used);
+  const setQuota = (t, v) => { if (t.id === 'payments') budget.dailyCap = v; else t.quota = v; };
+  const MODE = { off: 'Off', ask: 'Ask me', auto: 'Alone' };
+  const MODE_SENTENCE = { off: 'off.', ask: 'asks you first.', auto: 'works alone within its limit.' };
+
+  const store = [
+    { id: 'whatsapp', short: 'WhatsApp', name: 'WhatsApp Business', mark: 'Wa', desc: 'Broadcast updates to opted‑in supporters', unit: 'messages', quota: 500, step: 50, state: 'idle' },
+    { id: 'facebook', short: 'Facebook', name: 'Facebook Pages', mark: 'Fb', desc: 'Post to the page and reply to comments', unit: 'posts', quota: 6, step: 1, state: 'idle' },
+    { id: 'tiktok', short: 'TikTok', name: 'TikTok', mark: 'Tt', desc: 'Upload short videos made by the team', unit: 'videos', quota: 2, step: 1, state: 'idle' },
+    { id: 'telegram', short: 'Telegram', name: 'Telegram', mark: 'Tg', desc: 'Run a supporters channel', unit: 'posts', quota: 10, step: 1, state: 'idle' },
   ];
 
-  /* ---------- helpers ---------- */
+  const calls = [
+    { id: 'C-1', name: 'Dana K.', phone: '054-•••-••21', time: '12:41', duration: 84, outcome: 'supporter', tags: ['Zoom: yes', 'Petition: signed'],
+      summary: 'Teacher, member for 11 years. Frustrated about not knowing where dues go. Will join Zoom and share the thread with colleagues.',
+      transcript: [
+        { t: 0, who: 'bot', text: 'Hi Dana, this is Megaphone, an AI assistant calling for the Transparent Histadrut campaign. I want to be upfront that I’m not a human. You signed up yesterday and asked for a call. Is now a good time?' },
+        { t: 9, who: 'human', text: 'Oh. Okay, yes, I have a few minutes.' },
+        { t: 13, who: 'bot', text: 'Thanks. What made you sign up?' },
+        { t: 17, who: 'human', text: 'I’ve been a teacher for eleven years and I honestly have no idea what my dues pay for.' },
+        { t: 26, who: 'bot', text: 'You’re not alone, that’s the most common reason people join us. We’re not against unions, we’re asking for transparency. We have a short Zoom on Thursday at 8pm. Would you like to join?' },
+        { t: 39, who: 'human', text: 'Sure, send me the link.' },
+        { t: 43, who: 'bot', text: 'Done, it’s in your inbox. One more thing: we have a public petition asking for published, audited accounts. Would you like to sign?' },
+        { t: 53, who: 'human', text: 'Yes. Can I send it to people in the teachers’ room?' },
+        { t: 58, who: 'bot', text: 'Absolutely. I’ll text you a link you can share. Thank you, Dana. If you ever want to stop hearing from us, just reply STOP.' },
+        { t: 70, who: 'human', text: 'Great, thanks.' },
+      ] },
+    { id: 'C-2', name: 'Avi M.', phone: '052-•••-••07', time: '12:38', duration: 62, outcome: 'opposed', tags: ['Removed from list'],
+      summary: 'Strong union supporter. Disagreed with the campaign. Asked to be removed. Removed immediately, no further contact.',
+      transcript: [
+        { t: 0, who: 'bot', text: 'Hi Avi, this is Megaphone, an AI assistant for the Transparent Histadrut campaign. You signed up for updates. Do you have a minute?' },
+        { t: 8, who: 'human', text: 'I think my son signed me up. I support the Histadrut, they protected my job twice.' },
+        { t: 17, who: 'bot', text: 'Thank you for telling me. That matters, and we’re not trying to weaken worker protection. Our ask is only about financial transparency.' },
+        { t: 28, who: 'human', text: 'I don’t agree. Please take me off the list.' },
+        { t: 33, who: 'bot', text: 'Of course. I’ve removed you, and you won’t hear from us again. Have a good day, Avi.' },
+      ] },
+    { id: 'C-3', name: 'Rina S.', phone: '050-•••-••88', time: '12:35', duration: 96, outcome: 'neutral', tags: ['Wants more info', 'Email: report'],
+      summary: 'Nurse. Interested but cautious. Asked for the research report by email before deciding.',
+      transcript: [
+        { t: 0, who: 'bot', text: 'Hi Rina, this is Megaphone, an AI assistant for the Transparent Histadrut campaign. You asked us to call. Is now okay?' },
+        { t: 7, who: 'human', text: 'Yes, but I’m between shifts so quickly please.' },
+        { t: 11, who: 'bot', text: 'I’ll be brief. We’re asking for published, audited accounts and an opt-in for political spending. Would you like to hear about Thursday’s Zoom?' },
+        { t: 24, who: 'human', text: 'I’m not sure yet. Do you have something in writing?' },
+        { t: 30, who: 'bot', text: 'Yes, a 6-page summary with sources for every claim. I’ll email it now. No pressure at all.' },
+        { t: 40, who: 'human', text: 'Okay, I’ll read it.' },
+      ] },
+    { id: 'C-4', name: 'Yossi B.', phone: '053-•••-••45', time: '12:31', duration: 0, outcome: 'no-answer', tags: ['Retry tomorrow 18:00'],
+      summary: 'No answer. Voicemail not left (policy). Retry scheduled within allowed hours.', transcript: [] },
+    { id: 'C-5', name: 'Michal A.', phone: '058-•••-••13', time: '12:27', duration: 71, outcome: 'supporter', tags: ['Volunteer: graphics', 'Zoom: yes'],
+      summary: 'Graphic designer. Offered to volunteer on campaign visuals. Flagged for the human team to follow up.',
+      transcript: [
+        { t: 0, who: 'bot', text: 'Hi Michal, this is Megaphone, an AI assistant for the Transparent Histadrut campaign. Thanks for signing up. Do you have a minute?' },
+        { t: 7, who: 'human', text: 'Sure! I actually wanted to ask if you need help with design.' },
+        { t: 13, who: 'bot', text: 'That would be great. I’ll pass this to Maya on our human team, she coordinates volunteers. What kind of design do you do?' },
+        { t: 22, who: 'human', text: 'Mostly social media and infographics.' },
+        { t: 27, who: 'bot', text: 'Perfect fit. Maya will reach out today. Will we also see you at Thursday’s Zoom?' },
+        { t: 35, who: 'human', text: 'Yes, definitely.' },
+      ] },
+  ];
+
+  /* ================= helpers ================= */
   let toastT;
   function toast(msg) {
     const t = $('#toast');
     t.textContent = msg;
     t.classList.add('on');
     clearTimeout(toastT);
-    toastT = setTimeout(() => t.classList.remove('on'), 2200);
+    toastT = setTimeout(() => t.classList.remove('on'), 2400);
   }
+  function setHash(h) { history.replaceState(null, '', '#' + h); }
+  function refocus(sel) { const el = document.querySelector(sel); if (el) el.focus({ preventScroll: true }); }
 
-  /* ---------- view switch ---------- */
+  /* ================= view switch + routing ================= */
+  const TEAM_TABS = ['inbox', 'log', 'brain', 'tools', 'budget', 'calls'];
+  let teamTab = 'inbox';
+
   function show(view) {
-    $$('.seg button').forEach(b => b.classList.toggle('on', b.dataset.view === view));
+    $$('.seg button').forEach(b => {
+      const on = b.dataset.view === view;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-selected', String(on));
+    });
     $$('.view').forEach(v => v.classList.toggle('on', v.id === 'view-' + view));
-    history.replaceState(null, '', '#' + view);
+    if (view !== 'team') stopPlay();
     window.scrollTo({ top: 0 });
   }
-  $$('.seg button').forEach(b => b.addEventListener('click', () => show(b.dataset.view)));
-  if (location.hash === '#team') show('team');
 
+  function tabHash(tab) {
+    if (tab === 'log' && openLog) return 'team/log/' + openLog;
+    if (tab === 'calls' && callSel) return 'team/calls/' + callSel;
+    return 'team/' + tab;
+  }
+
+  function setTeamTab(tab, push = true) {
+    teamTab = tab;
+    $$('#team-nav button').forEach(b => {
+      const on = b.dataset.tab === tab;
+      b.classList.toggle('on', on);
+      if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+    });
+    $$('.pane').forEach(p => p.classList.toggle('on', p.id === 'pane-' + tab));
+    if (tab !== 'calls') stopPlay();
+    if (push) setHash(tabHash(tab));
+  }
+
+  function route() {
+    const parts = location.hash.replace(/^#/, '').split('/');
+    if (parts[0] !== 'team') { show('public'); return; }
+    show('team');
+    const tab = TEAM_TABS.includes(parts[1]) ? parts[1] : 'inbox';
+    if (tab === 'log' && parts[2] && log.some(a => a.id === parts[2])) { openLog = parts[2]; renderLog(); }
+    if (tab === 'calls' && parts[2] && calls.some(c => c.id === parts[2])) selectCall(parts[2], false);
+    setTeamTab(tab, false);
+  }
+
+  $$('.seg button').forEach(b => b.addEventListener('click', () => {
+    show(b.dataset.view);
+    if (b.dataset.view === 'team') setTeamTab(teamTab); else setHash('public');
+  }));
+  $('#team-nav').addEventListener('click', e => {
+    const b = e.target.closest('button[data-tab]');
+    if (!b) return;
+    setTeamTab(b.dataset.tab);
+    window.scrollTo({ top: 0 });
+  });
+  window.addEventListener('hashchange', route);
   window.addEventListener('scroll', () => $('#top').classList.toggle('scrolled', scrollY > 8), { passive: true });
 
-  /* ---------- public: feed ---------- */
+  /* ================= public: feed ================= */
   const chev = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+  let feedFilter = 'all';
   function renderFeed(filter = 'all') {
     const items = feed.filter(f => filter === 'all' || f.kind === filter);
     $('#feed').innerHTML = items.map(f => `
@@ -536,10 +1214,24 @@
   renderFeed();
   $$('#tabs button').forEach(b => b.addEventListener('click', () => {
     $$('#tabs button').forEach(x => x.classList.toggle('on', x === b));
-    renderFeed(b.dataset.f);
+    feedFilter = b.dataset.f;
+    renderFeed(feedFilter);
   }));
 
-  /* ---------- public: now ---------- */
+  function syncPublic(it, d) {
+    const f = feed.find(x => x.ref === it.actionId);
+    if (d === 'approve' || d === 'edit') {
+      const title = it.pub.title || '“' + clip(it.text, 110) + '”';
+      if (f) feed.splice(feed.indexOf(f), 1);
+      feed.unshift({ ref: it.actionId, time: nowHM(), kind: it.pub.kind, label: it.pub.label, title, why: it.pub.why, src: it.pub.src });
+    } else if (d === 'decline' && f) {
+      f.tag = ['block', 'Declined'];
+      f.why = 'A person reviewed it and said no. Nothing was sent.';
+    }
+    renderFeed(feedFilter);
+  }
+
+  /* ================= public: now ================= */
   let ti = 0, paused = false;
   setInterval(() => {
     if (paused) return;
@@ -552,7 +1244,7 @@
     }, 450);
   }, 6000);
 
-  /* ---------- public: ask ---------- */
+  /* ================= public: ask ================= */
   function ask(q) {
     const hit = qa.find(x => x.k.some(k => q.toLowerCase().includes(k)));
     $('#answer-q').textContent = q;
@@ -570,94 +1262,697 @@
   });
   $$('.hints button').forEach(b => b.addEventListener('click', () => ask(b.dataset.q)));
   $('#ask-jump').addEventListener('click', () => {
-    $('#ask-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    $('#ask-section').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
     setTimeout(() => $('#ask-input').focus(), 500);
   });
   $('#join-btn').addEventListener('click', () => toast('Thanks — you’d be signed up here.'));
 
-  /* ---------- team: focus queue ---------- */
-  function renderFocus() {
-    const wrap = $('#focus-wrap');
-    const left = queue.length - qIndex;
-    $('#greet-sub').textContent = left
-      ? `${left} thing${left > 1 ? 's' : ''} need${left > 1 ? '' : 's'} you. One at a time.`
+  /* ================= team: pause ================= */
+  function setPaused(p) {
+    paused = p;
+    $('#team-status').classList.toggle('is-paused', p);
+    $('#team-dot').classList.toggle('paused', p);
+    $('#team-state').textContent = p ? 'Paused · nothing goes out' : 'Running · Day 23';
+    $('#pause-btn').textContent = p ? 'Resume' : 'Pause';
+    $('#pub-dot').classList.toggle('paused', p);
+    $('#pub-status').textContent = p ? 'Megaphone is paused' : 'Megaphone is working · Day 23';
+    $('#now-text').textContent = p ? 'Paused by the team. Nothing will be sent.' : thoughts[ti];
+    toast(p ? 'Agent paused. No posts, emails, calls or payments.' : 'Agent running again.');
+  }
+  $('#pause-btn').addEventListener('click', () => setPaused(!paused));
+
+  /* ================= team: inbox ================= */
+  let decided = 0, inboxMode = 'focus', editing = false, searching = false, busy = false;
+
+  const pillTextOf = (it) => (it.type === 'payment' ? `Above ₪${budget.autoLimit}` : it.pillText);
+
+  function previewHTML(it) {
+    if (it.type === 'payment') return `<div class="big">${ils(it.amount)}</div><div class="sub">${esc(it.sub)}</div>`;
+    if (it.type === 'email') return `<div class="subject">${esc(it.subject)}</div>${esc(it.body)}`;
+    let t = esc(it.text);
+    if (it.blocked && it.flag) t = t.replace(esc(it.flag), `<mark>${esc(it.flag)}</mark>`);
+    return t;
+  }
+
+  function editHTML(it) {
+    if (it.type === 'email') {
+      return `<input class="field" id="ed-subject" value="${esc(it.subject)}" aria-label="Email subject" />` +
+        `<textarea class="field" id="ed-body" rows="9" aria-label="Email body">${esc(it.body)}</textarea>`;
+    }
+    return `<textarea class="field" id="ed-text" rows="5" aria-label="Text to publish">${esc(it.text)}</textarea>`;
+  }
+
+  function renderInbox() {
+    const n = queue.length;
+    if (n < 2) inboxMode = 'focus';
+    const h = new Date().getHours();
+    $('#greet-h').textContent = `Good ${h < 12 ? 'morning' : h < 18 ? 'afternoon' : 'evening'}, Yoav.`;
+    $('#greet-sub').textContent = n
+      ? `${n} thing${n > 1 ? 's' : ''} need${n > 1 ? '' : 's'} you. One at a time.`
       : 'Nothing needs you right now.';
-    if (!left) {
+    const cnt = $('#inbox-count');
+    cnt.textContent = n;
+    cnt.hidden = !n;
+    const sa = $('#see-all');
+    sa.hidden = n < 2 || searching || editing;
+    sa.textContent = inboxMode === 'list' ? 'One at a time' : `See all ${n}`;
+    sa.setAttribute('aria-pressed', String(inboxMode === 'list'));
+
+    const wrap = $('#focus-wrap');
+    if (!n) {
       wrap.innerHTML = `
         <div class="focus clear">
-          <div class="check"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+          <div class="check"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
           <h3>All clear</h3>
           <p>Megaphone will keep going with what it’s allowed to do alone.</p>
+          <button class="link-btn" data-gotab="log">See what you decided in the Log →</button>
         </div>`;
       return;
     }
-    const it = queue[qIndex];
+
+    if (inboxMode === 'list') {
+      wrap.innerHTML = `<div class="list">${queue.map((it, i) => `
+        <button class="q-row" data-pick="${i}">
+          <span class="pill sm ${it.pill}">${esc(it.kind)}</span>
+          <span class="q-title">${esc(it.title)}</span>
+          <span class="q-meta">${esc(pillTextOf(it))}</span>
+        </button>`).join('')}</div>
+        <p class="meta-line">Pick one to look at it. The rest will wait.</p>`;
+      return;
+    }
+
+    const it = queue[0];
+    const total = decided + n;
+    const progress = Array.from({ length: total }, (_, i) => `<i class="${i < decided ? 'done' : i === decided ? 'cur' : ''}"></i>`).join('');
+    const later = n > 1 ? '<span class="spacer"></span><button class="btn btn-text" data-d="later">Later</button>' : '';
+    let body, actions;
+    if (searching) {
+      body = `<div class="preview">${previewHTML(it)}</div>`;
+      actions = '<div class="search-lines" id="search-lines" aria-live="polite"><div class="muted"><span class="spin"></span> Looking for a primary source…</div></div>';
+    } else if (editing) {
+      body = `<div class="edit-area">${editHTML(it)}</div>`;
+      actions = '<div class="focus-actions"><button class="btn btn-green" data-d="save">Save &amp; approve</button><button class="btn btn-light" data-d="cancel">Cancel</button></div>';
+    } else if (it.blocked) {
+      body = `<div class="preview">${previewHTML(it)}</div><div class="policy-note">${svg.shield}<span><b>Policy:</b> ${esc(it.rule)}</span></div>`;
+      actions = `<div class="focus-actions"><button class="btn btn-dark" data-d="source">Ask agent to find a source</button><button class="btn btn-light" data-d="discard">Discard</button>${later}</div>`;
+    } else {
+      body = `<div class="preview">${previewHTML(it)}</div>`;
+      actions = `<div class="focus-actions"><button class="btn btn-green" data-d="approve">Approve</button>${it.type !== 'payment' ? '<button class="btn btn-light" data-d="edit">Edit</button>' : ''}<button class="btn btn-light" data-d="decline">Decline</button>${later}</div>`;
+    }
     wrap.innerHTML = `
       <div class="focus" id="focus">
         <div class="focus-top">
-          <span class="pill ${it.pill}">${it.kind} · ${it.pillText}</span>
-          <div class="progress">${queue.map((_, i) => `<i class="${i < qIndex ? 'done' : i === qIndex ? 'cur' : ''}"></i>`).join('')}</div>
+          <span class="pill ${it.pill}">${esc(it.kind)} · ${esc(pillTextOf(it))}</span>
+          <div class="progress" aria-label="${decided} of ${total} done">${progress}</div>
         </div>
         <h3>${esc(it.title)}</h3>
         <p class="why">${esc(it.why)}</p>
-        <div class="preview">${it.preview}</div>
-        <div class="focus-actions">
-          <button class="btn btn-green" data-d="approve">Approve</button>
-          <button class="btn btn-light" data-d="decline">Decline</button>
-          <span class="spacer"></span>
-          <button class="btn btn-text" data-d="later">Later</button>
-        </div>
+        ${body}
+        ${actions}
         <div class="meta-line">${esc(it.meta)}</div>
       </div>`;
-    $$('#focus [data-d]').forEach(b => b.addEventListener('click', () => decide(b.dataset.d)));
   }
-  function decide(d) {
-    const card = $('#focus');
-    card.classList.add('leave');
-    const msg = { approve: 'Approved. Megaphone is on it.', decline: 'Declined. It won’t do this.', later: 'Moved to the end.' }[d];
-    setTimeout(() => {
-      if (d === 'later') queue.push(queue.splice(qIndex, 1)[0]);
-      else qIndex++;
-      renderFocus();
-      toast(msg);
-    }, 260);
-  }
-  renderFocus();
 
-  /* ---------- team: pause ---------- */
-  $('#run-switch').addEventListener('click', e => {
-    paused = !paused;
-    e.currentTarget.classList.toggle('off', paused);
-    $('#run-name').textContent = paused ? 'Paused' : 'Running';
-    $('#pub-dot').classList.toggle('paused', paused);
-    $('#pub-status').textContent = paused ? 'Megaphone is paused' : 'Megaphone is working · Day 23';
-    $('#now-text').textContent = paused ? 'Paused by the team. Nothing will be sent.' : thoughts[ti];
-    toast(paused ? 'Agent paused. Nothing will go out.' : 'Agent running again.');
+  $('#see-all').addEventListener('click', () => {
+    inboxMode = inboxMode === 'list' ? 'focus' : 'list';
+    renderInbox();
   });
 
-  /* ---------- team: permissions ---------- */
-  function renderPerms() {
-    $('#perms').innerHTML = perms.map((p, i) => `
-      <div class="setting">
-        <div><div class="setting-name">${p.name}</div><div class="setting-desc">${p.desc}</div></div>
-        <div class="mini-seg">
-          ${['off', 'ask', 'auto'].map(m => `<button class="${p.mode === m ? 'on' : ''}" data-i="${i}" data-m="${m}">${{ off: 'Off', ask: 'Ask me', auto: 'Alone' }[m]}</button>`).join('')}
-        </div>
-      </div>`).join('');
-    $$('#perms button').forEach(b => b.addEventListener('click', () => {
-      perms[b.dataset.i].mode = b.dataset.m;
-      renderPerms();
-    }));
-  }
-  renderPerms();
+  $('#focus-wrap').addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    if (b.dataset.gotab) { setTeamTab(b.dataset.gotab); window.scrollTo({ top: 0 }); return; }
+    if (b.dataset.pick != null) {
+      queue.unshift(queue.splice(+b.dataset.pick, 1)[0]);
+      inboxMode = 'focus'; editing = false;
+      renderInbox();
+      return;
+    }
+    const d = b.dataset.d;
+    if (d === 'approve' || d === 'decline' || d === 'later' || d === 'discard') decide(d);
+    else if (d === 'edit') { editing = true; renderInbox(); refocus('#focus .field'); }
+    else if (d === 'cancel') { editing = false; renderInbox(); }
+    else if (d === 'save') saveAndApprove();
+    else if (d === 'source') findSource();
+  });
 
-  /* ---------- team: voice ---------- */
-  function renderVoice() {
-    const v = +$('#voice').value;
-    $('#voice-sample').textContent = voices[v < 34 ? 0 : v < 67 ? 1 : 2];
+  function saveAndApprove() {
+    const it = queue[0];
+    if (!it) return;
+    if (it.type === 'email') {
+      it.subject = $('#ed-subject').value.trim() || it.subject;
+      it.body = $('#ed-body').value.trim() || it.body;
+    } else {
+      it.text = $('#ed-text').value.trim() || it.text;
+    }
+    decide('edit');
   }
-  $('#voice').addEventListener('input', renderVoice);
-  renderVoice();
+
+  function decide(d) {
+    const it = queue[0];
+    if (!it || busy) return;
+    if (d === 'later' && queue.length < 2) { toast('It’s the only thing left.'); return; }
+    busy = true;
+    const card = $('#focus');
+    if (card) card.classList.add('leave');
+    setTimeout(() => {
+      busy = false; editing = false;
+      if (d === 'later') { queue.push(queue.shift()); toast('Moved to the end.'); }
+      else { queue.shift(); decided++; resolve(it, d); }
+      renderInbox();
+    }, reduceMotion ? 0 : 260);
+  }
+
+  function actionFor(it) {
+    let a = log.find(x => x.id === it.actionId);
+    if (!a) {
+      a = { id: it.actionId, time: nowHM(), tool: it.tool, title: it.title, status: 'pending', policy: 'approval', cost: 0, tokens: 0, why: it.why, input: {}, output: '' };
+      log.unshift(a);
+    }
+    return a;
+  }
+
+  function setLedger(itemId, status) {
+    const x = budget.ledger.find(l => l.item === itemId);
+    if (x) { x.status = status; x.time = 'Today ' + nowHM(); }
+  }
+
+  function resolve(it, d) {
+    const a = actionFor(it);
+    a.time = nowHM();
+    if (d === 'approve' || d === 'edit') {
+      a.status = 'executed'; a.policy = 'approval'; a.approvedBy = ME;
+      a.output = it.done + (d === 'edit' ? ' Edited by Yoav C. before approval.' : '');
+      if (it.type === 'payment') {
+        budget.dailySpent += it.amount;
+        budget.monthlySpent += it.amount;
+        setLedger(it.id, 'approved');
+      }
+      const t = tools.find(x => x.id === it.tool);
+      if (t && it.uses && t.id !== 'payments') t.used += it.uses;
+      syncPublic(it, d);
+      toast(paused ? 'Approved. It goes out when you resume.' : d === 'edit' ? 'Saved and approved.' : 'Approved. Megaphone is on it.');
+    } else if (d === 'decline') {
+      a.status = 'rejected'; a.rejectedBy = ME;
+      a.output = 'Declined by Yoav C. Nothing was sent.';
+      if (it.type === 'payment') setLedger(it.id, 'rejected');
+      syncPublic(it, d);
+      toast('Declined. It won’t do this.');
+    } else if (d === 'discard') {
+      a.status = 'discarded';
+      a.output = 'Discarded by Yoav C. The draft was deleted and nothing was posted.';
+      toast('Discarded. Nothing was posted.');
+    }
+    log.splice(log.indexOf(a), 1);
+    log.unshift(a);
+    renderLog(); renderBudget(); renderTools();
+  }
+
+  function findSource() {
+    const it = queue[0];
+    if (!it || !it.blocked || searching) return;
+    searching = true;
+    renderInbox();
+    const lines = [
+      'web_search("dues political spending share annual report")',
+      '→ Reading annual_report_2025.pdf §4…',
+      '→ No published figure. Rewriting as a sourced question.',
+    ];
+    const step = reduceMotion ? 400 : 800;
+    lines.forEach((l, i) => setTimeout(() => {
+      const box = document.getElementById('search-lines');
+      if (!box) return;
+      const dv = document.createElement('div');
+      dv.textContent = l;
+      box.appendChild(dv);
+    }, 300 + i * step));
+    setTimeout(() => {
+      Object.assign(it, {
+        blocked: false, pill: '', pillText: 'Rewritten', kind: 'Reply', flag: null,
+        title: 'Reply, rewritten with a source',
+        why: 'No published figure exists, so it dropped the number and the charged word. Now it asks the question and points to the report.',
+        text: 'Good question. The annual report doesn’t break out political spending as its own line (Annual report 2025, §4).\n\nThat’s exactly what we’re asking for: a clear number every member can see.',
+      });
+      const a = actionFor(it);
+      a.status = 'pending'; a.policy = 'approval'; a.time = nowHM();
+      a.title = 'Reply to @user_8812, rewritten after policy block';
+      a.why = 'Could not find a published figure for political spending, so I removed the number and the charged language and pointed to the report section instead.';
+      a.input = { type: 'reply', to: '@user_8812', source: 'annual_report_2025.pdf §4', text: 'Good question. The annual report doesn’t break out political spending…' };
+      a.output = 'Rewritten after policy block. Waiting for approval.';
+      a.tokens += 4200; a.cost += 0.21;
+      log.splice(log.indexOf(a), 1);
+      log.unshift(a);
+      searching = false;
+      renderInbox(); renderLog();
+      toast('Found a safer way to say it. Take a look.');
+    }, 300 + lines.length * step + 400);
+  }
+
+  function goInbox(itemId) {
+    const i = queue.findIndex(q => q.id === itemId);
+    if (i > 0 && !searching && !busy) { queue.unshift(queue.splice(i, 1)[0]); editing = false; }
+    inboxMode = 'focus';
+    renderInbox();
+    setTeamTab('inbox');
+    window.scrollTo({ top: 0 });
+  }
+
+  /* ================= team: log ================= */
+  const STATUS = { executed: ['Done', 'ok'], pending: ['Waiting', 'warn'], blocked: ['Blocked', 'stop'], rejected: ['Declined', ''], failed: ['Failed', 'stop'], discarded: ['Discarded', ''] };
+  const STATUS_GROUPS = { all: null, done: ['executed'], waiting: ['pending'], stopped: ['blocked', 'failed', 'rejected', 'discarded'] };
+  const STATUS_LABELS = { all: 'All', done: 'Done', waiting: 'Waiting', stopped: 'Stopped' };
+  let logTool = 'all', logStatus = 'all', openLog = null;
+
+  function policyText(a) {
+    if (a.status === 'blocked') return 'Blocked by PolicyEngine before anything was sent.';
+    if (a.status === 'discarded') return 'Blocked by PolicyEngine, then discarded by Yoav C.';
+    if (a.policy === 'auto') return 'Allowed alone. Within its permissions and daily limits.';
+    if (a.approvedBy) return `Needed a person. Approved by ${a.approvedBy}.`;
+    if (a.rejectedBy) return `Needed a person. Declined by ${a.rejectedBy}.`;
+    return 'Needs a person. Waiting in the Inbox.';
+  }
+
+  function logRow(a) {
+    const [label, cls] = STATUS[a.status] || [a.status, ''];
+    const open = openLog === a.id;
+    const q = open ? queue.find(x => x.actionId === a.id) : null;
+    return `<div class="log-item${open ? ' open' : ''}">
+      <button class="log-row" data-id="${a.id}" aria-expanded="${open}">
+        <span class="row-time">${a.time}</span>
+        <span class="log-tool">${esc(toolName(a.tool))}</span>
+        <span class="log-title"><span class="log-tool-m">${esc(toolName(a.tool))} · </span>${esc(a.title)}</span>
+        <span class="pill sm ${cls}">${label}</span>
+      </button>${open ? `
+      <div class="log-more">
+        <dl class="kv">
+          <dt>Why</dt><dd>${esc(a.why)}</dd>
+          <dt>Policy</dt><dd>${esc(policyText(a))}</dd>
+          <dt>Input</dt><dd><pre class="code">${esc(JSON.stringify(a.input, null, 2))}</pre></dd>
+          <dt>Output</dt><dd>${esc(a.output)}</dd>
+          <dt>Cost</dt><dd>${money(a.cost)} · ${a.tokens.toLocaleString('en-US')} tokens · <span class="mono">${a.id}</span></dd>
+        </dl>
+        ${q ? `<button class="link-btn" data-goto="${q.id}">Open in Inbox →</button>` : ''}
+      </div>` : ''}
+    </div>`;
+  }
+
+  function renderLog() {
+    const toolsUsed = [...new Set(log.map(a => a.tool))];
+    if (logTool !== 'all' && !toolsUsed.includes(logTool)) logTool = 'all';
+    $('#log-status').innerHTML = Object.keys(STATUS_GROUPS).map(s =>
+      `<button class="${logStatus === s ? 'on' : ''}" data-status="${s}" aria-pressed="${logStatus === s}">${STATUS_LABELS[s]}</button>`).join('');
+    $('#log-tools').innerHTML = ['all', ...toolsUsed].map(t =>
+      `<button class="${logTool === t ? 'on' : ''}" data-tool="${t}" aria-pressed="${logTool === t}">${t === 'all' ? 'All tools' : esc(toolName(t))}</button>`).join('');
+    const g = STATUS_GROUPS[logStatus];
+    const rows = log.filter(a => (logTool === 'all' || a.tool === logTool) && (!g || g.includes(a.status)));
+    $('#log-list').innerHTML = rows.length ? rows.map(logRow).join('') : '<div class="empty">Nothing here with these filters.</div>';
+    const cost = rows.reduce((s, a) => s + a.cost, 0);
+    $('#log-count').textContent = `${rows.length} action${rows.length === 1 ? '' : 's'} · ${money(cost)} total`;
+  }
+
+  $('#log-status').addEventListener('click', e => {
+    const b = e.target.closest('button[data-status]');
+    if (!b) return;
+    logStatus = b.dataset.status;
+    renderLog();
+    refocus(`#log-status [data-status="${logStatus}"]`);
+  });
+  $('#log-tools').addEventListener('click', e => {
+    const b = e.target.closest('button[data-tool]');
+    if (!b) return;
+    logTool = b.dataset.tool;
+    renderLog();
+    refocus(`#log-tools [data-tool="${logTool}"]`);
+  });
+  $('#log-list').addEventListener('click', e => {
+    const go = e.target.closest('[data-goto]');
+    if (go) { goInbox(go.dataset.goto); return; }
+    const r = e.target.closest('.log-row');
+    if (!r) return;
+    const id = r.dataset.id;
+    openLog = openLog === id ? null : id;
+    renderLog();
+    refocus(`.log-row[data-id="${id}"]`);
+    setHash(tabHash('log'));
+  });
+
+  /* ================= team: brain ================= */
+  const band = (v) => (v < 34 ? 0 : v < 67 ? 1 : 2);
+  function stylePreview() {
+    const open = ['Fair question, Dan.', 'Good question, and an important one.', 'Respectfully, Dan, that’s exactly the problem.'][band(brain.tone)];
+    const body = [
+      'Negotiating salaries is valuable work and we’re grateful for it. We just think members should also be able to see how their dues are spent.',
+      'Negotiating salaries is the job, and it matters. But you pay for it every month, so you should be able to see the accounts [[src:Annual report 2025]].',
+      'You pay every month and get no itemized breakdown. Any other organization holding your money would have to show you the books [[src:Annual report 2025]].',
+    ][band(brain.sharpness)];
+    const close = ['Published, audited accounts would settle the question for everyone.', 'Transparency isn’t anti-union. It’s pro-member.', 'Even your gym tells you what the membership fee covers.'][band(brain.humor)];
+    return `${open} ${body}\n\n${close}`;
+  }
+  function renderSample() {
+    $('#voice-sample').innerHTML = esc(stylePreview())
+      .replace(/\[\[src:(.+?)\]\]/g, '<span class="src-chip">$1</span>')
+      .replace(/\n/g, '<br>');
+  }
+
+  function updateDirty() {
+    $('#prompt-dirty').hidden = brain.prompt === brain.saved;
+    $('#prompt-ver').textContent = 'v' + brain.version;
+  }
+
+  function renderVersions() {
+    $('#versions').innerHTML = brain.versions.map((v, i) => `
+      <div class="ver">
+        <b>v${v.v}</b>
+        <div><div class="ver-note">${esc(v.note)}</div><div class="ver-meta">${esc(v.by)} · ${esc(v.when)}</div></div>
+        ${i === 0 ? '<span class="pill sm ok">Current</span>' : `<button class="btn btn-light sm" data-restore="${v.v}">Restore</button>`}
+      </div>`).join('');
+  }
+
+  function saveVersion(note) {
+    brain.version += 1;
+    brain.saved = brain.prompt;
+    brain.versions.unshift({ v: brain.version, by: ME, when: 'Today ' + nowHM(), note, prompt: brain.prompt });
+    renderVersions();
+    updateDirty();
+    toast(`Saved as v${brain.version}`);
+  }
+
+  function renderList(key) {
+    const items = brain[key];
+    $(`#list-${key}`).innerHTML = items.length
+      ? items.map((t, i) => `<li><span>${esc(t)}</span><button class="x-btn" data-i="${i}" aria-label="Remove: ${esc(t)}">${svg.x}</button></li>`).join('')
+      : '<li class="muted-li">Nothing here yet.</li>';
+  }
+
+  $('#prompt').value = brain.prompt;
+  $('#prompt').addEventListener('input', e => { brain.prompt = e.target.value; updateDirty(); });
+  $('#prompt-save').addEventListener('click', () => {
+    const note = brain.restoredFrom ? `Restored v${brain.restoredFrom}` : brain.prompt === brain.saved ? 'Re-saved, no changes' : 'Edited the system prompt';
+    brain.restoredFrom = null;
+    saveVersion(note);
+  });
+  $('#versions').addEventListener('click', e => {
+    const b = e.target.closest('[data-restore]');
+    if (!b) return;
+    const ver = brain.versions.find(v => v.v === +b.dataset.restore);
+    if (!ver) return;
+    brain.prompt = ver.prompt;
+    brain.restoredFrom = ver.v;
+    $('#prompt').value = ver.prompt;
+    updateDirty();
+    $('#prompt').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+    toast(`v${ver.v} loaded. Save to make it current.`);
+  });
+
+  ['messages', 'redLines'].forEach(key => {
+    $(`#list-${key}`).addEventListener('click', e => {
+      const b = e.target.closest('.x-btn');
+      if (!b) return;
+      brain[key].splice(+b.dataset.i, 1);
+      renderList(key);
+      toast(key === 'redLines' ? 'Red line removed.' : 'Message removed.');
+    });
+    $(`#add-${key}`).addEventListener('submit', e => {
+      e.preventDefault();
+      const inp = e.currentTarget.querySelector('input');
+      const v = inp.value.trim();
+      if (!v) return;
+      brain[key].push(v);
+      inp.value = '';
+      renderList(key);
+      toast(key === 'redLines' ? 'Red line added. It applies from the next action.' : 'Message added.');
+    });
+  });
+
+  $$('#pane-brain input[type=range]').forEach(r => r.addEventListener('input', () => {
+    brain[r.dataset.k] = +r.value;
+    renderSample();
+  }));
+  $('#style-save').addEventListener('click', () => saveVersion(`Voice: tone ${brain.tone}, sharpness ${brain.sharpness}, humor ${brain.humor}`));
+
+  /* ================= team: tools ================= */
+  function renderTools() {
+    $('#tools-list').innerHTML = tools.map((t, i) => {
+      const q = quotaOf(t), u = usedOf(t);
+      const pct = Math.min(100, (u / q) * 100);
+      const fmt = (n) => (t.money ? ils(n) : n.toLocaleString('en-US'));
+      return `<div class="tool${t.mode === 'off' ? ' is-off' : ''}">
+        <div class="tool-top">
+          <div><div class="setting-name">${esc(t.name)}</div><div class="setting-desc">${esc(t.desc)}</div></div>
+          <div class="mini-seg" role="group" aria-label="${esc(t.name)}: who decides">${['off', 'ask', 'auto'].map(m =>
+            `<button class="${t.mode === m ? 'on' : ''}" data-i="${i}" data-m="${m}" aria-pressed="${t.mode === m}">${MODE[m]}</button>`).join('')}</div>
+        </div>
+        <div class="tool-use">
+          <div class="bar"><i class="${u > q * 0.9 ? 'over' : ''}" style="width:${pct}%"></i></div>
+          <span class="use-label">${fmt(u)} / ${fmt(q)}${t.money ? '' : ' ' + t.unit} per day</span>
+          <div class="stepper" role="group" aria-label="Daily limit for ${esc(t.name)}">
+            <button data-i="${i}" data-step="-1" aria-label="Lower daily limit for ${esc(t.name)}"${q - t.step < t.step ? ' disabled' : ''}>−</button>
+            <button data-i="${i}" data-step="1" aria-label="Raise daily limit for ${esc(t.name)}">+</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  $('#tools-list').addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b || b.disabled) return;
+    const i = +b.dataset.i;
+    const t = tools[i];
+    if (!t) return;
+    if (b.dataset.m) {
+      t.mode = b.dataset.m;
+      renderTools();
+      refocus(`#tools-list [data-i="${i}"][data-m="${t.mode}"]`);
+      toast(`${t.name}: ${MODE_SENTENCE[t.mode]}`);
+    } else if (b.dataset.step) {
+      const s = b.dataset.step;
+      setQuota(t, Math.max(t.step, quotaOf(t) + t.step * +s));
+      renderTools();
+      renderBudget();
+      refocus(`#tools-list [data-i="${i}"][data-step="${s}"]`);
+    }
+  });
+
+  function renderStore() {
+    $('#store').innerHTML = store.map((s, i) => `
+      <div class="store-row">
+        <div class="store-info">
+          <span class="logo" aria-hidden="true">${s.mark}</span>
+          <div><div class="setting-name">${esc(s.name)}</div><div class="setting-desc">${esc(s.desc)}</div></div>
+        </div>
+        ${s.state === 'connected'
+          ? `<span class="connected">${svg.check} Connected</span>`
+          : s.state === 'connecting'
+            ? '<button class="btn btn-light sm" disabled><span class="spin"></span> Connecting…</button>'
+            : `<button class="btn btn-light sm" data-connect="${i}" aria-label="Connect ${esc(s.name)}">Connect</button>`}
+      </div>`).join('');
+  }
+
+  $('#store').addEventListener('click', e => {
+    const b = e.target.closest('[data-connect]');
+    if (!b) return;
+    const s = store[+b.dataset.connect];
+    if (!s || s.state !== 'idle') return;
+    s.state = 'connecting';
+    renderStore();
+    setTimeout(() => {
+      s.state = 'connected';
+      TOOL_NAMES[s.id] = s.short;
+      tools.push({ id: s.id, name: s.name, desc: s.desc, mode: 'ask', quota: s.quota, used: 0, unit: s.unit, step: s.step });
+      renderStore();
+      renderTools();
+      toast(`${s.short} connected. It will ask you before using it.`);
+    }, 1600);
+  });
+
+  /* ================= team: budget ================= */
+  const LEDGER = { pending: ['Waiting for you', 'warn'], auto: ['Paid alone', ''], approved: ['Approved', 'ok'], rejected: ['Declined', ''] };
+
+  function renderBudget() {
+    const m = budget;
+    const mp = Math.min(100, (m.monthlySpent / m.monthlyCap) * 100);
+    const dp = Math.min(100, (m.dailySpent / m.dailyCap) * 100);
+    $('#b-month').textContent = ils(m.monthlySpent);
+    $('#b-month-cap').textContent = `of ${ils(m.monthlyCap)} this month`;
+    $('#b-month-bar').style.width = mp + '%';
+    $('#b-day').textContent = ils(m.dailySpent);
+    $('#b-day-cap').textContent = `of ${ils(m.dailyCap)} today · ${ils(Math.max(0, m.dailyCap - m.dailySpent))} left`;
+    const db = $('#b-day-bar');
+    db.style.width = dp + '%';
+    db.classList.toggle('over', dp >= 90);
+
+    $('#b-auto').textContent = ils(m.autoLimit);
+    $('#b-auto-dec').disabled = m.autoLimit <= 0;
+    $('#b-auto-inc').disabled = m.autoLimit >= 500;
+
+    const pend = m.ledger.find(x => x.status === 'pending' && x.item);
+    const pb = $('#b-pending');
+    pb.hidden = !pend;
+    pb.innerHTML = pend
+      ? `<span>${ils(pend.amount)} to ${esc(pend.vendor)} is waiting for you.</span><button class="link-btn" data-goto="${pend.item}">Review in Inbox →</button>`
+      : '';
+
+    $('#ledger').innerHTML = m.ledger.map(x => {
+      const [label, cls] = LEDGER[x.status];
+      return `<div class="ledger-row">
+        <div>
+          <div class="ledger-vendor">${esc(x.vendor)}</div>
+          <div class="ledger-desc">${esc(x.desc)} · ${esc(x.time)}</div>
+          ${x.status === 'pending' && x.item ? `<button class="link-btn" data-goto="${x.item}">Review in Inbox →</button>` : ''}
+        </div>
+        <div class="ledger-side">
+          <span class="ledger-amt${x.status === 'rejected' ? ' struck' : ''}">${ils(x.amount)}</span>
+          <span class="pill sm ${cls}">${label}</span>
+        </div>
+      </div>`;
+    }).join('');
+
+    const limit = m.autoLimit.toLocaleString('en-US');
+    $('#rules').innerHTML = m.rules.map((r, i) => {
+      const text = r.text.replace(/\{auto\}/g, limit);
+      return `<div class="rule"><span>${esc(text)}</span><button class="switch sm${r.on ? '' : ' off'}" data-rule="${i}" role="switch" aria-checked="${r.on}" aria-label="${esc(text)}"></button></div>`;
+    }).join('');
+  }
+
+  $('#b-auto-dec').addEventListener('click', () => { budget.autoLimit = Math.max(0, budget.autoLimit - 25); renderBudget(); if (!editing && !searching) renderInbox(); });
+  $('#b-auto-inc').addEventListener('click', () => { budget.autoLimit = Math.min(500, budget.autoLimit + 25); renderBudget(); if (!editing && !searching) renderInbox(); });
+  $('#rules').addEventListener('click', e => {
+    const b = e.target.closest('[data-rule]');
+    if (!b) return;
+    const i = +b.dataset.rule;
+    budget.rules[i].on = !budget.rules[i].on;
+    renderBudget();
+    refocus(`#rules [data-rule="${i}"]`);
+    toast(budget.rules[i].on ? 'Rule on.' : 'Rule off.');
+  });
+  $('#pane-budget').addEventListener('click', e => {
+    const b = e.target.closest('[data-goto]');
+    if (b) goInbox(b.dataset.goto);
+  });
+
+  /* ================= team: calls ================= */
+  const OUTCOME = { supporter: ['Supporter', 'ok'], opposed: ['Opposed · removed', ''], neutral: ['Undecided', 'warn'], 'no-answer': ['No answer', ''] };
+  let callSel = null, playT = null, playAt = 0, shown = 0;
+
+  function renderCalls() {
+    $('#call-list').innerHTML = calls.map(c => {
+      const [label, cls] = OUTCOME[c.outcome];
+      return `<button class="call-row${c.id === callSel ? ' on' : ''}" data-call="${c.id}" aria-pressed="${c.id === callSel}">
+        <span><span class="call-name">${esc(c.name)}</span><span class="call-meta"> · ${c.time}</span></span>
+        <span class="call-meta call-dur">${c.duration ? mmss(c.duration) : '—'}</span>
+        <span class="pill sm ${cls}">${label}</span>
+      </button>`;
+    }).join('');
+  }
+
+  function renderCallDetail() {
+    const c = calls.find(x => x.id === callSel);
+    const box = $('#call-detail');
+    box.classList.toggle('is-empty', !c);
+    if (!c) { box.innerHTML = '<p class="hint">Pick a call to read or replay it.</p>'; return; }
+    const [label, cls] = OUTCOME[c.outcome];
+    box.innerHTML = `
+      <div class="cd-head">
+        <div><h3>${esc(c.name)}</h3><div class="setting-desc">${esc(c.phone)} · ${c.time} · ${c.duration ? mmss(c.duration) : 'not answered'}</div></div>
+        <span class="pill ${cls}">${label}</span>
+      </div>
+      <p class="cd-summary">${esc(c.summary)}</p>
+      <div class="tag-row">${c.tags.map(t => `<span>${esc(t)}</span>`).join('')}</div>
+      ${c.transcript.length ? `
+        <div class="player">
+          <button class="play-btn" id="play-btn" aria-label="Play call">${svg.play}</button>
+          <div class="bar"><i id="play-bar" style="width:0%"></i></div>
+          <span class="play-time" id="play-time">0:00 / ${mmss(c.duration)}</span>
+          <button class="link-btn" id="show-all">Show all</button>
+        </div>
+        <div class="transcript" id="transcript" aria-live="polite"><p class="hint" id="t-hint">Press play to hear how it went, line by line.</p></div>`
+      : '<p class="hint player-empty">No transcript. Nobody picked up, and it doesn’t leave voicemails.</p>'}`;
+  }
+
+  function lineHTML(c, l) {
+    return `<span class="who">${l.who === 'bot' ? 'Megaphone · AI' : esc(c.name.split(' ')[0])}</span><p>${esc(l.text)}</p>`;
+  }
+  function appendLine(c, l) {
+    const box = $('#transcript');
+    if (!box) return;
+    const dv = document.createElement('div');
+    dv.className = 'line ' + l.who;
+    dv.innerHTML = lineHTML(c, l);
+    box.appendChild(dv);
+  }
+  function updatePlayer(c) {
+    const bar = $('#play-bar'), time = $('#play-time');
+    if (bar) bar.style.width = Math.min(100, (playAt / c.duration) * 100) + '%';
+    if (time) time.textContent = `${mmss(playAt)} / ${mmss(c.duration)}`;
+  }
+  function stopPlay() {
+    clearInterval(playT);
+    playT = null;
+    const b = $('#play-btn');
+    if (b) { b.innerHTML = svg.play; b.setAttribute('aria-label', 'Play call'); }
+  }
+  function togglePlay() {
+    const c = calls.find(x => x.id === callSel);
+    if (!c || !c.transcript.length) return;
+    if (playT) { stopPlay(); return; }
+    if (playAt >= c.duration) { playAt = 0; shown = 0; $('#transcript').innerHTML = ''; }
+    const hint = $('#t-hint');
+    if (hint) hint.remove();
+    const b = $('#play-btn');
+    b.innerHTML = svg.pause;
+    b.setAttribute('aria-label', 'Pause call');
+    playT = setInterval(() => {
+      playAt = Math.min(c.duration, playAt + 0.5);
+      while (shown < c.transcript.length && c.transcript[shown].t <= playAt) appendLine(c, c.transcript[shown++]);
+      updatePlayer(c);
+      if (playAt >= c.duration) stopPlay();
+    }, 100);
+  }
+  function showAll() {
+    const c = calls.find(x => x.id === callSel);
+    if (!c) return;
+    stopPlay();
+    $('#transcript').innerHTML = c.transcript.map(l => `<div class="line ${l.who}">${lineHTML(c, l)}</div>`).join('');
+    shown = c.transcript.length;
+    playAt = c.duration;
+    updatePlayer(c);
+  }
+  function selectCall(id, push = true) {
+    stopPlay();
+    callSel = id; playAt = 0; shown = 0;
+    renderCalls();
+    renderCallDetail();
+    if (push) {
+      setHash(tabHash('calls'));
+      refocus(`[data-call="${id}"]`);
+      $('#call-detail').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
+    }
+  }
+
+  $('#call-list').addEventListener('click', e => {
+    const b = e.target.closest('[data-call]');
+    if (b) selectCall(b.dataset.call);
+  });
+  $('#call-detail').addEventListener('click', e => {
+    if (e.target.closest('#play-btn')) togglePlay();
+    else if (e.target.closest('#show-all')) showAll();
+  });
+
+  /* ================= init ================= */
+  renderInbox();
+  renderLog();
+  renderVersions();
+  updateDirty();
+  renderList('messages');
+  renderList('redLines');
+  renderSample();
+  renderTools();
+  renderStore();
+  renderBudget();
+  renderCalls();
+  renderCallDetail();
+  route();
 })();
 </script>
 </body>
