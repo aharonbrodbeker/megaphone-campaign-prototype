@@ -131,7 +131,7 @@ function showKillModal() {
       <div class="modal">
         <div class="flex items-center gap-3 mb-3 text-neon-red">
           ${icon('octagon-x', 'w-6 h-6')}
-          <h2 class="text-xl font-bold text-white">Kill switch</h2>
+          <h2 class="text-xl font-bold text-white">Stop everything</h2>
         </div>
         <p class="text-slate-400 text-sm leading-relaxed mb-6">
           This immediately stops the agent loop. No tweets, emails, calls, or payments will run until you resume.
@@ -1114,51 +1114,8 @@ function openMobileNav() {
   $$('[data-mob]').forEach(a => a.onclick = () => el.remove());
 }
 
-/* ---------- auth gate ---------- */
-const AUTH = { user: 'joker', pass: 'Aa123456', key: 'megaphone_auth_v1' };
-
-function isAuthed() {
-  return sessionStorage.getItem(AUTH.key) === '1';
-}
-
-function unlockApp() {
-  const gate = $('#login-gate');
-  const shell = $('#admin-shell');
-  if (gate) gate.classList.add('hidden');
-  if (shell) shell.classList.remove('hidden');
-  startApp();
-}
-
-function showLogin() {
-  const gate = $('#login-gate');
-  const shell = $('#admin-shell');
-  if (gate) gate.classList.remove('hidden');
-  if (shell) shell.classList.add('hidden');
-  lucide.createIcons();
-  const form = $('#login-form');
-  if (!form) return;
-  form.onsubmit = (e) => {
-    e.preventDefault();
-    const u = ($('#login-user')?.value || '').trim();
-    const p = $('#login-pass')?.value || '';
-    const err = $('#login-error');
-    if (u === AUTH.user && p === AUTH.pass) {
-      sessionStorage.setItem(AUTH.key, '1');
-      if (err) err.classList.add('hidden');
-      unlockApp();
-    } else {
-      if (err) err.classList.remove('hidden');
-      $('#login-pass').value = '';
-      $('#login-pass')?.focus();
-    }
-  };
-}
-
 /* ---------- boot ---------- */
-let appStarted = false;
-function startApp() {
-  if (appStarted) return;
-  appStarted = true;
+function boot() {
   window.addEventListener('hashchange', render);
   $('#kill-btn').onclick = showKillModal;
   $('#mobile-nav-btn').onclick = openMobileNav;
@@ -1180,11 +1137,6 @@ function startApp() {
       }
     }
   }, 14000);
-}
-
-function boot() {
-  if (isAuthed()) unlockApp();
-  else showLogin();
 }
 
 document.addEventListener('DOMContentLoaded', boot);
