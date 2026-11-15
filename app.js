@@ -131,7 +131,7 @@ function showKillModal() {
       <div class="modal">
         <div class="flex items-center gap-3 mb-3 text-neon-red">
           ${icon('octagon-x', 'w-6 h-6')}
-          <h2 class="text-xl font-bold text-white">Stop everything</h2>
+          <h2 class="text-xl font-bold text-white">Kill switch</h2>
         </div>
         <p class="text-slate-400 text-sm leading-relaxed mb-6">
           This immediately stops the agent loop. No tweets, emails, calls, or payments will run until you resume.
