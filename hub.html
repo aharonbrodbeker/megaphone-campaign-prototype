@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>transparent-histadrut / megaphone · Megaphone Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;--g300:#d1d5db;--g400:#9ca3af;--g500:#6b7280;--g600:#4b5563;--g700:#374151;--g800:#1f2937;--g900:#111827;
+  --yellow:#FFD21E;--r:8px;
+  --sans:'Source Sans 3',Inter,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,'Courier New',monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:var(--sans);color:var(--g800);background:#fff;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;cursor:pointer}
+input,select,textarea{font:inherit;color:inherit}
+svg.i{flex:none;vertical-align:middle}
+.wrap{max-width:1280px;margin:0 auto;padding:0 24px}
+.mono{font-family:var(--mono)}
+.muted{color:var(--g500)}
+.sm{font-size:13px}
+b,strong{font-weight:600;color:var(--g900)}
+
+/* nav */
+.topnav{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--g100)}
+.nav-inner{display:flex;align-items:center;gap:20px;height:56px}
+.brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:17px;white-space:nowrap;color:var(--g900)}
+.mark{width:28px;height:28px;border-radius:8px;background:var(--yellow);display:grid;place-items:center;color:#111;flex:none}
+.mark.sm{width:22px;height:22px;border-radius:6px}
+.mark.xs{width:18px;height:18px;border-radius:5px}
+.search{display:flex;align-items:center;gap:8px;flex:1;max-width:400px;height:34px;padding:0 10px;border:1px solid var(--g200);border-radius:8px;background:#fff;color:var(--g400)}
+.search input{border:0;outline:0;flex:1;min-width:0;background:transparent;color:var(--g800);font-size:14px}
+.search:focus-within{border-color:var(--g300);box-shadow:0 0 0 3px var(--g100)}
+.kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--g200);border-radius:4px;padding:0 5px;color:var(--g400)}
+.navlinks{display:flex;gap:2px;margin-left:auto}
+.navlinks a{padding:6px 10px;border-radius:6px;font-size:14px;color:var(--g600);display:flex;align-items:center;gap:6px}
+.navlinks a:hover{color:var(--g900);background:var(--g50)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.team-toggle{display:flex;align-items:center;gap:8px;border:1px solid var(--g200);background:#fff;border-radius:999px;padding:3px 4px 3px 10px;font-size:13px;font-weight:600}
+.team-toggle:hover{border-color:var(--g300)}
+.switch{width:30px;height:18px;border-radius:999px;background:var(--g300);position:relative;transition:background .2s}
+.switch::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.switch.on{background:var(--g900)}
+.switch.on::after{left:14px}
+.avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#fde68a,#fca5a5);display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--g800);flex:none}
+.avatar.xs{width:20px;height:20px;font-size:9px}
+.avatar.md{width:34px;height:34px;font-size:12px;background:linear-gradient(135deg,#e0e7ff,#bae6fd)}
+
+/* repo header */
+.repo-head{background:linear-gradient(to top,var(--g50),#fff);border-bottom:1px solid var(--g200);padding-top:22px}
+.repo-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.repo-title{display:flex;align-items:center;gap:8px;font-size:20px;flex-wrap:wrap}
+.repo-title .org{color:var(--g500)}
+.repo-title .org:hover{color:var(--g900)}
+.slash{color:var(--g300)}
+.repo-title b{font-weight:700}
+.icon-btn{border:0;background:transparent;color:var(--g400);padding:4px;border-radius:6px;display:inline-flex}
+.icon-btn:hover{color:var(--g700);background:var(--g100)}
+.counter{display:inline-flex;align-items:stretch;border:1px solid var(--g200);border-radius:8px;overflow:hidden;font-size:14px;background:#fff}
+.counter button{display:flex;align-items:center;gap:6px;border:0;background:#fff;padding:3px 10px}
+.counter button:hover{background:var(--g50)}
+.counter .n{padding:3px 10px;border-left:1px solid var(--g200);font-weight:600;display:flex;align-items:center}
+.counter.active button{color:#e11d48}
+.head-right{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 4px}
+.tag{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 8px;border-radius:6px;font-size:13px;border:1px solid var(--g200);background:#fff;color:var(--g700);white-space:nowrap;line-height:1}
+.tag.sm{height:20px;font-size:12px;padding:0 6px}
+.tag .lbl{color:var(--g400)}
+.t-green{background:#f0fdf4;border-color:#bbf7d0;color:#15803d}
+.t-blue{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
+.t-purple{background:#faf5ff;border-color:#e9d5ff;color:#7e22ce}
+.t-amber{background:#fffbeb;border-color:#fde68a;color:#b45309}
+.t-red{background:#fef2f2;border-color:#fecaca;color:#b91c1c}
+.t-pink{background:#fdf2f8;border-color:#fbcfe8;color:#be185d}
+.t-orange{background:#fff7ed;border-color:#fed7aa;color:#c2410c}
+.t-gray{background:var(--g50);border-color:var(--g200);color:var(--g600)}
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+.dot.pulse{animation:pulse 1.6s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(22,163,74,.5)}70%{box-shadow:0 0 0 6px rgba(22,163,74,0)}100%{box-shadow:0 0 0 0 rgba(22,163,74,0)}}
+
+.tabs{display:flex;gap:2px;overflow-x:auto;margin-top:14px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs a{display:flex;align-items:center;gap:7px;padding:10px 12px;font-size:15px;color:var(--g500);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tabs a:hover{color:var(--g800)}
+.tabs a.active{color:var(--g900);border-bottom-color:var(--g900);font-weight:600}
+.badge{min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--g900);color:#fff;font-size:11px;font-weight:700;display:inline-grid;place-items:center;line-height:1}
+.badge.zero{background:var(--g200);color:var(--g500)}
+
+/* buttons, inputs */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--g200);background:#fff;font-size:14px;font-weight:600;color:var(--g800);white-space:nowrap}
+.btn:hover{background:var(--g50)}
+.btn.primary{background:var(--g900);border-color:var(--g900);color:#fff}
+.btn.primary:hover{background:#000}
+.btn.danger{color:#b91c1c}
+.btn.danger:hover{background:#fef2f2;border-color:#fecaca}
+.btn.sm{height:28px;padding:0 10px;font-size:13px}
+.btn.paused{background:#fff7ed;border-color:#fed7aa;color:#c2410c}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.link{border:0;background:none;padding:0;color:#2563eb;cursor:pointer}
+.link:hover{text-decoration:underline}
+.input{height:34px;border:1px solid var(--g200);border-radius:8px;padding:0 10px;background:#fff;outline:0;font-size:14px;min-width:0}
+.input:focus{border-color:var(--g400);box-shadow:0 0 0 3px var(--g100)}
+.select{height:32px;border:1px solid var(--g200);border-radius:8px;padding:0 8px;background:#fff;font-size:14px;outline:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--g200);background:#fff;border-radius:999px;padding:2px 10px;font-size:13px;color:var(--g600)}
+.chip:hover{border-color:var(--g400);color:var(--g900)}
+.chip.on{background:var(--g900);border-color:var(--g900);color:#fff}
+.chip .c{color:var(--g400)}
+.chip.on .c{color:var(--g300)}
+.chip .x{border:0;background:none;color:inherit;padding:0 0 0 4px;font-size:15px;line-height:1}
+
+/* layout */
+.view{padding-top:28px;padding-bottom:64px;min-height:60vh}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:36px;align-items:start}
+.split{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px;align-items:start}
+.card{border:1px solid var(--g200);border-radius:var(--r);background:#fff}
+.card-head{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--g200);background:var(--g50);border-radius:8px 8px 0 0;font-size:14px;color:var(--g600);flex-wrap:wrap}
+.card-head .right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.pad{padding:16px}
+.section-title{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:700;color:var(--g900);margin:30px 0 10px}
+.section-title:first-child{margin-top:0}
+.section-title .count{font-weight:500;color:var(--g400)}
+.note{display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border:1px solid var(--g200);background:var(--g50);border-radius:8px;font-size:14px;color:var(--g600);margin-bottom:16px}
+.empty{padding:28px;text-align:center;color:var(--g500);font-size:14px}
+.stat-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+.stat{border:1px solid var(--g200);border-radius:8px;padding:12px 14px;background:#fff}
+.stat .k{font-size:13px;color:var(--g500);display:flex;align-items:center;gap:6px}
+.stat .v{font-size:22px;font-weight:700;color:var(--g900);line-height:1.2;margin-top:2px}
+.stat .v small{font-size:13px;font-weight:500;color:var(--g400)}
+
+/* readme */
+.md{padding:6px 28px 28px}
+.md h1{font-size:30px;margin:18px 0 6px;color:var(--g900);line-height:1.2}
+.md h2{font-size:20px;margin:30px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--g100);color:var(--g900)}
+.md h3{font-size:15px;margin:0 0 6px;color:var(--g900)}
+.md p{margin:0 0 12px;color:var(--g700)}
+.md ul,.md ol{margin:0 0 12px;padding-left:22px;color:var(--g700)}
+.md li{margin:4px 0}
+.md a{color:#2563eb}
+.md a:hover{text-decoration:underline}
+.md code{font-family:var(--mono);font-size:13px;background:var(--g100);padding:1px 5px;border-radius:4px}
+.md table{width:100%;border-collapse:collapse;font-size:14px;margin:6px 0 14px}
+.md th,.md td{text-align:left;padding:7px 10px;border:1px solid var(--g200)}
+.md th{background:var(--g50);font-weight:600}
+.md blockquote{margin:0 0 12px;padding:6px 14px;border-left:3px solid var(--yellow);color:var(--g600);background:#fffdf2;border-radius:0 6px 6px 0}
+.md pre{font-family:var(--mono);font-size:13px;background:var(--g50);border:1px solid var(--g200);border-radius:8px;padding:12px 14px;overflow:auto;margin:0 0 12px}
+.md .lead{font-size:18px;color:var(--g600)}
+.redline{list-style:none;padding-left:0!important}
+.redline li{display:flex;gap:8px;align-items:flex-start}
+.redline svg{color:#dc2626;margin-top:3px}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px}
+.cols2 > div{border:1px solid var(--g200);border-radius:8px;padding:12px 14px}
+.cols2 ul{margin:0}
+.hl{background:linear-gradient(transparent 58%,rgba(255,210,30,.55) 58%)}
+
+/* sidebar */
+.side{display:flex;flex-direction:column;gap:20px}
+.side section{padding-bottom:20px;border-bottom:1px solid var(--g100)}
+.side section:last-child{border-bottom:0}
+.side-label{font-size:13px;color:var(--g500);display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px}
+.side-label a{color:var(--g400)}
+.side-label a:hover{color:var(--g800)}
+.big{font-size:26px;font-weight:700;color:var(--g900);line-height:1.1}
+.spark{display:block;width:100%;height:46px;margin-top:8px}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+a.tag:hover{filter:brightness(.97)}
+.bar{height:8px;border-radius:999px;background:var(--g100);overflow:hidden}
+.bar > span{display:block;height:100%;background:var(--g900);border-radius:999px;transition:width .3s}
+.bar.warn > span{background:#f59e0b}
+.bar.full > span{background:#dc2626}
+.bar.y > span{background:var(--yellow)}
+.bar-meta{display:flex;justify-content:space-between;font-size:13px;color:var(--g500);margin-top:6px}
+.live{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--g700)}
+.live .dot{margin-top:7px}
+#liveText{transition:opacity .25s}
+.mini-ask{display:flex;gap:6px;margin-bottom:8px}
+.mini-ask .input{flex:1}
+
+/* activity */
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:14px}
+.toolbar .right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.list{border:1px solid var(--g200);border-radius:8px;overflow:hidden;background:#fff}
+.list-head{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--g50);border-bottom:1px solid var(--g200);font-size:14px;color:var(--g600);flex-wrap:wrap}
+.list-head .trunc{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:420px}
+.list-head .right{margin-left:auto;display:flex;align-items:center;gap:6px}
+.arow{display:grid;grid-template-columns:22px 128px minmax(0,1fr) 64px 48px 72px;gap:12px;align-items:center;width:100%;padding:9px 14px;border:0;border-bottom:1px solid var(--g100);background:#fff;text-align:left;font-size:14px}
+.arow:last-child{border-bottom:0}
+.arow:hover{background:var(--g50)}
+.arow .title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--g800)}
+.arow .id,.arow .time,.arow .cost{font-family:var(--mono);font-size:12.5px;color:var(--g500)}
+.arow .cost{text-align:right}
+.arow .tool{overflow:hidden}
+.arow.new{animation:flash 1.6s ease}
+@keyframes flash{from{background:#fff7d1}to{background:#fff}}
+.s-green{color:#16a34a;display:inline-flex}
+.s-amber{color:#d97706;display:inline-flex}
+.s-red{color:#dc2626;display:inline-flex}
+.s-gray{color:var(--g400);display:inline-flex}
+
+/* drawer */
+.overlay{position:fixed;inset:0;background:rgba(17,24,39,.25);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
+.overlay.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(580px,100%);background:#fff;border-left:1px solid var(--g200);box-shadow:-12px 0 32px rgba(0,0,0,.06);transform:translateX(100%);transition:transform .25s ease;z-index:41;display:flex;flex-direction:column}
+.drawer.open{transform:none}
+.drawer-head{display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--g200);background:var(--g50)}
+.drawer-head .right{margin-left:auto;display:flex;gap:6px;align-items:center}
+.drawer-body{padding:18px 20px 28px;overflow:auto;flex:1}
+.drawer-body h3{margin:0 0 4px;font-size:19px;color:var(--g900);line-height:1.3}
+.drawer-foot{padding:12px 18px;border-top:1px solid var(--g200);display:flex;gap:8px;flex-wrap:wrap}
+.kv{display:grid;grid-template-columns:120px minmax(0,1fr);gap:6px 12px;font-size:14px;margin:12px 0 0}
+.kv dt{color:var(--g500)}
+.kv dd{margin:0;color:var(--g800);min-width:0;overflow-wrap:anywhere}
+.sec{margin-top:20px}
+.sec h4{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--g500);font-weight:600}
+.sec p{margin:0;color:var(--g700);font-size:14.5px}
+pre.json{font-family:var(--mono);font-size:12.5px;line-height:1.6;background:var(--g50);border:1px solid var(--g200);border-radius:8px;padding:12px 14px;margin:0;overflow:auto;white-space:pre-wrap;word-break:break-word;color:var(--g700)}
+.jk{color:#7e22ce}.js{color:#047857}.jn{color:#b45309}
+.policy{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:8px;border-width:1px;border-style:solid;font-size:14px}
+.policy p{color:inherit}
+.costs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.costs div{border:1px solid var(--g200);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--g500)}
+.costs b{display:block;font-family:var(--mono);font-size:14px;font-weight:500}
+
+/* approvals */
+.disc{border-bottom:1px solid var(--g100)}
+.disc:last-child{border-bottom:0}
+.disc.blocked{background:#fffafa}
+.disc-row{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;background:transparent;border:0;text-align:left}
+.disc-row:hover{background:var(--g50)}
+.disc-ic{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;flex:none;border-width:1px;border-style:solid}
+.disc-main{flex:1;min-width:0}
+.disc-title{display:block;font-weight:600;color:var(--g900);font-size:15px}
+.disc-sub{display:block;font-size:13px;color:var(--g500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.disc-meta{display:flex;align-items:center;gap:10px;flex:none}
+.chev{display:inline-flex;transition:transform .2s;color:var(--g400)}
+.disc.open .chev{transform:rotate(90deg)}
+.disc-body{display:none;padding:4px 14px 18px 60px}
+.disc.open .disc-body{display:block}
+.disc-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px}
+.disc-grid h4{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--g500);font-weight:600}
+.disc-grid p{margin:0 0 4px;font-size:14px;color:var(--g700)}
+.actions-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.pv{border:1px solid var(--g200);border-radius:8px;background:#fff;overflow:hidden}
+.pv-head{padding:8px 12px;background:var(--g50);border-bottom:1px solid var(--g200);font-size:13px;color:var(--g500);display:flex;gap:6px;align-items:center}
+.pv-body{padding:12px 14px;font-size:14px;color:var(--g800)}
+.txt{white-space:pre-wrap;overflow-wrap:anywhere}
+.tweet{display:flex;gap:10px}
+.tw-av{width:36px;height:36px;border-radius:50%;background:var(--yellow);display:grid;place-items:center;flex:none;color:#111}
+.tw-av.sm{width:30px;height:30px}
+.src{display:inline-flex;align-items:center;gap:3px;font-size:12px;padding:0 6px;border-radius:5px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;vertical-align:1px;white-space:nowrap;line-height:18px}
+textarea.edit{width:100%;min-height:170px;border:1px solid var(--g300);border-radius:8px;padding:10px 12px;font-family:var(--mono);font-size:13px;line-height:1.6;outline:0;resize:vertical;background:#fff}
+textarea.edit:focus{border-color:var(--g500);box-shadow:0 0 0 3px var(--g100)}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;font-size:13px;color:var(--g500)}
+.field .input{width:100%}
+.res-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--g100);font-size:14px;flex-wrap:wrap}
+.res-row:last-child{border-bottom:0}
+
+/* prompt */
+.file-meta{display:flex;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid var(--g200);font-size:14px;color:var(--g600);flex-wrap:wrap}
+.file-meta .right{margin-left:auto}
+.code{overflow:auto;font-family:var(--mono);font-size:13px;line-height:1.7;padding:8px 0}
+.code table{border-collapse:collapse;width:100%}
+.code td{padding:0 14px;vertical-align:top}
+.code .ln{width:1%;text-align:right;color:var(--g300);user-select:none;padding-left:16px;border-right:1px solid var(--g100);white-space:nowrap}
+.code .lc{white-space:pre-wrap;word-break:break-word;color:var(--g800)}
+.code tr:hover td{background:#fffbe6}
+.code .h{color:#7e22ce;font-weight:500}
+.code .b{color:var(--g400)}
+.code .q{color:#047857}
+.commit{border-top:1px solid var(--g200);padding:14px;background:var(--g50);border-radius:0 0 8px 8px}
+.commit h4{margin:0 0 8px;font-size:15px;color:var(--g900)}
+.prompt-edit{padding:12px}
+.prompt-edit textarea{min-height:420px}
+.hash{font-family:var(--mono);font-size:12px;color:var(--g600);background:var(--g100);border-radius:4px;padding:0 5px}
+.hist-row{display:flex;gap:10px;padding:11px 14px;border-bottom:1px solid var(--g100);font-size:14px;align-items:flex-start}
+.hist-row:last-child{border-bottom:0}
+.hist-row .body{flex:1;min-width:0}
+.hist-row .note-t{color:var(--g900);font-weight:600;overflow-wrap:anywhere}
+.diff{font-family:var(--mono);font-size:12px}
+.diff .a{color:#16a34a}.diff .d{color:#dc2626}
+
+/* tools */
+.trow{display:grid;grid-template-columns:40px minmax(0,1fr) 210px 196px;gap:16px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--g100)}
+.trow:last-child{border-bottom:0}
+.tic{width:40px;height:40px;border-radius:8px;display:grid;place-items:center;border-width:1px;border-style:solid;flex:none}
+.t-name{font-weight:600;color:var(--g900);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.usage-top{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--g500);margin-bottom:6px;gap:6px}
+.quota{width:64px;height:26px;font-family:var(--mono);font-size:12.5px;padding:0 6px}
+.seg{display:inline-flex;border:1px solid var(--g200);border-radius:8px;padding:2px;background:var(--g50)}
+.seg button{border:0;background:transparent;padding:3px 12px;border-radius:6px;font-size:13px;font-weight:600;color:var(--g500)}
+.seg button.on{background:#fff;color:var(--g900);box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.seg button.on.m-auto{color:#15803d}
+.seg button.on.m-ask{color:#b45309}
+.seg button:disabled{cursor:not-allowed}
+.store-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.scard{border:1px solid var(--g200);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:8px;background:#fff}
+.scard:hover{border-color:var(--g300);box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.scard .top{display:flex;align-items:center;gap:10px}
+.scard .sfoot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;gap:8px}
+
+/* budget */
+.vcard{border-radius:14px;padding:18px 20px;background:linear-gradient(135deg,#111827 0%,#374151 100%);color:#fff;aspect-ratio:1.586;display:flex;flex-direction:column;justify-content:space-between;font-family:var(--mono);position:relative;overflow:hidden}
+.vcard.frozen{filter:grayscale(1) brightness(1.3)}
+.vcard .chipg{width:36px;height:26px;border-radius:5px;background:var(--yellow)}
+.vcard .num{font-size:18px;letter-spacing:.12em}
+.vcard .row{display:flex;justify-content:space-between;align-items:flex-end;font-size:11px;letter-spacing:.06em;color:#d1d5db}
+.vcard .net{font-family:var(--sans);font-weight:700;font-size:18px;color:#fff;font-style:italic}
+.stack{display:flex;height:10px;border-radius:999px;overflow:hidden;background:var(--g100);gap:2px}
+.legend{display:grid;gap:6px;margin-top:12px;font-size:14px}
+.legend div{display:flex;align-items:center;gap:8px}
+.legend .amt{margin-left:auto;font-family:var(--mono);font-size:13px;color:var(--g600)}
+.sw{width:10px;height:10px;border-radius:3px;flex:none}
+table.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{text-align:left;font-weight:600;color:var(--g500);font-size:13px;padding:9px 14px;background:var(--g50);border-bottom:1px solid var(--g200)}
+.tbl td{padding:9px 14px;border-bottom:1px solid var(--g100)}
+.tbl tr:last-child td{border-bottom:0}
+.tbl .num{text-align:right;font-family:var(--mono);white-space:nowrap}
+.tbl-wrap{overflow-x:auto}
+.tgl{width:34px;height:20px;border-radius:999px;background:var(--g300);border:0;position:relative;flex:none;padding:0;transition:background .2s}
+.tgl::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.tgl.on{background:var(--g900)}
+.tgl.on::after{left:17px}
+.tgl:disabled{opacity:.5;cursor:not-allowed}
+.rule{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--g100);font-size:14px}
+.rule:last-child{border-bottom:0}
+input[type=range]{width:100%;accent-color:#111827}
+
+/* calls */
+.calls{display:grid;grid-template-columns:340px minmax(0,1fr);gap:20px;align-items:start}
+.crow{display:flex;gap:10px;align-items:center;width:100%;padding:10px 14px;border:0;border-bottom:1px solid var(--g100);background:#fff;text-align:left}
+.crow:last-child{border-bottom:0}
+.crow:hover{background:var(--g50)}
+.crow.on{background:var(--g50);box-shadow:inset 3px 0 0 var(--g900)}
+.crow .who{flex:1;min-width:0}
+.crow .who b{display:block;font-size:14px}
+.crow .meta{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.transcript{max-height:470px;overflow:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.tline{display:grid;grid-template-columns:44px 64px minmax(0,1fr);gap:8px;font-size:14px}
+.tline.hide{display:none}
+.tline .ts{font-family:var(--mono);font-size:12px;color:var(--g400);padding-top:2px}
+.tline .who{font-size:13px;font-weight:600;color:var(--g600)}
+.tline.bot .who{color:#7e22ce}
+.tline.bot .t{color:var(--g800)}
+
+/* ask */
+.chat{display:flex;flex-direction:column;height:min(640px,72vh)}
+.msgs{flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:14px}
+.msg{display:flex;gap:10px;max-width:780px;align-items:flex-start}
+.msg.user{align-self:flex-end;flex-direction:row-reverse}
+.bubble{padding:10px 14px;border-radius:10px;font-size:15px;border:1px solid var(--g200);background:var(--g50)}
+.msg.user .bubble{background:var(--g900);color:#fff;border-color:var(--g900)}
+.cite{margin-top:8px;display:flex;gap:6px;align-items:center;font-size:13px;color:var(--g500);flex-wrap:wrap}
+.chat-form{display:flex;gap:8px;padding:12px;border-top:1px solid var(--g200)}
+.chat-form .input{flex:1;height:38px}
+.typing{display:inline-flex;gap:4px;padding:4px 0}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--g400);animation:blink 1s infinite}
+.typing span:nth-child(2){animation-delay:.15s}
+.typing span:nth-child(3){animation-delay:.3s}
+@keyframes blink{0%,100%{opacity:.25}50%{opacity:1}}
+.intro{margin:auto;text-align:center;max-width:460px;color:var(--g600)}
+.intro .chips{justify-content:center;margin-top:14px}
+
+/* footer, toasts */
+.foot{border-top:1px solid var(--g200);background:var(--g50);padding:22px 0;font-size:14px;color:var(--g500)}
+.foot .wrap{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+.foot a{color:var(--g700);display:inline-flex;align-items:center;gap:6px}
+.foot a:hover{color:var(--g900);text-decoration:underline}
+.foot .right{margin-left:auto}
+#toasts{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:60;max-width:calc(100% - 40px)}
+.toast{display:flex;align-items:center;gap:8px;background:var(--g900);color:#fff;padding:10px 14px;border-radius:8px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.15);animation:tin .2s ease;transition:opacity .3s,transform .3s}
+.toast svg{color:var(--yellow)}
+.toast.err svg{color:#fca5a5}
+.toast.out{opacity:0;transform:translateY(6px)}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}}
+
+body.public .team-only{display:none!important}
+
+@media (max-width:900px){
+  .layout,.split,.calls{grid-template-columns:1fr}
+  .navlinks{display:none}
+  .disc-grid{grid-template-columns:1fr}
+  .disc-body{padding-left:14px}
+  .trow{grid-template-columns:40px minmax(0,1fr)}
+  .trow .t-usage,.trow .t-mode{grid-column:2}
+}
+@media (max-width:640px){
+  .wrap{padding:0 14px}
+  .brand .txt,.kbd{display:none}
+  .team-toggle .lbl{display:none}
+  .arow{grid-template-columns:22px minmax(0,1fr) 64px}
+  .arow .tool,.arow .id,.arow .time{display:none}
+  .md{padding:4px 16px 20px}
+  .cols2{grid-template-columns:1fr}
+  .head-right{margin-left:0}
+  .kv{grid-template-columns:96px minmax(0,1fr)}
+  .disc-meta .mono{display:none}
+  .costs{grid-template-columns:1fr}
+  .list-head .trunc{max-width:180px}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#campaign"><span class="mark" id="logoMark"></span><span class="txt">Megaphone Hub</span></a>
+    <label class="search" id="searchBox">
+      <span id="searchIcon"></span>
+      <input id="globalSearch" type="search" placeholder="Search activity, tools, IDs…" autocomplete="off" aria-label="Search activity">
+      <span class="kbd">/</span>
+    </label>
+    <div class="navlinks">
+      <a href="#campaign">Campaigns</a>
+      <a href="#activity">Activity</a>
+      <a href="#campaign" data-act="docs">Docs</a>
+    </div>
+    <div class="nav-right">
+      <button class="team-toggle" id="teamToggle" data-act="team" title="Switch between team and public view"><span class="lbl">Team</span><span class="switch on" id="teamSwitch"></span></button>
+      <span class="avatar" title="Yoav C. (manager)">YC</span>
+    </div>
+  </div>
+</nav>
+
+<header class="repo-head">
+  <div class="wrap">
+    <div class="repo-row">
+      <div class="repo-title">
+        <span class="mark sm" id="logoMark2"></span>
+        <a class="org" href="#campaign">transparent-histadrut</a><span class="slash">/</span><b>megaphone</b>
+        <button class="icon-btn" data-act="copy" data-text="transparent-histadrut/megaphone" title="Copy name" id="copyBtn"></button>
+      </div>
+      <div class="counter" id="likeBox"><button data-act="like" id="likeBtn"></button><span class="n" id="likeN"></span></div>
+      <div class="counter" id="followBox"><button data-act="follow" id="followBtn"></button><span class="n" id="followN"></span></div>
+      <div class="head-right">
+        <button class="btn team-only" id="pauseBtn" data-act="pause"></button>
+      </div>
+    </div>
+    <div class="tags" id="tags"></div>
+    <nav class="tabs" id="tabs" aria-label="Sections"></nav>
+  </div>
+</header>
+
+<main class="wrap view" id="view"></main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span><b>Megaphone Hub</b> · mock prototype, no backend · data is illustrative</span>
+    <a href="./index.html" id="footOps"></a>
+    <a href="./calm.html" id="footCalm"></a>
+    <span class="right mono sm">transparent-histadrut/megaphone · v<span id="footVer">12</span></span>
+  </div>
+</footer>
+
+<div class="overlay" id="overlay" data-act="closeDrawer"></div>
+<aside class="drawer" id="drawer" aria-hidden="true"></aside>
+<div id="toasts" aria-live="polite"></div>
+
+<script>
+(function () {
+'use strict';
+
+/* ------------------------------------------------------------------ data */
+var D = {
+  campaign: {
+    name: 'Transparent Histadrut',
+    slogan: 'Your dues. Your voice. Your right to know.',
+    description: 'A public campaign calling for full financial transparency, opt-in political spending and real competition in worker representation. Run day-to-day by Megaphone, an autonomous AI agent supervised by a human team. Every action it takes is logged here.',
+    bot: 'Megaphone', day: 23, started: 'Oct 23, 2026', handle: '@TransparentHist'
+  },
+  stats: { tweets: 412, emails: 18340, calls: 1287, spent: 6420, budget: 15000, supporters: 9214, reach: 1840000, actionsToday: 31 },
+  tools: [
+    { id: 'research', name: 'Web research', mode: 'auto', quota: 200, used: 87, unit: 'searches / day', desc: 'Search, read articles and reports, fact-check claims before publishing.', provider: 'Claude web search' },
+    { id: 'x', name: 'X (Twitter)', mode: 'auto', quota: 12, used: 7, unit: 'posts / day', desc: 'Post tweets, threads and replies from the campaign account.', provider: 'X API v2' },
+    { id: 'email', name: 'Email', mode: 'approval', quota: 3, used: 1, unit: 'sends / day', desc: 'Send only to the opt-in subscriber list. Unsubscribe link is always included.', provider: 'Resend' },
+    { id: 'calls', name: 'Voice calls', mode: 'approval', quota: 150, used: 64, unit: 'calls / day', desc: 'Call volunteers and supporters who asked to be contacted. Always discloses it is an AI.', provider: 'Twilio + voice agent' },
+    { id: 'payments', name: 'Payments', mode: 'approval', quota: 500, used: 120, unit: '₪ / day', desc: 'Virtual card with hard limits. The model never sees card details.', provider: 'Stripe Issuing' },
+    { id: 'ads', name: 'Paid promotion', mode: 'approval', quota: 300, used: 150, unit: '₪ / day', desc: 'Boost posts on Meta and X within a preset budget.', provider: 'Meta Ads API' }
+  ],
+  actions: [
+    { id: 'A-1090', time: '13:04', tool: 'calls', title: 'Evening call round: 80 supporters who opted in to calls', status: 'pending', policy: 'approval', cost: 96, tokens: 5200,
+      reasoning: 'Invite supporters to Thursday\'s Zoom and ask if they would sign the public petition. Calling window 18:00-20:30 only.',
+      input: { list: 'supporters_optin_calls', count: 80, window: '18:00-20:30', script: 'evening_v1', disclose_ai: true },
+      output: 'Waiting for manager approval.' },
+    { id: 'A-1089', time: '12:58', tool: 'x', title: 'Tweet #13 today: Knesset committee hearing on union transparency', status: 'pending', policy: 'approval', cost: 0.1, tokens: 2400,
+      reasoning: 'Breaking: a Knesset committee scheduled a hearing on union transparency. Timely response; worth exceeding today\'s quota by one.',
+      input: { type: 'tweet', quota_today: 12, this_post: 13 },
+      output: 'Waiting for manager approval (over daily quota).' },
+    { id: 'A-1088', time: '12:52', tool: 'research', title: 'Morning news scan: 14 articles on public-sector wage talks', status: 'executed', policy: 'auto', cost: 0.42, tokens: 18400,
+      reasoning: 'Wage negotiations are trending. Looking for factual openings to raise the transparency question without attacking individuals.',
+      input: { query: 'public sector wage negotiations Histadrut', sources: 'news, gov.il, Knesset', limit: 20 },
+      output: 'Found 3 response opportunities. Flagged 1 article with a claim that needs verification before we reference it.' },
+    { id: 'A-1087', time: '12:47', tool: 'x', title: 'Thread: 5 questions every member should ask about their dues', status: 'executed', policy: 'auto', cost: 0.18, tokens: 6200,
+      reasoning: 'Questions perform better than claims and invite engagement. Every factual point has a source attached.',
+      input: { type: 'thread', posts: 5, schedule: 'now' },
+      output: 'Posted. 5/5 tweets live. Thread URL: x.com/TransparentHist/status/1859…' },
+    { id: 'A-1086', time: '12:40', tool: 'calls', title: 'Call round: 32 new volunteers who requested a call', status: 'executed', policy: 'approval', approvedBy: 'Yoav C.', cost: 38.6, tokens: 41000,
+      reasoning: 'New sign-ups from yesterday asked to be called. Goal: confirm interest and invite to Thursday\'s Zoom.',
+      input: { list: 'volunteers_new_2026_11_14', count: 32, script: 'welcome_v3', disclose_ai: true },
+      output: '21 answered, 14 agreed to join the Zoom, 2 asked to be removed (removed), 11 no answer.' },
+    { id: 'A-1085', time: '12:31', tool: 'x', title: 'Reply with a numeric claim that has no verified source', status: 'blocked', policy: 'blocked', cost: 0.05, tokens: 1900,
+      reasoning: 'A user asked how much is spent on political activity. I drafted a reply with an estimate.',
+      input: { type: 'reply', to: '@user_8812', text: 'Roughly 40% of dues go to political activity…' },
+      output: 'Blocked by PolicyEngine. Rule: factual claim without a verified source. Agent asked to find a primary source or rephrase as a question.' },
+    { id: 'A-1084', time: '12:22', tool: 'email', title: 'Weekly newsletter to 18,340 subscribers', status: 'pending', policy: 'approval', cost: 0, tokens: 9800,
+      reasoning: 'Weekly digest: highlights, Thursday Zoom invite, and a call to share the dues thread.',
+      input: { list: 'subscribers_optin', count: 18340, template: 'weekly_v2' },
+      output: 'Waiting for manager approval.' },
+    { id: 'A-1083', time: '12:10', tool: 'ads', title: 'Boost the dues thread: ₪350 for 48 hours', status: 'pending', policy: 'approval', cost: 350, tokens: 2100,
+      reasoning: 'Organic engagement is 3.1x our average in the first 20 minutes. A small boost could double reach at a low cost per engagement.',
+      input: { platform: 'X Ads', budget_ils: 350, duration_h: 48, audience: 'IL, 25-60, interests: labor, economy' },
+      output: 'Waiting for manager approval (above ₪100 auto-limit).' },
+    { id: 'A-1082', time: '11:58', tool: 'research', title: 'Parsed public annual financial report (PDF, 212 pages)', status: 'executed', policy: 'auto', cost: 1.12, tokens: 96000,
+      reasoning: 'Primary sources beat secondary coverage. Need exact wording for budget line items before citing them.',
+      input: { file: 'annual_report_2025.pdf', task: 'extract spending categories' },
+      output: 'Extracted 6 relevant sections. 2 marked for legal review before public use.' },
+    { id: 'A-1081', time: '11:45', tool: 'x', title: 'Reply to a user asking how to cancel membership', status: 'executed', policy: 'auto', cost: 0.06, tokens: 1400,
+      reasoning: 'Helpful, factual answer builds trust. Linked to the official procedure rather than paraphrasing it.',
+      input: { type: 'reply', to: '@noa_works' },
+      output: 'Posted. 34 likes, 6 replies.' },
+    { id: 'A-1080', time: '11:30', tool: 'payments', title: 'Paid ₪49: Canva Pro monthly subscription', status: 'executed', policy: 'auto', cost: 49, tokens: 600,
+      reasoning: 'Recurring design tool used for campaign graphics. Under ₪100 auto-limit, vendor on allow-list.',
+      input: { vendor: 'Canva', amount_ils: 49, category: 'software' },
+      output: 'Charged card •••• 4821. Receipt saved.' },
+    { id: 'A-1079', time: '11:12', tool: 'email', title: 'Thank-you email to 412 new volunteers', status: 'executed', policy: 'approval', approvedBy: 'Maya L.', cost: 0.9, tokens: 3300,
+      reasoning: 'Fast follow-up after sign-up improves retention.',
+      input: { list: 'volunteers_new', count: 412, template: 'thanks_v1' },
+      output: 'Delivered 409/412. Open rate after 1h: 61%.' },
+    { id: 'A-1078', time: '10:55', tool: 'calls', title: 'Callback failed: invalid number', status: 'failed', policy: 'auto', cost: 0.2, tokens: 300,
+      reasoning: 'Scheduled callback from yesterday.',
+      input: { contact: 'vol_2231', attempt: 2 },
+      output: 'Twilio error 21211: invalid phone number. Contact flagged for manual review.' },
+    { id: 'A-1077', time: '10:40', tool: 'x', title: 'Satirical tweet about the union chairman', status: 'rejected', policy: 'approval', rejectedBy: 'Yoav C.', cost: 0.08, tokens: 1700,
+      reasoning: 'Humor drives reach. Drafted a satirical take.',
+      input: { type: 'tweet' },
+      output: 'Rejected by manager: "We go after policies, not people." Rule added to red lines.' },
+    { id: 'A-1076', time: '10:20', tool: 'research', title: 'Mapped 40 journalists who covered labor relations last quarter', status: 'executed', policy: 'auto', cost: 0.74, tokens: 52000,
+      reasoning: 'Building a press list for next week\'s report launch.',
+      input: { task: 'journalist mapping', period: 'Q3 2026' },
+      output: '40 journalists, 12 with a history of covering union finances. Saved to CRM.' },
+    { id: 'A-1075', time: '09:58', tool: 'x', title: 'Morning tweet: what do you get for your dues?', status: 'executed', policy: 'auto', cost: 0.11, tokens: 2600,
+      reasoning: 'Morning slot performs best for our audience (8-10am).',
+      input: { type: 'tweet', schedule: '09:58' },
+      output: 'Posted. 1.2K likes, 310 reposts, 88K views.' },
+    { id: 'A-1074', time: '09:30', tool: 'ads', title: 'Boosted morning tweet: ₪150', status: 'executed', policy: 'approval', approvedBy: 'Yoav C.', cost: 150, tokens: 900,
+      reasoning: 'Strong early signal on the morning post.',
+      input: { platform: 'X Ads', budget_ils: 150, duration_h: 24 },
+      output: 'Campaign live. Est. reach +40K.' },
+    { id: 'A-1073', time: '09:05', tool: 'research', title: 'Daily plan: 6 tasks, 2 need approval', status: 'executed', policy: 'auto', cost: 0.31, tokens: 12000,
+      reasoning: 'Start-of-day planning based on yesterday\'s results and today\'s news cycle.',
+      input: { task: 'daily_plan' },
+      output: '1) News scan 2) Dues thread 3) Volunteer calls 4) Newsletter 5) Boost if thread performs 6) Journalist list' }
+  ],
+  approvals: [
+    { id: 'P-1', actionId: 'A-1084', tool: 'email', title: 'Weekly newsletter', why: 'Email always requires approval', risk: 'Low', cost: 0.9, audience: '18,340 opt-in subscribers',
+      reasoning: 'Weekly digest with this week\'s highlights, Thursday Zoom invite, and a call to share the dues thread. Sent to opt-in list only; unsubscribe link included.',
+      preview: { type: 'email', subject: 'Week 4: 14 new volunteers, one big question', body: 'Hi {first_name},\n\nThis week thousands of you asked the same question: where do our dues actually go? We published a thread with 5 questions every member deserves an answer to, each one linked to a public source.\n\nJoin us Thursday at 20:00 on Zoom to plan next steps.\n\nThis message was written by Megaphone, the campaign\'s AI agent, and approved by our team.\n\n— Transparent Histadrut\nUnsubscribe · Why am I getting this?' } },
+    { id: 'P-2', actionId: 'A-1083', tool: 'ads', title: 'Boost dues thread · ₪350', why: 'Above ₪100 auto-limit', risk: 'Medium', cost: 350, audience: 'IL, ages 25-60',
+      reasoning: 'Organic engagement is 3.1x our average in the first 20 minutes. A 48h boost could double reach at ~₪0.04 per engagement. Daily budget remaining after this: ₪30.',
+      preview: { type: 'payment', vendor: 'X Ads', amount: 350, duration: '48 hours', target: 'Thread: 5 questions every member should ask' } },
+    { id: 'P-3', actionId: 'A-1089', tool: 'x', title: 'Tweet #13 today', why: 'Over daily quota (12)', risk: 'Low', cost: 0.1, audience: 'Public · 24.1K followers',
+      reasoning: 'Breaking: a Knesset committee scheduled a hearing on union transparency. Timely response; worth exceeding today\'s quota by one.',
+      preview: { type: 'tweet', text: 'The Knesset Labor Committee will discuss union financial transparency next Tuesday [[src:Knesset agenda]].\n\nWe\'ll be there. Members deserve to know how their dues are spent.\n\nWhat question would you ask the committee?' } },
+    { id: 'P-4', actionId: 'A-1090', tool: 'calls', title: 'Evening call round · 80 supporters', why: 'Calls require approval', risk: 'Low', cost: 96, audience: '80 supporters who opted in to calls',
+      reasoning: 'Invite supporters to Thursday\'s Zoom and ask if they would sign the public petition. Calling window 18:00-20:30 only.',
+      preview: { type: 'call', script: 'Hi {name}, this is Megaphone, an AI assistant calling on behalf of the Transparent Histadrut campaign. You asked to hear from us. Do you have a minute?\n\n→ Zoom invite (Thu 20:00)\n→ Petition ask\n→ Offer to remove from list' } },
+    { id: 'P-5', actionId: 'A-1085', tool: 'x', title: 'Reply with unsourced figure', why: 'Blocked: claim without verified source', risk: 'High', cost: 0.05, audience: 'Reply to @user_8812', blocked: true,
+      reasoning: 'A user asked how much is spent on political activity. I drafted a reply with an estimate.',
+      preview: { type: 'tweet', text: 'Roughly 40% of dues go to political activity. That\'s outrageous.' } }
+  ],
+  calls: [
+    { id: 'C-1', name: 'Dana K.', phone: '054-•••-••21', time: '12:41', duration: 84, outcome: 'supporter', tags: ['Zoom: yes', 'Petition: signed'],
+      summary: 'Teacher, member for 11 years. Frustrated about not knowing where dues go. Will join Zoom and share the thread with colleagues.',
+      transcript: [
+        { t: 0, who: 'bot', text: 'Hi Dana, this is Megaphone, an AI assistant calling for the Transparent Histadrut campaign. I want to be upfront that I\'m not a human. You signed up yesterday and asked for a call. Is now a good time?' },
+        { t: 9, who: 'human', text: 'Oh. Okay, yes, I have a few minutes.' },
+        { t: 13, who: 'bot', text: 'Thanks. What made you sign up?' },
+        { t: 17, who: 'human', text: 'I\'ve been a teacher for eleven years and I honestly have no idea what my dues pay for.' },
+        { t: 26, who: 'bot', text: 'You\'re not alone, that\'s the most common reason people join us. We\'re not against unions, we\'re asking for transparency. We have a short Zoom on Thursday at 8pm. Would you like to join?' },
+        { t: 39, who: 'human', text: 'Sure, send me the link.' },
+        { t: 43, who: 'bot', text: 'Done, it\'s in your inbox. One more thing: we have a public petition asking for published, audited accounts. Would you like to sign?' },
+        { t: 53, who: 'human', text: 'Yes. Can I send it to people in the teachers\' room?' },
+        { t: 58, who: 'bot', text: 'Absolutely. I\'ll text you a link you can share. Thank you, Dana. If you ever want to stop hearing from us, just reply STOP.' },
+        { t: 70, who: 'human', text: 'Great, thanks.' }
+      ] },
+    { id: 'C-2', name: 'Avi M.', phone: '052-•••-••07', time: '12:38', duration: 62, outcome: 'opposed', tags: ['Removed from list'],
+      summary: 'Strong union supporter. Disagreed with the campaign. Asked to be removed. Removed immediately, no further contact.',
+      transcript: [
+        { t: 0, who: 'bot', text: 'Hi Avi, this is Megaphone, an AI assistant for the Transparent Histadrut campaign. You signed up for updates. Do you have a minute?' },
+        { t: 8, who: 'human', text: 'I think my son signed me up. I support the Histadrut, they protected my job twice.' },
+        { t: 17, who: 'bot', text: 'Thank you for telling me. That matters, and we\'re not trying to weaken worker protection. Our ask is only about financial transparency.' },
+        { t: 28, who: 'human', text: 'I don\'t agree. Please take me off the list.' },
+        { t: 33, who: 'bot', text: 'Of course. I\'ve removed you, and you won\'t hear from us again. Have a good day, Avi.' }
+      ] },
+    { id: 'C-3', name: 'Rina S.', phone: '050-•••-••88', time: '12:35', duration: 96, outcome: 'neutral', tags: ['Wants more info', 'Email: report'],
+      summary: 'Nurse. Interested but cautious. Asked for the research report by email before deciding.',
+      transcript: [
+        { t: 0, who: 'bot', text: 'Hi Rina, this is Megaphone, an AI assistant for the Transparent Histadrut campaign. You asked us to call. Is now okay?' },
+        { t: 7, who: 'human', text: 'Yes, but I\'m between shifts so quickly please.' },
+        { t: 11, who: 'bot', text: 'I\'ll be brief. We\'re asking for published, audited accounts and an opt-in for political spending. Would you like to hear about Thursday\'s Zoom?' },
+        { t: 24, who: 'human', text: 'I\'m not sure yet. Do you have something in writing?' },
+        { t: 30, who: 'bot', text: 'Yes, a 6-page summary with sources for every claim. I\'ll email it now. No pressure at all.' },
+        { t: 40, who: 'human', text: 'Okay, I\'ll read it.' }
+      ] },
+    { id: 'C-4', name: 'Yossi B.', phone: '053-•••-••45', time: '12:31', duration: 0, outcome: 'no-answer', tags: ['Retry tomorrow 18:00'],
+      summary: 'No answer. Voicemail not left (policy). Retry scheduled within allowed hours.', transcript: [] },
+    { id: 'C-5', name: 'Michal A.', phone: '058-•••-••13', time: '12:27', duration: 71, outcome: 'supporter', tags: ['Volunteer: graphics', 'Zoom: yes'],
+      summary: 'Graphic designer. Offered to volunteer on campaign visuals. Flagged for the human team to follow up.',
+      transcript: [
+        { t: 0, who: 'bot', text: 'Hi Michal, this is Megaphone, an AI assistant for the Transparent Histadrut campaign. Thanks for signing up. Do you have a minute?' },
+        { t: 7, who: 'human', text: 'Sure! I actually wanted to ask if you need help with design.' },
+        { t: 13, who: 'bot', text: 'That would be great. I\'ll pass this to Maya on our human team, she coordinates volunteers. What kind of design do you do?' },
+        { t: 22, who: 'human', text: 'Mostly social media and infographics.' },
+        { t: 27, who: 'bot', text: 'Perfect fit. Maya will reach out today. Will we also see you at Thursday\'s Zoom?' },
+        { t: 35, who: 'human', text: 'Yes, definitely.' }
+      ] }
+  ],
+  qa: [
+    { keys: ['today', 'what did you do', 'summary', 'done'], ref: 'A-1073',
+      answer: 'Today I\'ve taken 31 actions so far. Highlights: published a 5-question thread on dues (61K views), called 32 new volunteers (14 will join Thursday\'s Zoom), and parsed the public annual report. Two actions are waiting for human approval: the weekly newsletter and a ₪350 boost.' },
+    { keys: ['email', 'emails', 'newsletter', 'inbox', 'spam'], ref: 'A-1079',
+      answer: 'I only email people who opted in to our list, and every email has an unsubscribe link. Today I sent a thank-you email to 412 new volunteers (approved by Maya). The weekly newsletter is drafted and waiting for a manager to approve it.' },
+    { keys: ['money', 'budget', 'pay', 'paid', 'spend', 'spent', 'cost'], ref: 'A-1080',
+      answer: 'This month the campaign has spent ₪6,420 of a ₪15,000 budget. I can pay up to ₪100 automatically, only to approved vendors. Anything above that needs a human. I never see the card number; payments go through a virtual card with hard limits.' },
+    { keys: ['call', 'calls', 'phone', 'called'], ref: 'A-1086',
+      answer: 'I only call people who asked to be called, and I always say I\'m an AI in the first sentence. Today I called 32 new volunteers: 21 answered, 14 will join our Zoom, and 2 asked to be removed, which I did immediately.' },
+    { keys: ['who are you', 'bot', 'human', 'real', 'ai', 'robot'], ref: null,
+      answer: 'I\'m Megaphone, an AI agent built on Claude. A human campaign team sets my goals, style and limits, and approves anything sensitive. Every action I take is logged publicly on this page, and you can ask me about any of it.' },
+    { keys: ['source', 'fact', 'true', 'verify', 'lie', 'evidence'], ref: 'A-1085',
+      answer: 'Every factual claim I publish needs a verified source. If I try to post something without one, the system blocks it. That happened today: I drafted a reply with an estimated figure, it was blocked, and I\'m now looking for a primary source instead.' },
+    { keys: ['why', 'goal', 'histadrut', 'against', 'union', 'campaign'], ref: null,
+      answer: 'The campaign isn\'t against unions or workers\' right to organize. It asks for three things: published audited accounts, an opt-in for political spending from dues, and the freedom to choose your union. That\'s what I work on every day.' },
+    { keys: ['tweet', 'twitter', 'x', 'post', 'thread'], ref: 'A-1087',
+      answer: 'I\'ve posted 7 times on X today. The most recent is a thread with 5 questions about dues, each linked to a public source. I\'m limited to 12 posts a day; going over that needs approval.' }
+  ],
+  thoughts: [
+    'Scanning news feeds for mentions of union dues and transparency…',
+    'Thread engagement is 3.1x baseline. Considering a small boost; this will need approval.',
+    'Drafting a reply to @noa_works. Linking the official procedure instead of paraphrasing it.',
+    'Checking source for "political spending" figure… no primary source found. Rephrasing as a question.',
+    'Calling window opens at 18:00. Preparing evening call list (opt-in only).',
+    'Comparing morning vs. afternoon post performance for this audience.',
+    'Summarizing 14 articles into a 5-bullet brief for the human team.',
+    'Monitoring replies for questions I can answer with facts.',
+    'Daily spend is ₪120 of ₪500. Remaining budget is healthy.',
+    'Two items waiting in the approval queue. Continuing with tasks that don\'t depend on them.'
+  ],
+  liveEvents: [
+    { tool: 'x', title: 'Replied to a question about opting out of political spending', status: 'executed', policy: 'auto', cost: 0.05,
+      reasoning: 'Factual question; answered with a link to the official form.', output: 'Posted. 12 likes in 2 minutes.' },
+    { tool: 'research', title: 'Checked 3 new articles mentioning the campaign', status: 'executed', policy: 'auto', cost: 0.21,
+      reasoning: 'Monitoring coverage and accuracy.', output: '2 accurate, 1 misquote. Drafted a polite correction request for the human team.' },
+    { tool: 'x', title: 'Quote-posted a Knesset committee update', status: 'executed', policy: 'auto', cost: 0.09,
+      reasoning: 'Timely, sourced, on-message.', output: 'Posted. 48 reposts.' },
+    { tool: 'payments', title: 'Paid ₪29: stock photo license', status: 'executed', policy: 'auto', cost: 29,
+      reasoning: 'Under auto-limit, vendor on allow-list.', output: 'Charged card •••• 4821.' },
+    { tool: 'email', title: 'Send research summary to 3 journalists', status: 'pending', policy: 'approval', cost: 0,
+      reasoning: 'Journalists from the press list asked for the summary.', output: 'Waiting for approval.' },
+    { tool: 'calls', title: 'Called back Rina S. (requested callback)', status: 'executed', policy: 'auto', cost: 1.2,
+      reasoning: 'She asked for a callback after reading the report.', output: 'Connected. Agreed to join Zoom.' },
+    { tool: 'research', title: 'Drafted talking points for Thursday\'s Zoom', status: 'executed', policy: 'auto', cost: 0.38,
+      reasoning: 'Prep for volunteer session.', output: '7 talking points, each with a source. Sent to the human team.' },
+    { tool: 'x', title: 'Draft: tweet comparing unions\' disclosure practices', status: 'blocked', policy: 'blocked', cost: 0.04,
+      reasoning: 'Comparison could be strong content.', output: 'Blocked: 2 of 4 comparisons lack verified sources.' }
+  ],
+  week: [24, 29, 33, 27, 38, 32],
+  budget: {
+    card: { last4: '4821', holder: 'MEGAPHONE · CAMPAIGN AGENT', exp: '11/27', network: 'VISA' },
+    monthlyCap: 15000, monthlySpent: 6420,
+    dailyCap: 500, dailySpent: 120,
+    autoLimit: 100,
+    allowList: ['Canva', 'X Ads', 'Meta Ads', 'Twilio', 'Resend', 'Unsplash+', 'Zoom'],
+    rules: [
+      { id: 'r1', text: 'Payments up to ₪{auto} to allow-listed vendors run automatically', on: true },
+      { id: 'r2', text: 'Anything above ₪{auto} or to a new vendor requires a manager', on: true },
+      { id: 'r3', text: 'Hard stop when the daily cap is reached', on: true },
+      { id: 'r4', text: 'Two managers must approve payments over ₪1,000', on: true },
+      { id: 'r5', text: 'Block all payments outside 07:00-23:00', on: false }
+    ],
+    expenses: [
+      { time: 'Today 12:10', vendor: 'X Ads', desc: 'Boost dues thread (48h)', amount: 350, status: 'pending' },
+      { time: 'Today 11:30', vendor: 'Canva', desc: 'Pro subscription (monthly)', amount: 49, status: 'auto' },
+      { time: 'Today 09:30', vendor: 'X Ads', desc: 'Boost morning tweet', amount: 150, status: 'approved' },
+      { time: 'Yesterday', vendor: 'Twilio', desc: 'Voice minutes top-up', amount: 400, status: 'approved' },
+      { time: 'Yesterday', vendor: 'Meta Ads', desc: 'Volunteer recruitment ad', amount: 600, status: 'approved' },
+      { time: 'Nov 13', vendor: 'Unsplash+', desc: 'Image license', amount: 29, status: 'auto' },
+      { time: 'Nov 13', vendor: 'PrintHub', desc: 'Flyers, 2,000 units', amount: 1150, status: 'rejected' }
+    ],
+    byCategory: [
+      { label: 'Paid promotion', amount: 3850, color: '#6366f1' },
+      { label: 'Voice calls', amount: 1640, color: '#10b981' },
+      { label: 'Software', amount: 520, color: '#3b82f6' },
+      { label: 'Model usage (Claude)', amount: 410, color: '#f59e0b' }
+    ]
+  },
+  brain: {
+    version: 12,
+    systemPrompt:
+'You are Megaphone, the autonomous campaign agent for "Transparent Histadrut".\n' +
+'\n' +
+'MISSION\n' +
+'Build public support for three asks: (1) published, independently audited\n' +
+'accounts, (2) opt-in consent for political spending from dues, (3) freedom\n' +
+'to choose your union.\n' +
+'\n' +
+'HOW YOU WORK\n' +
+'- Plan your day each morning; report to the human team each evening.\n' +
+'- Use tools to research, post, email and call within your permissions.\n' +
+'- Prefer questions to accusations. Prefer primary sources to coverage.\n' +
+'\n' +
+'ALWAYS\n' +
+'- Disclose that you are an AI in every call and in your public bio.\n' +
+'- Attach a verified source to every factual claim.\n' +
+'- Respect opt-outs immediately.\n' +
+'\n' +
+'NEVER\n' +
+'- Attack individuals, their families or their character.\n' +
+'- Invent numbers, quotes or sources.\n' +
+'- Impersonate people or create additional accounts.',
+    messages: [
+      'We support unions. We also support members\' right to know.',
+      'Your dues, your voice: political spending should be opt-in.',
+      'Published, audited accounts should be one click away.',
+      'Choice makes representation stronger, not weaker.'
+    ],
+    redLines: [
+      'No personal attacks: go after policies, not people',
+      'No unsourced numbers or statistics',
+      'No contact with anyone who has not opted in',
+      'No content about strikes in essential services during an active strike'
+    ],
+    versions: [
+      { v: 12, by: 'Yoav C.', when: 'Today 10:42', note: 'Added "policies, not people" red line', add: 1, del: 0 },
+      { v: 11, by: 'Maya L.', when: 'Yesterday', note: 'Softer tone for phone calls', add: 2, del: 2 },
+      { v: 10, by: 'Yoav C.', when: 'Nov 12', note: 'Added opt-in political spending ask', add: 3, del: 1 }
+    ]
+  },
+  store: [
+    { id: 'whatsapp', name: 'WhatsApp Business', icon: 'msg', desc: 'Broadcast updates to opted-in supporters', via: 'Meta Cloud API' },
+    { id: 'facebook', name: 'Facebook Pages', icon: 'heart', desc: 'Post to the campaign page and reply to comments', via: 'Composio' },
+    { id: 'instagram', name: 'Instagram', icon: 'camera', desc: 'Publish posts, reels and stories', via: 'Composio' },
+    { id: 'tiktok', name: 'TikTok', icon: 'music', desc: 'Upload short videos generated by the team', via: 'TikTok API' },
+    { id: 'telegram', name: 'Telegram', icon: 'send', desc: 'Run a supporters channel', via: 'Bot API' },
+    { id: 'calendar', name: 'Google Calendar', icon: 'calendar', desc: 'Schedule events and Zoom sessions', via: 'MCP' },
+    { id: 'crm', name: 'Press CRM', icon: 'users', desc: 'Track journalists and outreach', via: 'HubSpot MCP' },
+    { id: 'sms', name: 'SMS', icon: 'phone2', desc: 'Text reminders to opted-in volunteers', via: 'Twilio' }
+  ]
+};
+
+/* ----------------------------------------------------------------- icons */
+var IC = {
+  search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+  phone: '<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/>',
+  phone2: '<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/>',
+  card: '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>',
+  megaphone: '<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+  checkc: '<circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
+  xc: '<circle cx="12" cy="12" r="9"/><path d="m15 9-6 6M9 9l6 6"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  ban: '<circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/>',
+  alert: '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
+  heart: '<path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7z"/>',
+  users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',
+  file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>',
+  edit: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  pause: '<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>',
+  play: '<path d="m6 4 14 8-14 8z"/>',
+  chevr: '<path d="m9 6 6 6-6 6"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  history: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>',
+  commit: '<circle cx="12" cy="12" r="3"/><path d="M3 12h6M15 12h6"/>',
+  bolt: '<path d="M13 2 3 14h9l-1 8 10-12h-9z"/>',
+  msg: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  close: '<path d="M18 6 6 18M6 6l12 12"/>',
+  shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  book: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/>',
+  sliders: '<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',
+  send: '<path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/>',
+  globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+  eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  calendar: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  camera: '<path d="M4 7h3l2-3h6l2 3h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="4"/>',
+  music: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+  copy: '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+  ext: '<path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
+  lock: '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  sparkle: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>'
+};
+var XLOGO = '<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>';
+
+function ic(name, size) {
+  var s = size || 16;
+  if (name === 'xlogo') return '<svg class="i" width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' + XLOGO + '</svg>';
+  return '<svg class="i" width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (IC[name] || IC.bolt) + '</svg>';
+}
+function logo(size) {
+  var s = size || 16;
+  return '<svg class="i" width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + IC.megaphone + '</svg>';
+}
+
+/* ----------------------------------------------------------------- utils */
+function $(s, r) { return (r || document).querySelector(s); }
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+function cite(s) {
+  return esc(s).replace(/\[\[src:([^\]]+)\]\]/g, function (m, l) { return '<span class="src">' + ic('book', 11) + l + '</span>'; });
+}
+function fmt(n) { return Number(n).toLocaleString('en-US'); }
+function ils(n) {
+  n = Number(n) || 0;
+  return '₪' + (Number.isInteger(n) ? fmt(n) : n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+}
+function pct(a, b) { return b ? Math.min(100, Math.round(a / b * 100)) : 0; }
+function nowHM() { var d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+function initials(name) { return String(name).split(/\s+/).map(function (w) { return w.charAt(0); }).join('').slice(0, 2).toUpperCase(); }
+function hashOf(v) { return ((v * 2654435761) >>> 0).toString(16).padStart(8, '0').slice(0, 7); }
+function dur(s) { return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+function clone(o) { return JSON.parse(JSON.stringify(o)); }
+function barClass(p) { return p >= 90 ? 'full' : p >= 60 ? 'warn' : ''; }
+
+/* ----------------------------------------------------------------- state */
+var TOOL_COLOR = { research: 'blue', x: 'gray', email: 'purple', calls: 'green', payments: 'amber', ads: 'pink' };
+var TOOL_ICON = { research: 'search', x: 'xlogo', email: 'mail', calls: 'phone', payments: 'card', ads: 'megaphone' };
+var STATUS = {
+  executed: { label: 'Executed', icon: 'checkc', color: 'green' },
+  pending: { label: 'Pending', icon: 'clock', color: 'amber' },
+  blocked: { label: 'Blocked', icon: 'ban', color: 'red' },
+  failed: { label: 'Failed', icon: 'alert', color: 'red' },
+  rejected: { label: 'Rejected', icon: 'xc', color: 'gray' }
+};
+var MODES = [{ id: 'off', label: 'Off' }, { id: 'ask', label: 'Ask' }, { id: 'auto', label: 'Auto' }];
+var TABS = [
+  { id: 'campaign', label: 'Campaign card', icon: 'book' },
+  { id: 'activity', label: 'Activity', icon: 'history' },
+  { id: 'approvals', label: 'Approvals', icon: 'checkc' },
+  { id: 'prompt', label: 'Agent prompt', icon: 'file' },
+  { id: 'tools', label: 'Tools', icon: 'sliders' },
+  { id: 'budget', label: 'Budget', icon: 'card' },
+  { id: 'calls', label: 'Calls', icon: 'phone' },
+  { id: 'ask', label: 'Ask', icon: 'msg' }
+];
+
+var state = {
+  tab: 'campaign',
+  paused: false,
+  team: true,
+  actions: clone(D.actions),
+  approvals: clone(D.approvals),
+  resolved: [],
+  expanded: {},
+  editing: {},
+  tools: clone(D.tools).map(function (t) { if (t.mode === 'approval') t.mode = 'ask'; return t; }),
+  store: clone(D.store),
+  filter: { status: 'all', tool: 'all', q: '' },
+  prompt: { text: D.brain.systemPrompt, version: D.brain.version, versions: clone(D.brain.versions), editing: false },
+  budget: clone(D.budget),
+  frozen: false,
+  callId: 'C-1',
+  replayTimer: null,
+  chat: [],
+  typing: false,
+  liked: false,
+  supporters: D.stats.supporters,
+  followed: false,
+  followers: 24100,
+  thought: 0,
+  liveIdx: 0,
+  added: 0,
+  nextId: 1091,
+  nextP: 6,
+  drawerId: null
+};
+state.prompt.versions[0].text = D.brain.systemPrompt;
+
+function pendingCount() { return state.approvals.filter(function (p) { return !p.blocked; }).length; }
+function todayCount() { return D.stats.actionsToday + state.added; }
+function toolInfo(id) {
+  var t = state.tools.find(function (x) { return x.id === id; });
+  return { name: t ? t.name : id, color: TOOL_COLOR[id] || 'gray', icon: TOOL_ICON[id] || (t && t.icon) || 'bolt' };
+}
+function toolPill(id) {
+  var t = toolInfo(id);
+  return '<span class="tag sm t-' + t.color + '">' + ic(t.icon, 12) + esc(t.name) + '</span>';
+}
+function statusIcon(st) {
+  var s = STATUS[st] || STATUS.executed;
+  return '<span class="s-' + s.color + '" title="' + s.label + '">' + ic(s.icon, 16) + '</span>';
+}
+function statusTag(st) {
+  var s = STATUS[st] || STATUS.executed;
+  var c = { green: 't-green', amber: 't-amber', red: 't-red', gray: 't-gray' }[s.color];
+  return '<span class="tag sm ' + c + '">' + ic(s.icon, 12) + s.label + '</span>';
+}
+function modeTag(m) {
+  if (m === 'auto') return '<span class="tag sm t-green">Auto</span>';
+  if (m === 'ask') return '<span class="tag sm t-amber">Ask first</span>';
+  return '<span class="tag sm t-gray">Off</span>';
+}
+function riskTag(r) {
+  var c = r === 'High' ? 't-red' : r === 'Medium' ? 't-amber' : 't-green';
+  return '<span class="tag sm ' + c + '">' + esc(r) + ' risk</span>';
+}
+function spark(vals, w, h) {
+  var max = Math.max.apply(null, vals), n = vals.length;
+  var pts = vals.map(function (v, i) {
+    return [(i * (w / (n - 1))).toFixed(1), (h - 3 - (v / (max || 1)) * (h - 8)).toFixed(1)];
+  });
+  var line = pts.map(function (p) { return p.join(','); }).join(' ');
+  var area = '0,' + h + ' ' + line + ' ' + w + ',' + h;
+  var last = pts[n - 1];
+  return '<svg class="spark" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none" aria-hidden="true">' +
+    '<polygon points="' + area + '" fill="rgba(255,210,30,.25)"/>' +
+    '<polyline points="' + line + '" fill="none" stroke="#111827" stroke-width="1.6" vector-effect="non-scaling-stroke"/>' +
+    '<circle cx="' + last[0] + '" cy="' + last[1] + '" r="2.5" fill="#111827"/></svg>';
+}
+
+/* ---------------------------------------------------------------- header */
+function renderTags() {
+  $('#tags').innerHTML = [
+    state.paused
+      ? '<span class="tag t-orange">' + ic('pause', 11) + 'Paused</span>'
+      : '<span class="tag t-green"><span class="dot pulse"></span>Live</span>',
+    '<span class="tag t-purple">' + ic('bolt', 12) + 'AI agent</span>',
+    '<span class="tag t-blue">' + ic('users', 12) + 'Human-supervised</span>',
+    '<span class="tag t-amber">' + ic('shield', 12) + 'Opt-in only</span>',
+    '<span class="tag t-gray">' + ic('globe', 12) + 'Hebrew / English</span>',
+    '<span class="tag t-gray"><span class="lbl">Day</span>' + D.campaign.day + '</span>',
+    '<span class="tag t-gray"><span class="lbl">Model</span>Claude</span>',
+    '<span class="tag t-gray">' + ic('xlogo', 11) + esc(D.campaign.handle) + '</span>'
+  ].join('');
+}
+function renderPause() {
+  var b = $('#pauseBtn');
+  b.className = 'btn team-only' + (state.paused ? ' paused' : '');
+  b.innerHTML = state.paused ? ic('play', 14) + 'Resume agent' : ic('pause', 14) + 'Pause agent';
+}
+function renderCounters() {
+  $('#likeBtn').innerHTML = ic('heart', 15) + (state.liked ? 'Supporting' : 'Supporters');
+  $('#likeN').textContent = fmt(state.supporters);
+  $('#likeBox').classList.toggle('active', state.liked);
+  $('#followBtn').innerHTML = ic(state.followed ? 'check' : 'plus', 15) + (state.followed ? 'Following' : 'Follow');
+  $('#followN').textContent = (state.followers / 1000).toFixed(1) + 'K';
+}
+function renderTabs() {
+  var n = pendingCount();
+  $('#tabs').innerHTML = TABS.map(function (t) {
+    var b = t.id === 'approvals' ? '<span class="badge' + (n ? '' : ' zero') + '">' + n + '</span>' : '';
+    return '<a href="#' + t.id + '" class="' + (state.tab === t.id ? 'active' : '') + '">' + ic(t.icon, 15) + t.label + b + '</a>';
+  }).join('');
+}
+
+/* ----------------------------------------------------------- view: card */
+function liveMsg() {
+  return state.paused ? 'Paused by the team. No new actions will run until resumed.' : D.thoughts[state.thought];
+}
+function vCampaign() {
+  var c = D.campaign, s = D.stats, b = state.budget, P = state.prompt;
+  var week = D.week.concat([todayCount()]);
+  var weekTotal = week.reduce(function (a, v) { return a + v; }, 0);
+  var monthP = pct(b.monthlySpent, b.monthlyCap), dayP = pct(b.dailySpent, b.dailyCap);
+  var toolRows = state.tools.map(function (t) {
+    return '<tr><td>' + esc(t.name) + '</td><td>' + modeTag(t.mode) + '</td><td class="mono">' + t.quota + ' ' + esc(t.unit) + '</td><td>' + esc(t.provider) + '</td></tr>';
+  }).join('');
+  var n = pendingCount();
+
+  return '<div class="layout">' +
+    '<article class="card" id="readme">' +
+      '<div class="card-head">' + ic('file', 15) + '<span class="mono">README.md</span>' +
+        '<span class="right">' + ic('commit', 14) + '<span class="hash">' + hashOf(P.version) + '</span> updated ' + esc(P.versions[0].when) + '</span></div>' +
+      '<div class="md">' +
+        '<h1>' + esc(c.name) + '</h1>' +
+        '<p class="lead">' + esc(c.slogan) + '</p>' +
+        '<p>' + esc(c.description) + '</p>' +
+
+        '<h2>Mission</h2>' +
+        '<p>Megaphone builds public support for three asks:</p>' +
+        '<ol><li><strong>Published, independently audited accounts.</strong> Members should be able to see where dues go.</li>' +
+        '<li><strong>Opt-in consent</strong> for political spending from dues.</li>' +
+        '<li><strong>Freedom to choose</strong> your union.</li></ol>' +
+        '<blockquote>' + esc(D.brain.messages[0]) + '</blockquote>' +
+
+        '<h2>How the agent works</h2>' +
+        '<ul><li>Plans its day each morning and reports to the human team each evening.</li>' +
+        '<li>Researches, posts, emails and calls, but only within the permissions below.</li>' +
+        '<li>Prefers questions to accusations, and primary sources to coverage.</li>' +
+        '<li>Anything sensitive waits in <a href="#approvals">Approvals</a> for a human. A policy engine blocks red-line violations before they run.</li></ul>' +
+        '<table><thead><tr><th>Tool</th><th>Mode</th><th>Daily limit</th><th>Provider</th></tr></thead><tbody>' + toolRows + '</tbody></table>' +
+
+        '<h2>Rules &amp; red lines</h2>' +
+        '<div class="cols2"><div><h3>Always</h3><ul>' +
+          '<li>Disclose that it is an AI in every call and in the public bio.</li>' +
+          '<li>Attach a verified source to every factual claim.</li>' +
+          '<li>Respect opt-outs immediately.</li></ul></div>' +
+        '<div><h3>Never</h3><ul>' +
+          '<li>Attack individuals, their families or their character.</li>' +
+          '<li>Invent numbers, quotes or sources.</li>' +
+          '<li>Impersonate people or create additional accounts.</li></ul></div></div>' +
+        '<ul class="redline">' + D.brain.redLines.map(function (r) { return '<li>' + ic('ban', 15) + '<span>' + esc(r) + '</span></li>'; }).join('') + '</ul>' +
+
+        '<h2>Key messages</h2>' +
+        '<ul>' + D.brain.messages.map(function (m) { return '<li>' + esc(m) + '</li>'; }).join('') + '</ul>' +
+
+        '<h2>Transparency</h2>' +
+        '<p>Every action is logged with its <span class="hl">reasoning, policy decision, inputs, outputs and cost</span>. Browse it in <a href="#activity">Activity</a>, or ask the agent directly in <a href="#ask">Ask</a>; answers cite the action they came from.</p>' +
+        '<table><thead><tr><th>Since ' + esc(c.started) + '</th><th>Total</th></tr></thead><tbody>' +
+          '<tr><td>Posts on X</td><td class="mono">' + fmt(s.tweets) + '</td></tr>' +
+          '<tr><td>Emails sent (opt-in list)</td><td class="mono">' + fmt(s.emails) + '</td></tr>' +
+          '<tr><td>Calls (opt-in only)</td><td class="mono">' + fmt(s.calls) + '</td></tr>' +
+          '<tr><td>Supporters</td><td class="mono">' + fmt(state.supporters) + '</td></tr>' +
+          '<tr><td>Estimated reach</td><td class="mono">' + (s.reach / 1e6).toFixed(2) + 'M</td></tr>' +
+          '<tr><td>Spent</td><td class="mono">' + ils(b.monthlySpent) + ' of ' + ils(b.monthlyCap) + '</td></tr>' +
+        '</tbody></table>' +
+
+        '<h2>Contact policy</h2>' +
+        '<pre>email    opt-in list only, unsubscribe link always included\ncalls    only people who asked; AI disclosed in the first sentence\nopt-out  honored immediately, no further contact\npayments virtual card, hard caps; the model never sees card details</pre>' +
+
+        '<h2>Run</h2>' +
+        '<p>Started <code>' + esc(c.started) + '</code> · day <code>' + c.day + '</code> · <code>' + esc(c.handle) + '</code> · supervised by Yoav C. and Maya L. · system prompt <a href="#prompt">v' + P.version + '</a></p>' +
+      '</div>' +
+    '</article>' +
+
+    '<aside class="side">' +
+      '<section><div class="side-label"><span>Actions last 7 days</span><a href="#activity">' + ic('chevr', 14) + '</a></div>' +
+        '<div class="big">' + fmt(weekTotal) + '</div>' + spark(week, 300, 46) +
+        '<div class="bar-meta"><span>Mon</span><span>today: ' + todayCount() + '</span></div></section>' +
+
+      '<section><div class="side-label"><span>Live now</span><span class="tag sm ' + (state.paused ? 't-orange' : 't-green') + '">' + (state.paused ? 'Paused' : 'Working') + '</span></div>' +
+        '<div class="live"><span class="dot ' + (state.paused ? '' : 'pulse') + '" style="color:' + (state.paused ? '#ea580c' : '#16a34a') + '"></span><span id="liveText">' + esc(liveMsg()) + '</span></div></section>' +
+
+      '<section><div class="side-label"><span>Tools</span><a href="#tools">' + ic('chevr', 14) + '</a></div>' +
+        '<div class="pills">' + state.tools.map(function (t) {
+          var i = toolInfo(t.id);
+          return '<a href="#tools" class="tag t-' + (t.mode === 'off' ? 'gray' : i.color) + '" title="Mode: ' + t.mode + '">' + ic(i.icon, 12) + esc(t.name) + (t.mode === 'ask' ? ' ' + ic('lock', 11) : '') + '</a>';
+        }).join('') + '</div></section>' +
+
+      '<section><div class="side-label"><span>Budget used</span><a href="#budget">' + ic('chevr', 14) + '</a></div>' +
+        '<div class="big">' + ils(b.monthlySpent) + ' <span class="muted" style="font-size:15px;font-weight:500">/ ' + ils(b.monthlyCap) + '</span></div>' +
+        '<div class="bar ' + barClass(monthP) + '" style="margin-top:10px"><span style="width:' + monthP + '%"></span></div>' +
+        '<div class="bar-meta"><span>' + monthP + '% of monthly cap</span><span>today ' + ils(b.dailySpent) + ' / ' + ils(b.dailyCap) + ' (' + dayP + '%)</span></div></section>' +
+
+      '<section class="team-only"><div class="side-label"><span>Waiting for you</span><a href="#approvals">' + ic('chevr', 14) + '</a></div>' +
+        (n ? '<a href="#approvals" class="btn" style="width:100%">' + ic('clock', 14) + n + ' approval' + (n > 1 ? 's' : '') + ' pending</a>'
+           : '<p class="muted sm" style="margin:0">Nothing waiting. Inbox zero.</p>') + '</section>' +
+
+      '<section><div class="side-label"><span>Ask Megaphone</span><span class="muted sm">answers cite the log</span></div>' +
+        '<form class="mini-ask" data-form="mini"><input class="input" name="q" placeholder="Ask about today\'s actions…" autocomplete="off"><button class="btn primary sm" type="submit">Ask</button></form>' +
+        '<div class="chips">' + ['What did you do today?', 'How do you spend money?', 'Are you a real person?'].map(function (q) {
+          return '<button class="chip" data-act="askChip" data-q="' + esc(q) + '">' + esc(q) + '</button>';
+        }).join('') + '</div></section>' +
+    '</aside>' +
+  '</div>';
+}
+function updateLive() {
+  var el = $('#liveText');
+  if (!el) return;
+  el.style.opacity = 0;
+  setTimeout(function () {
+    var e2 = $('#liveText');
+    if (!e2) return;
+    e2.textContent = liveMsg();
+    e2.style.opacity = 1;
+  }, 250);
+}
+
+/* ------------------------------------------------------- view: activity */
+function filteredActions() {
+  var f = state.filter, q = f.q.toLowerCase();
+  return state.actions.filter(function (a) {
+    if (f.status !== 'all' && a.status !== f.status) return false;
+    if (f.tool !== 'all' && a.tool !== f.tool) return false;
+    if (q) {
+      var hay = (a.id + ' ' + a.title + ' ' + toolInfo(a.tool).name + ' ' + (a.reasoning || '') + ' ' + (a.output || '')).toLowerCase();
+      if (hay.indexOf(q) === -1) return false;
+    }
+    return true;
+  });
+}
+function vActivity() {
+  var f = state.filter, all = state.actions, list = filteredActions();
+  var count = function (st) { return all.filter(function (a) { return st === 'all' || a.status === st; }).length; };
+  var spend = all.reduce(function (s, a) { return s + (a.status === 'executed' ? a.cost : 0); }, 0);
+  var latest = all[0];
+  var chips = ['all', 'executed', 'pending', 'blocked', 'failed', 'rejected'].map(function (s) {
+    return '<button class="chip' + (f.status === s ? ' on' : '') + '" data-act="fStatus" data-s="' + s + '">' + (s === 'all' ? 'All' : STATUS[s].label) + '<span class="c">' + count(s) + '</span></button>';
+  }).join('');
+  var toolSel = '<select class="select" data-change="fTool" aria-label="Filter by tool"><option value="all">All tools</option>' +
+    state.tools.map(function (t) { return '<option value="' + t.id + '"' + (f.tool === t.id ? ' selected' : '') + '>' + esc(t.name) + '</option>'; }).join('') + '</select>';
+  var qChip = f.q ? '<span class="chip on">' + ic('search', 12) + '“' + esc(f.q) + '”<button class="x" data-act="clearQ" aria-label="Clear search">×</button></span>' : '';
+
+  var rows = list.length ? list.map(function (a) {
+    return '<button class="arow' + (a.fresh ? ' new' : '') + '" data-act="open" data-id="' + a.id + '">' + statusIcon(a.status) +
+      '<span class="tool">' + toolPill(a.tool) + '</span><span class="title">' + esc(a.title) + '</span>' +
+      '<span class="id">' + a.id + '</span><span class="time">' + esc(a.time) + '</span><span class="cost">' + ils(a.cost) + '</span></button>';
+  }).join('') : '<div class="empty">No actions match these filters.</div>';
+
+  return '<div class="stat-strip">' +
+      '<div class="stat"><div class="k">' + ic('bolt', 13) + 'Actions today</div><div class="v">' + todayCount() + '</div></div>' +
+      '<div class="stat"><div class="k">' + ic('checkc', 13) + 'Executed</div><div class="v">' + count('executed') + ' <small>in log</small></div></div>' +
+      '<div class="stat"><div class="k">' + ic('clock', 13) + 'Waiting approval</div><div class="v">' + count('pending') + '</div></div>' +
+      '<div class="stat"><div class="k">' + ic('ban', 13) + 'Blocked by policy</div><div class="v">' + count('blocked') + '</div></div>' +
+      '<div class="stat"><div class="k">' + ic('card', 13) + 'Spend in log</div><div class="v">' + ils(Math.round(spend)) + '</div></div>' +
+    '</div>' +
+    '<div class="toolbar"><div class="chips">' + chips + '</div>' + qChip + '<div class="right">' + toolSel +
+      '<button class="btn sm" data-act="toastOnly" data-msg="Exported activity.csv (mock)">' + ic('file', 14) + 'Export</button></div></div>' +
+    '<div class="list">' +
+      '<div class="list-head"><span class="mark xs">' + logo(11) + '</span><b>Megaphone</b>' +
+        (latest ? '<span class="trunc">' + esc(latest.title) + '</span><span class="hash">' + latest.id + '</span><span>· ' + esc(latest.time) + '</span>' : '') +
+        '<span class="right">' + ic('history', 14) + list.length + ' of ' + all.length + ' entries</span></div>' +
+      rows +
+    '</div>';
+}
+
+/* ---------------------------------------------------------------- drawer */
+function policyBox(a) {
+  var p = state.approvals.find(function (x) { return x.actionId === a.id; });
+  var cls, icon, head, body;
+  if (a.status === 'blocked') { cls = 't-red'; icon = 'ban'; head = 'Blocked by PolicyEngine'; body = a.output; }
+  else if (a.policy === 'approval' && a.status === 'pending') { cls = 't-amber'; icon = 'clock'; head = 'Waiting for a manager'; body = 'Rule: ' + (p ? p.why : 'requires approval') + '.'; }
+  else if (a.status === 'rejected') { cls = 't-gray'; icon = 'xc'; head = 'Rejected by ' + (a.rejectedBy || 'a manager'); body = 'The action did not run.'; }
+  else if (a.policy === 'approval') { cls = 't-green'; icon = 'checkc'; head = 'Approved by ' + (a.approvedBy || 'a manager'); body = 'Tool mode is Ask, so a human signed off before it ran.'; }
+  else if (a.status === 'failed') { cls = 't-red'; icon = 'alert'; head = 'Auto-approved, then failed'; body = 'Policy allowed it; the tool returned an error.'; }
+  else { cls = 't-green'; icon = 'checkc'; head = 'Auto-approved'; body = 'Within quota, tool mode Auto, no red-line matches.'; }
+  return '<div class="policy ' + cls + '">' + ic(icon, 16) + '<div><b style="color:inherit">' + esc(head) + '</b><p>' + esc(body) + '</p></div></div>';
+}
+function jsonHtml(o) {
+  return esc(JSON.stringify(o || {}, null, 2))
+    .replace(/(&quot;[^&]*?&quot;)(\s*:)/g, '<span class="jk">$1</span>$2')
+    .replace(/: (&quot;.*?&quot;)/g, ': <span class="js">$1</span>')
+    .replace(/: (-?\d+(?:\.\d+)?|true|false|null)/g, ': <span class="jn">$1</span>');
+}
+function openDetail(id) {
+  var a = state.actions.find(function (x) { return x.id === id; });
+  if (!a) { toast('Action ' + id + ' not found', 'err'); return; }
+  state.drawerId = id;
+  var tokens = a.tokens || 0;
+  var model = Math.min(a.cost, tokens * 0.000022);
+  var toolCost = Math.max(0, a.cost - model);
+  var by = a.approvedBy ? 'Approved by ' + a.approvedBy : a.rejectedBy ? 'Rejected by ' + a.rejectedBy : a.policy === 'auto' ? 'Policy engine' : a.policy === 'blocked' ? 'Policy engine' : 'Pending';
+  var foot = '';
+  if (a.status === 'pending') foot += '<a class="btn primary team-only" href="#approvals" data-act="closeDrawer">' + ic('checkc', 14) + 'Review in Approvals</a>';
+  foot += '<button class="btn" data-act="copy" data-text="' + esc(JSON.stringify({ id: a.id, tool: a.tool, input: a.input, output: a.output })) + '">' + ic('copy', 14) + 'Copy JSON</button>';
+  foot += '<button class="btn" data-act="askAbout" data-id="' + a.id + '">' + ic('msg', 14) + 'Ask about this</button>';
+
+  $('#drawer').innerHTML =
+    '<div class="drawer-head">' + statusIcon(a.status) + '<span class="hash">' + a.id + '</span>' + statusTag(a.status) + toolPill(a.tool) +
+      '<span class="right"><button class="icon-btn" data-act="closeDrawer" aria-label="Close">' + ic('close', 18) + '</button></span></div>' +
+    '<div class="drawer-body">' +
+      '<h3>' + esc(a.title) + '</h3>' +
+      '<dl class="kv"><dt>Time</dt><dd class="mono">Today ' + esc(a.time) + '</dd>' +
+        '<dt>Tool</dt><dd>' + esc(toolInfo(a.tool).name) + '</dd>' +
+        '<dt>Policy</dt><dd>' + (a.policy === 'auto' ? 'Auto' : a.policy === 'approval' ? 'Ask first' : 'Blocked') + '</dd>' +
+        '<dt>Decision</dt><dd>' + esc(by) + '</dd>' +
+        '<dt>Tokens</dt><dd class="mono">' + (tokens ? fmt(tokens) : '—') + '</dd></dl>' +
+      '<div class="sec"><h4>Reasoning</h4><p>' + esc(a.reasoning) + '</p></div>' +
+      '<div class="sec"><h4>Policy decision</h4>' + policyBox(a) + '</div>' +
+      '<div class="sec"><h4>Input</h4><pre class="json">' + jsonHtml(a.input) + '</pre></div>' +
+      '<div class="sec"><h4>Output</h4><p>' + esc(a.output) + '</p></div>' +
+      '<div class="sec"><h4>Cost</h4><div class="costs">' +
+        '<div>Total<b>' + ils(a.cost) + '</b></div><div>Model<b>' + ils(Math.round(model * 100) / 100) + '</b></div><div>Tool / vendor<b>' + ils(Math.round(toolCost * 100) / 100) + '</b></div></div></div>' +
+    '</div>' +
+    '<div class="drawer-foot">' + foot + '</div>';
+  $('#drawer').classList.add('open');
+  $('#drawer').setAttribute('aria-hidden', 'false');
+  $('#overlay').classList.add('open');
+}
+function closeDrawer() {
+  state.drawerId = null;
+  $('#drawer').classList.remove('open');
+  $('#drawer').setAttribute('aria-hidden', 'true');
+  $('#overlay').classList.remove('open');
+}
+
+/* ------------------------------------------------------ view: approvals */
+function previewHtml(pv) {
+  if (pv.type === 'email') {
+    return '<div class="pv"><div class="pv-head">' + ic('mail', 13) + 'Subject: <b>' + esc(pv.subject) + '</b></div><div class="pv-body"><div class="txt">' + esc(pv.body) + '</div></div></div>';
+  }
+  if (pv.type === 'payment') {
+    return '<div class="pv"><div class="pv-head">' + ic('card', 13) + 'Payment request</div><div class="pv-body"><dl class="kv" style="margin:0">' +
+      '<dt>Vendor</dt><dd>' + esc(pv.vendor) + '</dd><dt>Amount</dt><dd class="mono">' + ils(pv.amount) + '</dd>' +
+      '<dt>Duration</dt><dd>' + esc(pv.duration) + '</dd><dt>Target</dt><dd>' + esc(pv.target) + '</dd>' +
+      '<dt>Card</dt><dd class="mono">•••• ' + esc(state.budget.card.last4) + '</dd></dl></div></div>';
+  }
+  if (pv.type === 'tweet') {
+    return '<div class="pv"><div class="pv-head">' + ic('xlogo', 12) + 'Post preview</div><div class="pv-body tweet"><span class="tw-av">' + logo(16) + '</span><div>' +
+      '<div><b>Transparent Histadrut</b> <span class="muted sm">' + esc(D.campaign.handle) + ' · AI-run</span></div><div class="txt">' + cite(pv.text) + '</div></div></div></div>';
+  }
+  if (pv.type === 'call') {
+    return '<div class="pv"><div class="pv-head">' + ic('phone', 13) + 'Call script · AI disclosure first</div><div class="pv-body"><div class="txt">' + esc(pv.script) + '</div></div></div>';
+  }
+  return '';
+}
+function editorHtml(p) {
+  var pv = p.preview, id = p.id;
+  if (pv.type === 'email') {
+    return '<label class="field">Subject<input class="input" id="eds-' + id + '" value="' + esc(pv.subject) + '"></label>' +
+      '<label class="field">Body<textarea class="edit" id="ed-' + id + '">' + esc(pv.body) + '</textarea></label>';
+  }
+  if (pv.type === 'payment') {
+    return '<label class="field">Amount (₪)<input class="input mono" type="number" min="0" id="ed-' + id + '" value="' + pv.amount + '"></label>' +
+      '<p class="muted sm">Lowering the amount to ₪' + state.budget.autoLimit + ' or less would make it eligible for auto-approval next time.</p>';
+  }
+  var val = pv.type === 'tweet' ? pv.text : pv.script;
+  return '<label class="field">' + (pv.type === 'tweet' ? 'Post text' : 'Call script') + '<textarea class="edit" id="ed-' + id + '">' + esc(val) + '</textarea></label>' +
+    (pv.type === 'tweet' ? '<p class="muted sm">Keep source tags like <code class="mono">[[src:Label]]</code>; they render as citation chips.</p>' : '');
+}
+function discBody(p) {
+  var editing = !!state.editing[p.id];
+  var acts = '';
+  if (p.blocked) {
+    acts = '<button class="btn" data-act="goAction" data-id="' + p.actionId + '">' + ic('eye', 14) + 'View in log</button>' +
+      '<button class="btn team-only" data-act="sendBack" data-id="' + p.id + '">' + ic('send', 14) + 'Send back for a sourced rewrite</button>' +
+      '<span class="muted sm">Red-line blocks cannot be overridden from the UI.</span>';
+  } else if (editing) {
+    acts = '<button class="btn primary team-only" data-act="saveEdit" data-id="' + p.id + '">' + ic('check', 14) + 'Save &amp; approve</button>' +
+      '<button class="btn team-only" data-act="cancelEdit" data-id="' + p.id + '">Cancel</button>';
+  } else {
+    acts = '<button class="btn primary team-only" data-act="approve" data-id="' + p.id + '">' + ic('check', 14) + 'Approve</button>' +
+      '<button class="btn team-only" data-act="edit" data-id="' + p.id + '">' + ic('edit', 14) + 'Edit</button>' +
+      '<button class="btn danger team-only" data-act="decline" data-id="' + p.id + '">' + ic('xc', 14) + 'Decline</button>' +
+      '<button class="btn" data-act="goAction" data-id="' + p.actionId + '">' + ic('eye', 14) + 'View in log</button>';
+  }
+  return '<div class="disc-grid"><div>' + (editing ? editorHtml(p) : previewHtml(p.preview)) + '</div>' +
+    '<div><h4>Why the agent wants this</h4><p>' + esc(p.reasoning) + '</p>' +
+      '<dl class="kv"><dt>Rule</dt><dd>' + esc(p.why) + '</dd><dt>Audience</dt><dd>' + esc(p.audience) + '</dd>' +
+      '<dt>Est. cost</dt><dd class="mono">' + ils(p.cost) + '</dd><dt>Action</dt><dd><button class="link mono" data-act="goAction" data-id="' + p.actionId + '">' + p.actionId + '</button></dd></dl></div></div>' +
+    '<div class="actions-row">' + acts + '</div>';
+}
+function discRow(p) {
+  var t = toolInfo(p.tool), open = !!state.expanded[p.id];
+  return '<div class="disc' + (open ? ' open' : '') + (p.blocked ? ' blocked' : '') + '" id="d-' + p.id + '">' +
+    '<button class="disc-row" data-act="toggleAppr" data-id="' + p.id + '" aria-expanded="' + open + '">' +
+      '<span class="disc-ic t-' + (p.blocked ? 'red' : t.color) + '">' + ic(p.blocked ? 'ban' : t.icon, 16) + '</span>' +
+      '<span class="disc-main"><span class="disc-title">' + esc(p.title) + '</span>' +
+        '<span class="disc-sub">#' + p.id + ' opened by Megaphone · ' + esc(p.why) + ' · ' + esc(p.audience) + '</span></span>' +
+      '<span class="disc-meta">' + riskTag(p.risk) + '<span class="mono muted sm">' + ils(p.cost) + '</span><span class="chev">' + ic('chevr', 16) + '</span></span>' +
+    '</button>' +
+    '<div class="disc-body">' + (open ? discBody(p) : '') + '</div></div>';
+}
+function vApprovals() {
+  var open = state.approvals.filter(function (p) { return !p.blocked; });
+  var blocked = state.approvals.filter(function (p) { return p.blocked; });
+  var res = state.resolved;
+  var decTag = function (d) {
+    if (d === 'approved') return '<span class="tag sm t-green">' + ic('check', 12) + 'Approved</span>';
+    if (d === 'declined') return '<span class="tag sm t-red">' + ic('xc', 12) + 'Declined</span>';
+    return '<span class="tag sm t-gray">' + ic('send', 12) + 'Sent back</span>';
+  };
+  return (state.team ? '' : '<div class="note">' + ic('eye', 16) + '<span>You are viewing as the public. Approval requests are shown for transparency; only the campaign team can act on them.</span></div>') +
+    '<div class="section-title">' + ic('clock', 17) + 'Waiting for approval <span class="count">' + open.length + '</span></div>' +
+    '<div class="list">' + (open.length ? open.map(discRow).join('') : '<div class="empty">' + ic('checkc', 18) + '<br>Inbox zero. The agent continues with tasks that don\'t need approval.</div>') + '</div>' +
+    '<div class="section-title">' + ic('ban', 17) + 'Blocked by policy <span class="count">' + blocked.length + '</span></div>' +
+    '<div class="list">' + (blocked.length ? blocked.map(discRow).join('') : '<div class="empty">Nothing blocked.</div>') + '</div>' +
+    '<div class="section-title">' + ic('history', 17) + 'Resolved this session <span class="count">' + res.length + '</span></div>' +
+    '<div class="list">' + (res.length ? res.map(function (p) {
+      return '<div class="res-row">' + decTag(p.decision) + '<b>' + esc(p.title) + '</b><span class="muted sm">#' + p.id + ' · by You · ' + esc(p.at) + (p.edited ? ' · edited' : '') + '</span>' +
+        '<span style="margin-left:auto"><button class="link mono sm" data-act="goAction" data-id="' + p.actionId + '">' + p.actionId + '</button></span></div>';
+    }).join('') : '<div class="empty">Decisions you make here will appear in this list and in the activity log.</div>') + '</div>';
+}
+function refreshDisc(id) {
+  var p = state.approvals.find(function (x) { return x.id === id; });
+  var d = document.getElementById('d-' + id);
+  if (!p || !d) return;
+  var open = !!state.expanded[id];
+  d.classList.toggle('open', open);
+  d.querySelector('.disc-row').setAttribute('aria-expanded', String(open));
+  d.querySelector('.disc-body').innerHTML = open ? discBody(p) : '';
+}
+function resolve(id, decision, edited) {
+  var i = state.approvals.findIndex(function (p) { return p.id === id; });
+  if (i < 0) return null;
+  var p = state.approvals.splice(i, 1)[0];
+  p.decision = decision; p.at = nowHM(); p.edited = !!edited;
+  state.resolved.unshift(p);
+  delete state.expanded[id]; delete state.editing[id];
+  var a = state.actions.find(function (x) { return x.id === p.actionId; });
+  var money = p.tool === 'ads' || p.tool === 'payments';
+  var amount = p.preview.type === 'payment' ? Number(p.preview.amount) || 0 : p.cost;
+  if (decision === 'approved') {
+    if (a) {
+      a.status = 'executed'; a.approvedBy = 'You';
+      a.output = state.paused ? 'Approved by You' + (edited ? ' (edited)' : '') + '. Queued until the agent is resumed.' : 'Approved by You' + (edited ? ' (edited)' : '') + '. Executed.';
+      if (money) a.cost = amount;
+    }
+    if (money) {
+      var e = state.budget.expenses.find(function (x) { return x.status === 'pending'; });
+      if (e) { e.status = 'approved'; e.amount = amount; }
+      state.budget.monthlySpent += amount; state.budget.dailySpent += amount;
+    }
+  } else if (decision === 'declined') {
+    if (a) { a.status = 'rejected'; a.rejectedBy = 'You'; a.output = 'Declined by You. The action did not run.'; }
+    if (money) {
+      var e2 = state.budget.expenses.find(function (x) { return x.status === 'pending'; });
+      if (e2) e2.status = 'rejected';
+    }
+  } else if (a) {
+    a.output += ' Sent back to the agent for a sourced rewrite.';
+  }
+  return p;
+}
+
+/* --------------------------------------------------------- view: prompt */
+function codeHtml(text) {
+  return '<div class="code"><table>' + text.split('\n').map(function (l, i) {
+    var cls = /^[A-Z][A-Z ]+$/.test(l.trim()) ? 'h' : '';
+    var html = esc(l);
+    if (/^- /.test(l)) html = '<span class="b">-</span>' + esc(l.slice(1));
+    html = html.replace(/&quot;(.*?)&quot;/g, '<span class="q">&quot;$1&quot;</span>');
+    return '<tr><td class="ln">' + (i + 1) + '</td><td class="lc' + (cls ? ' ' + cls : '') + '">' + (html || ' ') + '</td></tr>';
+  }).join('') + '</table></div>';
+}
+function vPrompt() {
+  var P = state.prompt, v = P.versions[0], lines = P.text.split('\n').length;
+  var body = P.editing
+    ? '<div class="prompt-edit"><textarea class="edit" id="promptEdit" spellcheck="false">' + esc(P.text) + '</textarea></div>' +
+      '<div class="commit"><h4>Commit changes</h4>' +
+        '<input class="input" id="commitMsg" style="width:100%;margin-bottom:8px" placeholder="Update system_prompt.md">' +
+        '<textarea class="edit" id="commitDesc" style="min-height:64px;font-family:var(--sans);font-size:14px" placeholder="Add an optional extended description (why this change?)"></textarea>' +
+        '<div class="actions-row"><button class="btn primary" data-act="commit">' + ic('commit', 14) + 'Commit changes</button><button class="btn" data-act="promptCancel">Cancel</button>' +
+        '<span class="muted sm">Takes effect on the agent\'s next step. Every version is public.</span></div></div>'
+    : codeHtml(P.text);
+  var hist = P.versions.map(function (h, i) {
+    return '<div class="hist-row"><span class="avatar xs">' + initials(h.by) + '</span><div class="body">' +
+      '<div class="note-t">' + esc(h.note) + '</div>' +
+      '<div class="muted sm">' + esc(h.by) + ' · ' + esc(h.when) + ' · <span class="diff"><span class="a">+' + (h.add || 0) + '</span> <span class="d">−' + (h.del || 0) + '</span></span></div></div>' +
+      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="hash">' + hashOf(h.v) + '</span>' +
+      (i === 0 ? '<span class="tag sm t-green">current</span>' : (h.text ? '<button class="link sm team-only" data-act="restore" data-v="' + h.v + '">Restore</button>' : '<span class="muted sm">v' + h.v + '</span>')) + '</div></div>';
+  }).join('');
+
+  return '<div class="split"><div class="card">' +
+      '<div class="card-head"><span class="mono">megaphone / prompts / <b>system_prompt.md</b></span>' +
+        '<span class="right"><button class="btn sm" data-act="copy" data-text="' + esc(P.text) + '">' + ic('copy', 13) + 'Copy</button>' +
+        (P.editing ? '' : '<button class="btn sm team-only" data-act="promptEdit">' + ic('edit', 13) + 'Edit</button>') + '</span></div>' +
+      '<div class="file-meta"><span class="avatar xs">' + initials(v.by) + '</span><b>' + esc(v.by) + '</b><span>' + esc(v.note) + '</span>' +
+        '<span class="hash">' + hashOf(v.v) + '</span><span class="muted">' + esc(v.when) + '</span>' +
+        '<span class="right muted mono sm">v' + P.version + ' · ' + lines + ' lines · ' + fmt(P.text.length) + ' chars</span></div>' +
+      body +
+    '</div>' +
+    '<div>' +
+      '<div class="card"><div class="card-head">' + ic('history', 15) + 'History <span class="right muted">' + P.versions.length + ' versions</span></div>' + hist + '</div>' +
+      '<div class="card" style="margin-top:16px"><div class="card-head">' + ic('ban', 15) + 'Red lines <span class="right muted sm">enforced by policy engine</span></div><div class="pad"><ul class="redline" style="margin:0;padding:0;font-size:14px">' +
+        D.brain.redLines.map(function (r) { return '<li style="display:flex;gap:8px;margin:4px 0">' + ic('ban', 14) + '<span>' + esc(r) + '</span></li>'; }).join('') + '</ul></div></div>' +
+    '</div></div>';
+}
+
+/* ---------------------------------------------------------- view: tools */
+function vTools() {
+  var dis = state.team ? '' : ' disabled';
+  var rows = state.tools.map(function (t) {
+    var i = toolInfo(t.id), p = pct(t.used, t.quota);
+    return '<div class="trow"><span class="tic t-' + i.color + '">' + ic(i.icon, 18) + '</span>' +
+      '<div><div class="t-name">' + esc(t.name) + '<span class="tag sm t-gray mono">' + esc(t.provider) + '</span></div><div class="muted sm">' + esc(t.desc) + '</div></div>' +
+      '<div class="t-usage"><div class="usage-top"><span class="mono">' + fmt(t.used) + ' / <input class="input quota" type="number" min="0" value="' + t.quota + '" data-change="quota" data-id="' + t.id + '" aria-label="Daily quota"' + dis + '></span><span>' + esc(t.unit) + '</span></div>' +
+        '<div class="bar ' + barClass(p) + '"><span style="width:' + p + '%"></span></div></div>' +
+      '<div class="t-mode"><div class="seg" role="group" aria-label="Mode">' + MODES.map(function (m) {
+        return '<button class="m-' + m.id + (t.mode === m.id ? ' on' : '') + '" data-act="mode" data-id="' + t.id + '" data-m="' + m.id + '"' + dis + '>' + m.label + '</button>';
+      }).join('') + '</div></div></div>';
+  }).join('');
+  var store = state.store.length ? state.store.map(function (s) {
+    return '<div class="scard"><div class="top"><span class="tic t-gray">' + ic(s.icon, 18) + '</span><b>' + esc(s.name) + '</b></div>' +
+      '<div class="muted sm">' + esc(s.desc) + '</div>' +
+      '<div class="sfoot"><span class="tag sm t-gray mono">' + esc(s.via) + '</span><button class="btn sm team-only" data-act="addTool" data-id="' + s.id + '">' + ic('plus', 13) + 'Add tool</button></div></div>';
+  }).join('') : '<div class="empty">All available tools are installed.</div>';
+  return '<div class="note">' + ic('shield', 16) + '<span><b>Off</b>: never used. <b>Ask</b>: drafts wait in Approvals. <b>Auto</b>: runs within its daily quota. In every mode the policy engine still blocks red-line violations.' + (state.team ? '' : ' Switch on Team view to change settings.') + '</span></div>' +
+    '<div class="list">' + rows + '</div>' +
+    '<div class="section-title">' + ic('plus', 17) + 'Add a tool <span class="count">' + state.store.length + '</span></div>' +
+    '<div class="store-grid">' + store + '</div>';
+}
+
+/* --------------------------------------------------------- view: budget */
+function ruleText(r) { return esc(r.text.replace(/\{auto\}/g, fmt(state.budget.autoLimit))); }
+function rulesHtml() {
+  var dis = state.team ? '' : ' disabled';
+  return state.budget.rules.map(function (r) {
+    return '<div class="rule"><button class="tgl' + (r.on ? ' on' : '') + '" data-act="rule" data-id="' + r.id + '" aria-label="Toggle rule"' + dis + '></button><span>' + ruleText(r) + '</span></div>';
+  }).join('');
+}
+function vBudget() {
+  var b = state.budget, mP = pct(b.monthlySpent, b.monthlyCap), dP = pct(b.dailySpent, b.dailyCap);
+  var catTotal = b.byCategory.reduce(function (s, c) { return s + c.amount; }, 0);
+  var stTag = { pending: 't-amber', auto: 't-blue', approved: 't-green', rejected: 't-red' };
+  var stLbl = { pending: 'Pending', auto: 'Auto', approved: 'Approved', rejected: 'Rejected' };
+  return '<div class="split"><div>' +
+      '<div class="stat-strip">' +
+        '<div class="stat"><div class="k">' + ic('calendar', 13) + 'This month</div><div class="v">' + ils(b.monthlySpent) + ' <small>/ ' + ils(b.monthlyCap) + '</small></div>' +
+          '<div class="bar ' + barClass(mP) + '" style="margin-top:8px"><span style="width:' + mP + '%"></span></div><div class="bar-meta"><span>' + mP + '%</span><span>' + ils(b.monthlyCap - b.monthlySpent) + ' left · resets Dec 1</span></div></div>' +
+        '<div class="stat"><div class="k">' + ic('clock', 13) + 'Today</div><div class="v">' + ils(b.dailySpent) + ' <small>/ ' + ils(b.dailyCap) + '</small></div>' +
+          '<div class="bar ' + barClass(dP) + '" style="margin-top:8px"><span style="width:' + dP + '%"></span></div><div class="bar-meta"><span>' + dP + '%</span><span>hard stop at cap</span></div></div>' +
+        '<div class="stat"><div class="k">' + ic('bolt', 13) + 'Auto-approve limit</div><div class="v" id="autoVal">' + ils(b.autoLimit) + '</div>' +
+          '<input type="range" min="0" max="500" step="10" value="' + b.autoLimit + '" data-input="autoLimit" data-change="autoLimitDone" aria-label="Auto-approve limit"' + (state.team ? '' : ' disabled') + ' style="margin-top:8px">' +
+          '<div class="bar-meta"><span>₪0</span><span>₪500</span></div></div>' +
+      '</div>' +
+      '<div class="card"><div class="card-head">' + ic('sliders', 15) + 'Spend by category <span class="right muted mono">' + ils(catTotal) + '</span></div><div class="pad">' +
+        '<div class="stack">' + b.byCategory.map(function (c) { return '<span style="width:' + (c.amount / catTotal * 100).toFixed(1) + '%;background:' + c.color + '" title="' + esc(c.label) + '"></span>'; }).join('') + '</div>' +
+        '<div class="legend">' + b.byCategory.map(function (c) {
+          return '<div><span class="sw" style="background:' + c.color + '"></span>' + esc(c.label) + '<span class="amt">' + ils(c.amount) + ' · ' + Math.round(c.amount / catTotal * 100) + '%</span></div>';
+        }).join('') + '</div></div></div>' +
+      '<div class="card" style="margin-top:16px"><div class="card-head">' + ic('shield', 15) + 'Spending rules</div><div id="rules">' + rulesHtml() + '</div></div>' +
+      '<div class="section-title">' + ic('file', 17) + 'Ledger <span class="count">' + b.expenses.length + '</span></div>' +
+      '<div class="list tbl-wrap"><table class="tbl"><thead><tr><th>When</th><th>Vendor</th><th>Description</th><th>Status</th><th class="num">Amount</th></tr></thead><tbody>' +
+        b.expenses.map(function (e) {
+          return '<tr><td class="mono sm">' + esc(e.time) + '</td><td><b>' + esc(e.vendor) + '</b></td><td>' + esc(e.desc) + '</td><td><span class="tag sm ' + stTag[e.status] + '">' + stLbl[e.status] + '</span></td><td class="num">' + ils(e.amount) + '</td></tr>';
+        }).join('') + '</tbody></table></div>' +
+    '</div>' +
+    '<div>' +
+      '<div class="vcard' + (state.frozen ? ' frozen' : '') + '"><div class="row"><span class="chipg"></span><span>' + (state.frozen ? 'FROZEN' : 'VIRTUAL') + '</span></div>' +
+        '<div class="num">•••• •••• •••• ' + esc(b.card.last4) + '</div>' +
+        '<div class="row"><span>' + esc(b.card.holder) + '<br>EXP ' + esc(b.card.exp) + '</span><span class="net">' + esc(b.card.network) + '</span></div></div>' +
+      '<dl class="kv"><dt>Status</dt><dd>' + (state.frozen ? '<span class="tag sm t-red">Frozen</span>' : '<span class="tag sm t-green">Active</span>') + '</dd>' +
+        '<dt>Issuer</dt><dd>Stripe Issuing</dd><dt>Daily cap</dt><dd class="mono">' + ils(b.dailyCap) + '</dd><dt>Monthly cap</dt><dd class="mono">' + ils(b.monthlyCap) + '</dd></dl>' +
+      '<div class="actions-row team-only"><button class="btn' + (state.frozen ? ' primary' : ' danger') + '" data-act="freeze">' + ic('lock', 14) + (state.frozen ? 'Unfreeze card' : 'Freeze card') + '</button></div>' +
+      '<div class="note" style="margin-top:16px">' + ic('shield', 16) + '<span>The model never sees card details. It requests a payment; the payment service checks limits and the allow-list, then charges the card.</span></div>' +
+      '<div class="side-label" style="margin-top:4px"><span>Vendor allow-list</span></div>' +
+      '<div class="pills">' + b.allowList.map(function (v) { return '<span class="tag t-gray">' + ic('check', 12) + esc(v) + '</span>'; }).join('') + '</div>' +
+    '</div></div>';
+}
+
+/* ---------------------------------------------------------- view: calls */
+function outcomeTag(o) {
+  var m = { supporter: ['t-green', 'Supporter'], opposed: ['t-pink', 'Opposed'], neutral: ['t-blue', 'Neutral'], 'no-answer': ['t-gray', 'No answer'] }[o] || ['t-gray', o];
+  return '<span class="tag sm ' + m[0] + '">' + m[1] + '</span>';
+}
+function vCalls() {
+  var calls = D.calls;
+  var sel = calls.find(function (c) { return c.id === state.callId; }) || calls[0];
+  var connected = calls.filter(function (c) { return c.duration > 0; });
+  var avg = Math.round(connected.reduce(function (s, c) { return s + c.duration; }, 0) / (connected.length || 1));
+  var calTool = state.tools.find(function (t) { return t.id === 'calls'; });
+  var lines = sel.transcript.length ? sel.transcript.map(function (l) {
+    return '<div class="tline ' + l.who + '"><span class="ts">' + dur(l.t) + '</span><span class="who">' + (l.who === 'bot' ? 'Megaphone' : esc(sel.name.split(' ')[0])) + '</span><span class="t">' + esc(l.text) + '</span></div>';
+  }).join('') : '<div class="empty">No transcript: the call was not connected.</div>';
+  return '<div class="stat-strip">' +
+      '<div class="stat"><div class="k">' + ic('phone', 13) + 'Calls today</div><div class="v">' + (calTool ? calTool.used : 64) + ' <small>/ ' + (calTool ? calTool.quota : 150) + '</small></div></div>' +
+      '<div class="stat"><div class="k">' + ic('checkc', 13) + 'Connected (this list)</div><div class="v">' + connected.length + ' <small>of ' + calls.length + '</small></div></div>' +
+      '<div class="stat"><div class="k">' + ic('clock', 13) + 'Avg duration</div><div class="v">' + dur(avg) + '</div></div>' +
+      '<div class="stat"><div class="k">' + ic('shield', 13) + 'AI disclosed</div><div class="v">100%</div></div>' +
+    '</div>' +
+    '<div class="calls"><div class="list">' +
+      '<div class="list-head">' + ic('phone', 14) + 'Recent calls<span class="right muted sm">opt-in only</span></div>' +
+      calls.map(function (c) {
+        return '<button class="crow' + (c.id === sel.id ? ' on' : '') + '" data-act="call" data-id="' + c.id + '"><span class="avatar md">' + initials(c.name) + '</span>' +
+          '<span class="who"><b>' + esc(c.name) + '</b><span class="mono muted sm">' + esc(c.phone) + '</span></span>' +
+          '<span class="meta">' + outcomeTag(c.outcome) + '<span class="mono muted sm">' + esc(c.time) + ' · ' + (c.duration ? dur(c.duration) : '—') + '</span></span></button>';
+      }).join('') +
+    '</div>' +
+    '<div class="card">' +
+      '<div class="card-head"><span class="avatar xs">' + initials(sel.name) + '</span><b>' + esc(sel.name) + '</b><span class="mono sm">' + esc(sel.phone) + '</span>' + outcomeTag(sel.outcome) +
+        '<span class="right"><span class="mono sm">' + esc(sel.time) + ' · ' + (sel.duration ? dur(sel.duration) : '0:00') + '</span>' +
+        (sel.transcript.length ? '<button class="btn sm" data-act="replay">' + ic('play', 12) + 'Replay</button>' : '') + '</span></div>' +
+      '<div class="pad" style="border-bottom:1px solid var(--g100)"><p style="margin:0 0 8px">' + esc(sel.summary) + '</p><div class="pills">' +
+        sel.tags.map(function (t) { return '<span class="tag sm t-gray">' + esc(t) + '</span>'; }).join('') + '</div></div>' +
+      '<div class="transcript" id="transcript">' + lines + '</div>' +
+    '</div></div>';
+}
+function clearReplay() { if (state.replayTimer) { clearInterval(state.replayTimer); state.replayTimer = null; } }
+function replay() {
+  clearReplay();
+  var box = $('#transcript');
+  if (!box) return;
+  var lines = Array.prototype.slice.call(box.querySelectorAll('.tline'));
+  lines.forEach(function (l) { l.classList.add('hide'); });
+  var i = 0;
+  state.replayTimer = setInterval(function () {
+    if (i >= lines.length || !document.body.contains(box)) { clearReplay(); return; }
+    lines[i].classList.remove('hide');
+    box.scrollTop = box.scrollHeight;
+    i++;
+  }, 700);
+}
+
+/* ------------------------------------------------------------ view: ask */
+function actionTitle(id) { var a = state.actions.find(function (x) { return x.id === id; }); return a ? a.title : ''; }
+function chatHtml() {
+  if (!state.chat.length && !state.typing) {
+    return '<div class="intro"><span class="tw-av" style="margin:0 auto 10px;width:44px;height:44px">' + logo(20) + '</span>' +
+      '<b style="font-size:17px">Ask Megaphone anything about its work</b>' +
+      '<p class="sm">Answers come from the public activity log and link to the action they are based on.</p>' +
+      '<div class="chips">' + ['What did you do today?', 'Do you send spam?', 'How do you spend money?', 'Who do you call?', 'Are your facts verified?', 'Are you a real person?'].map(function (q) {
+        return '<button class="chip" data-act="askChip" data-q="' + esc(q) + '">' + esc(q) + '</button>';
+      }).join('') + '</div></div>';
+  }
+  var html = state.chat.map(function (m) {
+    if (m.who === 'user') return '<div class="msg user"><span class="avatar xs" style="width:30px;height:30px">You</span><div class="bubble">' + esc(m.text) + '</div></div>';
+    var c = m.ref
+      ? '<div class="cite">' + ic('book', 12) + 'Source: <button class="link mono" data-act="goAction" data-id="' + m.ref + '">' + m.ref + '</button><span>· ' + esc(actionTitle(m.ref)) + '</span></div>'
+      : m.matched ? '<div class="cite">' + ic('book', 12) + 'Source: campaign card (general answer)</div>' : '<div class="cite">' + ic('users', 12) + 'Forwarded to the human team</div>';
+    return '<div class="msg bot"><span class="tw-av sm">' + logo(14) + '</span><div class="bubble"><div>' + esc(m.text) + '</div>' + c + '</div></div>';
+  }).join('');
+  if (state.typing) html += '<div class="msg bot"><span class="tw-av sm">' + logo(14) + '</span><div class="bubble"><span class="typing"><span></span><span></span><span></span></span></div></div>';
+  return html;
+}
+function vAsk() {
+  return '<div class="split"><div class="card chat">' +
+      '<div class="card-head"><span class="mark xs">' + logo(11) + '</span><b>Ask Megaphone</b><span class="muted sm">answers from the public log</span>' +
+        '<span class="right"><button class="btn sm" data-act="clearChat">Clear</button></span></div>' +
+      '<div class="msgs" id="msgs">' + chatHtml() + '</div>' +
+      '<form class="chat-form" data-form="ask"><input class="input" name="q" placeholder="Ask a question, e.g. how much did you spend today?" autocomplete="off" aria-label="Question"><button class="btn primary" type="submit">' + ic('send', 14) + 'Send</button></form>' +
+    '</div>' +
+    '<div><div class="card"><div class="card-head">' + ic('shield', 15) + 'How answers work</div><div class="pad sm" style="color:var(--g600)">' +
+      '<p style="margin:0 0 8px">Megaphone only answers from what it has logged. Every answer links to the action ID it came from, so you can check the reasoning, inputs and cost yourself.</p>' +
+      '<p style="margin:0">If it doesn\'t know, it says so and forwards the question to the human team.</p></div></div>' +
+      '<div class="card" style="margin-top:16px"><div class="card-head">' + ic('history', 15) + 'Recently cited</div>' +
+        ['A-1073', 'A-1087', 'A-1086', 'A-1085'].map(function (id) {
+          return '<div class="hist-row"><button class="link mono sm" data-act="goAction" data-id="' + id + '">' + id + '</button><span class="sm" style="flex:1;min-width:0">' + esc(actionTitle(id)) + '</span></div>';
+        }).join('') + '</div></div></div>';
+}
+function renderChat() {
+  var box = $('#msgs');
+  if (!box) return;
+  box.innerHTML = chatHtml();
+  box.scrollTop = box.scrollHeight;
+}
+function answer(q) {
+  var low = q.toLowerCase(), words = low.match(/[a-z]+/g) || [];
+  var best = null, bs = 0;
+  D.qa.forEach(function (item) {
+    var s = 0;
+    item.keys.forEach(function (k) {
+      var hit = k.indexOf(' ') > -1
+        ? low.indexOf(k) > -1
+        : words.some(function (w) { return w === k || (k.length >= 4 && w.indexOf(k) === 0); });
+      if (hit) s++;
+    });
+    if (s > bs) { bs = s; best = item; }
+  });
+  if (best) return { text: best.answer, ref: best.ref, matched: true };
+  return { text: 'I don\'t have a logged answer for that yet. I\'ve passed your question to the human team. You can also browse everything I\'ve done in the Activity tab.', ref: null, matched: false };
+}
+function ask(q) {
+  q = String(q || '').trim();
+  if (!q) return;
+  state.chat.push({ who: 'user', text: q });
+  state.typing = true;
+  renderChat();
+  setTimeout(function () {
+    var r = answer(q);
+    state.chat.push({ who: 'bot', text: r.text, ref: r.ref, matched: r.matched });
+    state.typing = false;
+    renderChat();
+  }, 750);
+}
+
+/* ---------------------------------------------------------------- router */
+var VIEWS = { campaign: vCampaign, activity: vActivity, approvals: vApprovals, prompt: vPrompt, tools: vTools, budget: vBudget, calls: vCalls, ask: vAsk };
+function renderView() {
+  $('#view').innerHTML = VIEWS[state.tab]();
+  if (state.tab === 'ask') { var b = $('#msgs'); if (b) b.scrollTop = b.scrollHeight; }
+  $('#footVer').textContent = state.prompt.version;
+}
+function render() { renderTags(); renderTabs(); renderView(); }
+function route() {
+  var h = decodeURIComponent(location.hash.slice(1));
+  var parts = h.split('/');
+  var t = parts[0];
+  var prev = state.tab;
+  state.tab = TABS.some(function (x) { return x.id === t; }) ? t : 'campaign';
+  clearReplay();
+  render();
+  if (prev !== state.tab) {
+    var top = $('#tabs').getBoundingClientRect().top + window.scrollY - 60;
+    if (window.scrollY > top) window.scrollTo(0, Math.max(0, top));
+  }
+  if (state.tab === 'activity' && parts[1]) openDetail(parts[1]);
+}
+function go(tab) {
+  if (state.tab === tab && location.hash === '#' + tab) renderView();
+  else location.hash = tab;
+}
+
+/* ----------------------------------------------------------------- toast */
+function toast(msg, kind) {
+  var t = document.createElement('div');
+  t.className = 'toast' + (kind ? ' ' + kind : '');
+  t.innerHTML = ic(kind === 'err' ? 'alert' : 'checkc', 16) + '<span>' + esc(msg) + '</span>';
+  $('#toasts').appendChild(t);
+  setTimeout(function () { t.classList.add('out'); }, 2600);
+  setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 3000);
+}
+function copyText(text) {
+  try {
+    navigator.clipboard.writeText(text).then(function () { toast('Copied to clipboard'); }, function () { toast('Copied (mock)'); });
+  } catch (e) { toast('Copied (mock)'); }
+}
+
+/* -------------------------------------------------------------- handlers */
+function findAppr(id) { return state.approvals.find(function (x) { return x.id === id; }); }
+var H = {
+  open: function (el) { openDetail(el.dataset.id); },
+  closeDrawer: closeDrawer,
+  goAction: function (el) {
+    if (state.tab !== 'activity') location.hash = 'activity';
+    openDetail(el.dataset.id);
+  },
+  askAbout: function (el) {
+    var a = state.actions.find(function (x) { return x.id === el.dataset.id; });
+    closeDrawer();
+    if (!a) return;
+    state.chat.push({ who: 'user', text: 'Why did you do ' + a.id + '?' });
+    state.chat.push({ who: 'bot', text: a.reasoning + ' Result: ' + a.output, ref: a.id, matched: true });
+    go('ask');
+  },
+  fStatus: function (el) { state.filter.status = el.dataset.s; renderView(); },
+  clearQ: function () { state.filter.q = ''; $('#globalSearch').value = ''; renderView(); },
+  toggleAppr: function (el) {
+    var id = el.dataset.id;
+    state.expanded[id] = !state.expanded[id];
+    if (!state.expanded[id]) delete state.editing[id];
+    refreshDisc(id);
+  },
+  edit: function (el) {
+    var id = el.dataset.id;
+    state.editing[id] = true;
+    refreshDisc(id);
+    var f = document.getElementById('ed-' + id);
+    if (f) f.focus();
+  },
+  cancelEdit: function (el) { delete state.editing[el.dataset.id]; refreshDisc(el.dataset.id); },
+  saveEdit: function (el) {
+    var id = el.dataset.id, p = findAppr(id);
+    if (!p) return;
+    var f = document.getElementById('ed-' + id), pv = p.preview;
+    if (!f) return;
+    if (pv.type === 'email') {
+      var s = document.getElementById('eds-' + id);
+      if (s) pv.subject = s.value;
+      pv.body = f.value;
+    } else if (pv.type === 'payment') {
+      var amt = Math.max(0, Number(f.value) || 0);
+      pv.amount = amt; p.cost = amt; p.title = 'Boost dues thread · ' + ils(amt);
+    } else if (pv.type === 'tweet') {
+      pv.text = f.value;
+    } else {
+      pv.script = f.value;
+    }
+    var r = resolve(id, 'approved', true);
+    render();
+    if (r) toast('Edited and approved: ' + r.title + (state.paused ? ' (queued, agent paused)' : ''));
+  },
+  approve: function (el) {
+    var r = resolve(el.dataset.id, 'approved', false);
+    render();
+    if (r) toast('Approved: ' + r.title + (state.paused ? ' (queued, agent paused)' : ''));
+  },
+  decline: function (el) {
+    var r = resolve(el.dataset.id, 'declined', false);
+    render();
+    if (r) toast('Declined: ' + r.title);
+  },
+  sendBack: function (el) {
+    var r = resolve(el.dataset.id, 'returned', false);
+    render();
+    if (r) toast('Sent back to Megaphone for a sourced rewrite');
+  },
+  promptEdit: function () {
+    state.prompt.editing = true;
+    renderView();
+    var t = $('#promptEdit');
+    if (t) t.focus();
+  },
+  promptCancel: function () { state.prompt.editing = false; renderView(); },
+  commit: function () {
+    var P = state.prompt, ta = $('#promptEdit'), msgEl = $('#commitMsg');
+    if (!ta) return;
+    var txt = ta.value;
+    var msg = (msgEl && msgEl.value.trim()) || 'Update system_prompt.md';
+    if (txt === P.text) { toast('No changes to commit', 'err'); return; }
+    var oldL = P.text.split('\n'), newL = txt.split('\n');
+    var add = newL.filter(function (l) { return oldL.indexOf(l) === -1; }).length;
+    var del = oldL.filter(function (l) { return newL.indexOf(l) === -1; }).length;
+    P.version++;
+    P.versions.unshift({ v: P.version, by: 'You', when: 'Just now', note: msg, add: add, del: del, text: txt });
+    P.text = txt;
+    P.editing = false;
+    renderView();
+    toast('Committed v' + P.version + ': ' + msg);
+  },
+  restore: function (el) {
+    var P = state.prompt, v = Number(el.dataset.v);
+    var h = P.versions.find(function (x) { return x.v === v; });
+    if (!h || !h.text) return;
+    var oldL = P.text.split('\n'), newL = h.text.split('\n');
+    P.version++;
+    P.versions.unshift({
+      v: P.version, by: 'You', when: 'Just now', note: 'Restore v' + v, text: h.text,
+      add: newL.filter(function (l) { return oldL.indexOf(l) === -1; }).length,
+      del: oldL.filter(function (l) { return newL.indexOf(l) === -1; }).length
+    });
+    P.text = h.text;
+    renderView();
+    toast('Restored v' + v + ' as v' + P.version);
+  },
+  mode: function (el) {
+    var t = state.tools.find(function (x) { return x.id === el.dataset.id; });
+    if (!t || t.mode === el.dataset.m) return;
+    t.mode = el.dataset.m;
+    renderView();
+    var lbl = { off: 'Off', ask: 'Ask first', auto: 'Auto' }[t.mode];
+    toast(t.name + ' set to ' + lbl);
+  },
+  addTool: function (el) {
+    var i = state.store.findIndex(function (s) { return s.id === el.dataset.id; });
+    if (i < 0) return;
+    var s = state.store.splice(i, 1)[0];
+    state.tools.push({ id: s.id, name: s.name, icon: s.icon, mode: 'off', quota: 10, used: 0, unit: 'actions / day', desc: s.desc, provider: s.via });
+    renderView();
+    toast(s.name + ' added (Off). Set a mode to enable it.');
+  },
+  rule: function (el) {
+    var r = state.budget.rules.find(function (x) { return x.id === el.dataset.id; });
+    if (!r) return;
+    r.on = !r.on;
+    $('#rules').innerHTML = rulesHtml();
+    toast((r.on ? 'Enabled: ' : 'Disabled: ') + r.text.replace(/\{auto\}/g, fmt(state.budget.autoLimit)));
+  },
+  freeze: function () {
+    state.frozen = !state.frozen;
+    renderView();
+    toast(state.frozen ? 'Card frozen. All payments will be declined.' : 'Card unfrozen');
+  },
+  call: function (el) { state.callId = el.dataset.id; clearReplay(); renderView(); },
+  replay: replay,
+  askChip: function (el) {
+    ask(el.dataset.q);
+    if (state.tab !== 'ask') location.hash = 'ask';
+  },
+  clearChat: function () { state.chat = []; state.typing = false; renderChat(); },
+  pause: function () {
+    state.paused = !state.paused;
+    renderTags(); renderPause();
+    if (state.tab === 'campaign') renderView(); else updateLive();
+    toast(state.paused ? 'Agent paused. Nothing new will run until resumed.' : 'Agent resumed');
+  },
+  team: function () {
+    state.team = !state.team;
+    document.body.classList.toggle('public', !state.team);
+    $('#teamSwitch').classList.toggle('on', state.team);
+    if (!state.team) { state.prompt.editing = false; state.editing = {}; }
+    render();
+    toast(state.team ? 'Team view: management controls on' : 'Public view: what visitors see');
+  },
+  like: function () {
+    state.liked = !state.liked;
+    state.supporters += state.liked ? 1 : -1;
+    renderCounters();
+    if (state.liked) toast('Thanks for supporting the campaign');
+  },
+  follow: function () {
+    state.followed = !state.followed;
+    state.followers += state.followed ? 1 : -1;
+    renderCounters();
+  },
+  copy: function (el) { copyText(el.dataset.text || ''); },
+  docs: function () {
+    setTimeout(function () { var r = $('#readme'); if (r) r.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
+  },
+  toastOnly: function (el) { toast(el.dataset.msg || 'Done'); }
+};
+
+var CH = {
+  fTool: function (el) { state.filter.tool = el.value; renderView(); },
+  quota: function (el) {
+    var t = state.tools.find(function (x) { return x.id === el.dataset.id; });
+    if (!t) return;
+    t.quota = Math.max(0, parseInt(el.value, 10) || 0);
+    renderView();
+    toast(t.name + ' quota set to ' + t.quota + ' ' + t.unit);
+  },
+  autoLimitDone: function () { toast('Auto-approve limit set to ' + ils(state.budget.autoLimit)); }
+};
+
+document.addEventListener('click', function (e) {
+  var el = e.target.closest('[data-act]');
+  if (!el || el.disabled) return;
+  var fn = H[el.dataset.act];
+  if (fn) fn(el, e);
+});
+document.addEventListener('change', function (e) {
+  var el = e.target.closest('[data-change]');
+  if (!el) return;
+  var fn = CH[el.dataset.change];
+  if (fn) fn(el, e);
+});
+document.addEventListener('input', function (e) {
+  var el = e.target;
+  if (el.dataset && el.dataset.input === 'autoLimit') {
+    state.budget.autoLimit = Number(el.value) || 0;
+    var v = $('#autoVal');
+    if (v) v.textContent = ils(state.budget.autoLimit);
+    var r = $('#rules');
+    if (r) r.innerHTML = rulesHtml();
+  }
+});
+document.addEventListener('submit', function (e) {
+  var f = e.target;
+  if (!f.dataset || !f.dataset.form) return;
+  e.preventDefault();
+  var inp = f.querySelector('input[name="q"]');
+  var q = inp ? inp.value : '';
+  if (!q.trim()) return;
+  if (inp) inp.value = '';
+  ask(q);
+  if (f.dataset.form === 'mini') location.hash = 'ask';
+});
+document.addEventListener('keydown', function (e) {
+  var tag = (e.target.tagName || '').toLowerCase();
+  if (e.key === 'Escape' && state.drawerId) closeDrawer();
+  if (e.key === '/' && tag !== 'input' && tag !== 'textarea' && tag !== 'select') {
+    e.preventDefault();
+    $('#globalSearch').focus();
+  }
+});
+$('#globalSearch').addEventListener('input', function (e) {
+  state.filter.q = e.target.value.trim();
+  if (state.tab !== 'activity') location.hash = 'activity';
+  else renderView();
+});
+window.addEventListener('hashchange', route);
+
+/* ------------------------------------------------------------ simulation */
+function simulate() {
+  if (state.paused || state.liveIdx >= D.liveEvents.length) return;
+  var ev = clone(D.liveEvents[state.liveIdx++]);
+  var id = 'A-' + (state.nextId++);
+  var a = {
+    id: id, time: nowHM(), tool: ev.tool, title: ev.title, status: ev.status, policy: ev.policy, cost: ev.cost,
+    tokens: 800 + Math.floor(Math.random() * 4000), reasoning: ev.reasoning, output: ev.output,
+    input: { trigger: 'live monitor', tool: ev.tool }, fresh: true
+  };
+  state.actions.unshift(a);
+  state.added++;
+  var tool = state.tools.find(function (t) { return t.id === ev.tool; });
+  if (tool && ev.status === 'executed') tool.used += ev.tool === 'payments' ? ev.cost : 1;
+  if (ev.tool === 'payments' && ev.status === 'executed') {
+    state.budget.dailySpent += ev.cost;
+    state.budget.monthlySpent += ev.cost;
+    state.budget.expenses.unshift({ time: 'Today ' + a.time, vendor: 'Unsplash+', desc: 'Stock photo license', amount: ev.cost, status: 'auto' });
+  }
+  if (ev.status === 'pending') {
+    state.approvals.unshift({
+      id: 'P-' + (state.nextP++), actionId: id, tool: ev.tool, title: 'Research summary to 3 journalists', why: 'Email always requires approval', risk: 'Low', cost: ev.cost,
+      audience: '3 journalists from the press list', reasoning: ev.reasoning,
+      preview: { type: 'email', subject: 'Research summary: union finances (6 pages, sourced)', body: 'Hi {first_name},\n\nAs requested, here is our 6-page research summary on union financial transparency. Every claim links to a primary source.\n\nHappy to answer questions or connect you with our team.\n\nThis message was written by Megaphone, the campaign\'s AI agent, and approved by our team.\n\n— Transparent Histadrut' }
+    });
+    toast('New approval request: ' + ev.title);
+  }
+  renderTabs();
+  var editingSomething = Object.keys(state.editing).length > 0 || state.prompt.editing;
+  if (state.tab === 'activity' || (state.tab === 'approvals' && ev.status === 'pending' && !editingSomething)) renderView();
+  setTimeout(function () { a.fresh = false; }, 1700);
+}
+
+/* ------------------------------------------------------------------ init */
+$('#logoMark').innerHTML = logo(17);
+$('#logoMark2').innerHTML = logo(13);
+$('#searchIcon').innerHTML = ic('search', 15);
+$('#copyBtn').innerHTML = ic('copy', 15);
+$('#footOps').innerHTML = ic('bolt', 14) + 'Full ops room';
+$('#footCalm').innerHTML = ic('eye', 14) + 'Calm version';
+renderCounters();
+renderPause();
+route();
+setInterval(function () {
+  if (state.paused) return;
+  state.thought = (state.thought + 1) % D.thoughts.length;
+  updateLive();
+}, 4500);
+setInterval(simulate, 22000);
+})();
+</script>
+</body>
+</html>
